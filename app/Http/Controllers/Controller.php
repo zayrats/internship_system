@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -14,7 +15,9 @@ class Controller
 {
     public function index(Request $request)
     {
-        return view('homepage');
+
+    return view('homepage');
+
     }
 
     public function history(Request $request)

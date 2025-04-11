@@ -14,6 +14,7 @@ class Students extends Model
     public $timestamps = true; // Jika tidak menggunakan created_at & updated_at, ubah ke false
 
     protected $fillable = [
+        'user_id',
         'name',
         'student_number',
         'email',
@@ -21,6 +22,13 @@ class Students extends Model
         'prodi',
         'department',
         'year',
+        'phone',
+        'address',
+        'instagram',
+        'birthdate',
+        'gender',
+        'profile_picture',
+        'cv',
     ];
 
     protected $hidden = [
@@ -31,5 +39,10 @@ class Students extends Model
     public function internships()
     {
         return $this->hasMany(Internship::class, 'student_id', 'student_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

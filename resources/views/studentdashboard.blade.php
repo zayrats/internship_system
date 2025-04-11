@@ -20,7 +20,7 @@
             </a>
         </div>
         <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-54 md:rounded-none md:rounded-s-lg"
-            src="../image/internship.jpg" alt="internship">
+            src="https://www.pens.ac.id/wp-content/uploads/2023/12/cover-web-ionic-1080x675.jpg" alt="internship">
     </div>
 
 

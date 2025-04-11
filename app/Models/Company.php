@@ -17,6 +17,12 @@ class Company extends Model
         'name',
         'address',
         'logo',
+        'user_id',
+        'contact_email',
+        'contact_phone',
+        'description',
+        'x_coordinate',
+        'y_coordinate',
     ];
 
     // Relasi ke internship

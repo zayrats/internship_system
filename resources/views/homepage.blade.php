@@ -1,112 +1,135 @@
 @extends('master')
 @section('content')
-    <div
-        class="flex flex-col items-center bg-white border border-gray-200  shadow-sm md:flex-row  dark:border-gray-700 dark:bg-gray-800 ">
-        <div class="flex flex-col justify-between p-4 leading-normal pt-16 pb-10 px-10">
-            <h3 class="mb-2 text-5xl font-semibold tracking-tight text-gray-900 dark:text-white">Kisahmu jadi bekalku</h3>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Temukan informasi magang yang komprehensif
-                dari rekan-rekan senior, jelajahi kisah sukses mereka, dan terhubung langsung dengan mereka melalui platform yang disediakan
-                kontak di BAK.</p>
-            <a href="{{ route('internship') }}"
-                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                Ayo Buat Kisahmu
-                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
-                    fill="none" viewBox="0 0 14 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M1 5h12m0 0L9 1m4 4L9 9" />
-                </svg>
-            </a>
-        </div>
-        <img class="object-cover m-6    max-w-3xl rounded-t-lg md:h-72  md:w-54 md:rounded-l-lg"
-            src="https://www.pens.ac.id/wp-content/uploads/2023/12/cover-web-ionic-1080x675.jpg" alt="internship">
-    </div>
-
-
-    <div
-        class="flex flex-col items-center bg-white border border-gray-200 h-60 shadow-sm md:flex-row md:max-w-full hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-700 dark:hover:bg-gray-700">
-        <!-- Bungkus gambar dengan <a> -->
-        <a href="{{ route('maps') }}" class="group">
-            <img class="mx-20 object-cover w-full rounded-t-lg md:h-auto md:w-60 md:rounded-none md:rounded-s-lg transition-transform duration-300 ease-in-out transform group-hover:scale-110"
-                src="http://2.bp.blogspot.com/-zsKt2Xv7pb0/UV2PedQ4tgI/AAAAAAAAACY/09wKfwHFdSM/s1600/peta+perekonomian.gif"
-                alt="maps image">
-        </a>
-
-        <!-- Bagian teks tetap tanpa link -->
-        <div class="flex flex-col justify-between p-4 leading-normal">
-            <h5 class="mb-2 text-5xl font-bold tracking-tight text-gray-900 dark:text-white">Magang di Seluruh Indonesia</h5>
-            <p class="mb-3 text-xl font-normal text-gray-700 dark:text-gray-400">Lihat siswa yang telah melakukan magang
-                di seluruh Indonesia</p>
-        </div>
-    </div>
-
-
-    {{-- menampilkan chat grup --}}
-    <div
-        class="flex flex-col  bg-white border border-gray-200 h-auto  shadow-sm md:flex-col md:max-w-full  dark:border-gray-700 dark:bg-gray-600  ">
-        <h3 class="pt-5 mb-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white text-center">Forum Diskusi
-        </h3>
-        <div class="flex items-start gap-2.5 mx-20">
-            <div class="flex flex-col gap-1 w-full max-w-[320px]">
-                <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                    <span class="text-sm font-semibold text-gray-900 dark:text-white">Bonnie Green</span>
-                    <span class="text-sm font-normal text-gray-500 dark:text-gray-400">11:46</span>
+    <div class="min-h-screen p-3  bg-gray-100 dark:bg-gray-700">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Section 1: Hero -->
+            <div class="flex flex-col bg-gray-500 bg-opacity-50 shadow-md rounded-xl overflow-hidden">
+                <div class="p-6 lg:p-8">
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white">Kisahmu jadi bekalku</h3>
+                    <p class="mt-2 text-gray-900 dark:text-white">
+                        Temukan informasi magang yang komprehensif dari rekan-rekan senior, jelajahi kisah sukses mereka,
+                        dan
+                        terhubung langsung.
+                    </p>
+                    <a href="{{ route('internship') }}"
+                        class="mt-4 inline-flex items-center px-5 py-2.5 text-white bg-gray-700 rounded-lg shadow-md hover:bg-gray-700 transition font-semibold">
+                        Ayo Buat Kisahmu
+                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
                 </div>
-                <div
-                    class="flex flex-col leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-                    <p class="text-sm font-normal text-gray-900 dark:text-white"> That's awesome. I think our users will
-                        really appreciate the improvements.</p>
-                </div>
-                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
+                <img class="w-full h-52 object-cover"
+                    src="https://www.pens.ac.id/wp-content/uploads/2023/12/cover-web-ionic-1080x675.jpg" alt="internship">
             </div>
 
-        </div>
-        <div class="pt-4 flex flex-col gap-2.5 mx-20">
-
-            <form>
-                <label for="chat" class="sr-only">ketik pesan anda disini</label>
-                <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
-                    <button type="button"
-                        class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 20 18">
-                            <path fill="currentColor"
-                                d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z" />
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18 1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z" />
-                        </svg>
-                        <span class="sr-only">Upload image</span>
-                    </button>
-                    <button type="button"
-                        class="p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13.408 7.5h.01m-6.876 0h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM4.6 11a5.5 5.5 0 0 0 10.81 0H4.6Z" />
-                        </svg>
-                        <span class="sr-only">Add emoji</span>
-                    </button>
-                    <textarea id="chat" rows="1"
-                        class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Your message..."></textarea>
-                    <button type="submit"
-                        class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600">
-                        <svg class="w-5 h-5 rotate-90 rtl:-rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor" viewBox="0 0 18 20">
-                            <path
-                                d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
-                        </svg>
-                        <span class="sr-only">Send message</span>
-                    </button>
+            <!-- Section 2: Maps -->
+            <div class="flex flex-col bg-gray-500 bg-opacity-50 shadow-md rounded-xl overflow-hidden">
+                <a href="{{ route('maps') }}" class="group">
+                    <img class="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-105"
+                        src="http://2.bp.blogspot.com/-zsKt2Xv7pb0/UV2PedQ4tgI/AAAAAAAAACY/09wKfwHFdSM/s1600/peta+perekonomian.gif"
+                        alt="maps">
+                </a>
+                <div class="p-6 lg:p-8">
+                    <h5 class="text-2xl font-bold text-gray-900 dark:text-white">Magang di Seluruh Indonesia</h5>
+                    <p class="mt-2 text-gray-900 dark:text-white">
+                        Lihat siswa yang telah melakukan magang di seluruh Indonesia.
+                    </p>
                 </div>
-            </form>
-
+            </div>
         </div>
 
+        <!-- Chat Section -->
+        <div class="mt-10 bg-gray-600 bg-opacity-50 shadow-md rounded-xl overflow-hidden">
+            <h3 class="text-center text-2xl font-bold py-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Forum Diskusi</h3>
+            <div class="p-6">
+                <div class="max-w-6xl mx-auto">
+                    <!-- Tempat Menampilkan Pesan Chat -->
+                    <div id="chat-messages"
+                        class="min-h-[500px] overflow-y-auto bg-gray-100 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 shadow-sm flex flex-col-reverse">
+                        <p class="text-gray-900 dark:text-white text-center">Memuat pesan...</p>
+                    </div>
+
+                    <!-- Form Chat -->
+                    <form id="chat-form" class="mt-4 flex gap-2">
+                        <textarea id="chat-input" rows="1"
+                            class="flex-1 p-2.5 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-gray-600 focus:border-gray-600"
+                            placeholder="Tulis pesan..."></textarea>
+                        <button type="submit"
+                            class="p-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-700 transition">
+                            <svg class="w-6 h-6 rotate-90" fill="currentColor" viewBox="0 0 18 20">
+                                <path
+                                    d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const chatMessages = document.getElementById("chat-messages");
+            const chatForm = document.getElementById("chat-form");
+            const chatInput = document.getElementById("chat-input");
+
+            // 🔄 Fetch pesan chat saat halaman dimuat
+            function fetchMessages() {
+                fetch("/chat/messages")
+                    .then(response => response.json())
+                    .then(data => {
+                        chatMessages.innerHTML = ""; // Kosongkan chat sebelum diisi ulang
+
+                        // Tambahkan pesan ke dalam container (biar urutan benar)
+                        data.forEach(chat => {
+                            let messageElement = document.createElement("div");
+                            messageElement.classList.add("mb-2");
+                            messageElement.innerHTML = `
+                        <strong class=" text-blue-500">${chat.user.username}</strong>
+                        <p class="text-gray-900 dark:text-white">${chat.message}</p>
+                    `;
+                            chatMessages.appendChild(
+                                messageElement); // Tambahkan pesan dari atas ke bawah
+                        });
+                    })
+                    .catch(error => console.error("Error fetching messages:", error));
+            }
+
+            // ▶️ Jalankan fetchMessages tiap 5 detik untuk update otomatis
+            setInterval(fetchMessages, 5000);
+            fetchMessages(); // Jalankan pertama kali saat halaman dimuat
+
+            // 📨 Kirim pesan ke server
+            chatForm.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const message = chatInput.value.trim();
+                if (message === "") return;
+
+                fetch("/chat/send", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            message: message
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        chatInput.value = ""; // Kosongkan input setelah kirim
+                        fetchMessages(); // Ambil pesan terbaru
+                    })
+                    .catch(error => console.error("Error sending message:", error));
+            });
+        });
+    </script>
+
+
+
+    {{-- <div
         class="flex flex-col  bg-white border border-gray-200 h-auto  shadow-sm md:flex-col md:max-w-full  dark:border-gray-700 dark:bg-gray-500  ">
         <h3 class="pt-5 mb-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white text-center">
             Cerita Mahasiswa
@@ -246,5 +269,5 @@
             <button type="button" {{ route('history') }}
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Lihat lebih banyak</button>
         </div>
-    </div>
+    </div> --}}
 @endsection

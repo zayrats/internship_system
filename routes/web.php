@@ -1,16 +1,21 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ApplicationsController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\Logincontroller;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\VacancyController;
 
 Route::middleware(['web'])->group(function () {
 
     Route::get('/', [Controller::class, 'index'])->name('home');
+    Route::get('/chat/messages', [ChatController::class, 'index']); // Ambil semua chat terbaru
     Route::get('/login', [Logincontroller::class, 'login'])->name('login');
     Route::post('actionlogin', [LoginController::class, 'actionlogin'])->name('actionlogin');
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -24,12 +29,19 @@ Route::middleware(['web'])->group(function () {
         Route::post('/internship/{id}', [InternshipController::class, 'internshipapply'])->name('internshipapply');
         Route::get('/internship/{id}/document', [Controller::class, 'internshipdocument'])->name('internshipdocument');
         Route::get('/history', [InternshipController::class, 'history'])->name('history');
+        Route::post('/history/{id}/delete', [InternshipController::class, 'deleteHistory'])->name('deleteHistory');
+        Route::post('/history/submit-feedback', [InternshipController::class, 'submitHistoryFeedback'])->name('submitHistoryFeedback');
+        Route::post('/history/{id}/upload-kp-book', [InternshipController::class, 'uploadKpBook'])->name('uploadKpBook');
         Route::get('/maps', [Controller::class, 'maps'])->name('maps');
         Route::get('/profile', [InternshipController::class, 'profile'])->name('profile');
         Route::post('/profile/update', [InternshipController::class, 'updateProfile'])->name('profile.update');
-        Route::post('/profile/submit-feedback', [InternshipController::class, 'submitInternshipFeedback'])->name('profile.submitInternshipFeedback');
-        Route::post('/profile/upload-kp', [InternshipController::class, 'uploadKpBook'])->name('profile.uploadKpBook');
+        // Route::post('/profile/submit-feedback', [InternshipController::class, 'submitInternshipFeedback'])->name('profile.submitInternshipFeedback');
         Route::get('/our-story', [InternshipController::class, 'internexperience'])->name('internexperience');
+
+
+        //chat
+
+        Route::post('/chat/send', [ChatController::class, 'store']); // Kirim chat baru
     });
 
 
@@ -37,34 +49,57 @@ Route::middleware(['web'])->group(function () {
     Route::group(['middleware' => ['auth', 'role:Perusahaan']], function () {
         //login as company
         //menampilkan form untuk pengisian data perusahaan
-        Route::get('/company', [Controller::class, 'companydashboard'])->name('companydashboard');
+        Route::get('/company', [CompanyController::class, 'companydashboard'])->name('companydashboard');
         //menyimpan data perusahaan
-        Route::post('actionsavecompany', [Controller::class, 'actionsavecompany'])->name('actionsavecompany');
+        Route::post('/company/save', [CompanyController::class, 'actionsavecompany'])->name('actionsavecompany');
         //membuat lowongan magang
-        Route::get('/company/companyinternship', [Controller::class, 'companyinternship'])->name('companyinternship');
-        //membuka lowongan magang
-        Route::post('actionopeninternship', [Controller::class, 'actionopeninternship'])->name('actionopeninternship');
+        Route::get('/company/vacancies', [VacancyController::class, 'companyinternship'])->name('vacancy.index');
+        Route::post('/company/vacancies/store', [VacancyController::class, 'store'])->name('vacancy.store');
+        Route::delete('/company/vacancies/{id}', [VacancyController::class, 'destroy'])->name('vacancy.delete');
+
         //mengambil data mahasiswa pelamar magang
-        Route::get('/company/getstudent', [Controller::class, 'getstudent'])->name('getstudent');
-        //menyeleksi mahasiswa
-        Route::post('actionselectstudent', [Controller::class, 'actionselectstudent'])->name('actionselectstudent');
+        Route::get('/company/applications', [ApplicationsController::class, 'internapplications'])->name('applications.index');
+        Route::post('/company/applications/{id}/approve', [ApplicationsController::class, 'approve'])->name('applications.approve');
+        Route::post('/company/applications/{id}/reject', [ApplicationsController::class, 'reject'])->name('applications.reject');
+
+        //monitor
+        Route::get('/company/monitor', [VacancyController::class, 'monitor'])->name('vacancymonitor');
+
     });
 
 
     Route::group(['middleware' => ['auth', 'role:Dosen']], function () {
         //login as lecturer
         Route::get('/lecturerdashboard', [Controller::class, 'lecturerdashboard'])->name('lecturerdashboard');
-        Route::get('/lecturerinternship', [Controller::class, 'lecturerinternship'])->name('lecturerinternship');
-        Route::get('/lecturerinternship/{id}', [Controller::class, 'lecturerinternshipdetail'])->name('lecturerinternshipdetail');
-        Route::get('/lecturerinternship/{id}/document', [Controller::class, 'lecturerinternshipdocument'])->name('lecturerinternshipdocument');
     });
 
 
     Route::group(['middleware' => ['auth', 'role:Admin']], function () {
         //login as admin
-        Route::get('/admindashboard', [Controller::class, 'admindashboard'])->name('admindashboard');
-        Route::get('/detailuser/{id} ', [Controller::class, 'detailuser'])->name('detailuser');
-        Route::post('updateuser/{id}', [Controller::class, 'updateuser'])->name('updateuser');
-        Route::post('deleteuser/{id}', [Controller::class, 'deleteuser'])->name('deleteuser');
+        Route::get('/admindashboard', [AdminController::class, 'admindashboard'])->name('admindashboard');
+        Route::get('/admin/detailuser/{id} ', [AdminController::class, 'detailuser'])->name('detailuser');
+        Route::post('/admin/updateuser/{id}', [AdminController::class, 'updateuser'])->name('updateuser');
+        Route::post('/admin/deleteuser/{id}', [Controller::class, 'deleteuser'])->name('deleteuser');
+
+        //try
+        Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
+        Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
+        Route::put('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+
+        Route::get('/admin/monitoring', [AdminController::class, 'monitoringMahasiswa'])->name('admin.monitoring');
+        Route::get('/admin/internships', [AdminController::class, 'rekapInternships'])->name('admin.internships');
+        Route::get('/admin/internships/export', [AdminController::class, 'exportInternships'])->name('admin.internships.export');
+        Route::get('/admin/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
+
+
+        Route::get('/admin/internship/{id}', [Controller::class, 'lecturerinternshipdetail'])->name('lecturerinternshipdetail');
+        Route::get('admin/internship/{id}/document', [Controller::class, 'lecturerinternshipdocument'])->name('lecturerinternshipdocument');
+
+
+        Route::get('/admin/jobs', [AdminController::class, 'manageJobs'])->name('admin.jobs');
+        Route::put('/admin/jobs/{id}', [AdminController::class, 'updateJob'])->name('admin.jobs.update');
+        Route::delete('/admin/jobs/{id}', [AdminController::class, 'deleteJob'])->name('admin.jobs.delete');
     });
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Students;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +34,7 @@ class Logincontroller
 
             switch ($user->role) {
                 case 'Mahasiswa':
-                    return redirect()->route('studentdashboard');
+                    return redirect()->route('home');
                     break;
                 case 'Perusahaan':
                     return redirect()->route('companydashboard');
@@ -43,7 +44,7 @@ class Logincontroller
                     break;
 
                 case 'Admin':
-                    return redirect()->route('admindashboard');
+                    return redirect()->route('admin.users');
                     break;
                 default:
                     Auth::logout();
@@ -72,14 +73,37 @@ class Logincontroller
 
     public function actionregister(Request $request)
     {
-        $user = User::create([
-            'email' => $request->input('email'),
-            'username' => $request->input('username'),
-            'password' => Hash::make($request->input('password')),
-            'role' => $request->input('role'),
+        DB::beginTransaction(); // 🔹 Mulai transaksi database
+        request()->validate([
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'required',
         ]);
+        try {
+            // 🔹 Simpan data user
+            $user = User::create([
+                'email' => $request->input('email'),
+                'username' => $request->input('username'),
+                'password' => Hash::make($request->input('password')),
+                'role' => $request->input('role'),
+            ]);
+            // 🔹 Jika user mendaftar sebagai mahasiswa, tambahkan ke tabel students
+            if ($user->role === 'Mahasiswa') {
+                Students::create([
+                    'user_id' => $user->user_id, // 🔹 Pastikan tabel students punya kolom user_id
+                ]);
+            }
 
-        Session::flash('message', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');
-        return redirect('login');
+            DB::commit(); // 🔹 Simpan perubahan jika semua berhasil
+
+            Session::flash('message', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');
+            return redirect('login');
+        } catch (\Exception $e) {
+            DB::rollback(); // ❌ Batalkan semua perubahan jika terjadi error
+
+            Session::flash('error', 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.');
+            return redirect()->back()->withInput();
+        }
     }
 }

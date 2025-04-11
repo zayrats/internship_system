@@ -4,10 +4,9 @@
     <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-700">
         <div
             class="p-12  bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700  max-w-2xl mx-auto">
-            <br>
             <div class="max-w-xl mx-auto">
-                <h2 class="text-center text-2xl font-bold">SIGN IN</h2>
-                <p class="text-center text-gray-600 dark:text-gray-300">Start Your Internship</p>
+                <h2 class="text-center text-2xl font-bold pb-1">SIGN IN</h2>
+                <p class="text-center text-gray-600 dark:text-gray-300">Mulai Perjalanan Magangmu disini</p>
                 <hr class="my-4 border-gray-300 dark:border-gray-600">
 
                 @if (session('error'))
@@ -37,13 +36,13 @@
 
                     <button type="submit"
                         class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                        Sign In
+                        Masuk
                     </button>
                 </form>
 
                 <hr class="my-4 border-gray-300 dark:border-gray-600">
                 <p class="text-center text-gray-600 dark:text-gray-300">Belum punya akun? <a href="{{ route('register') }}"
-                        class="text-blue-600 hover:underline dark:text-blue-400">Register</a> sekarang!</p>
+                        class="text-blue-600 hover:underline dark:text-blue-400">Daftar</a> sekarang!</p>
             </div>
         </div>
     </div>
