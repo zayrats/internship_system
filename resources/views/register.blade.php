@@ -106,4 +106,25 @@
             });
         });
     </script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const role = document.getElementById('role').value;
+
+            let errorMessage = '';
+
+            if (!email || !username || !password || !role) {
+                errorMessage = 'Semua field harus diisi!';
+            } else if (password.length < 8) {
+                errorMessage = 'Password minimal harus terdiri dari 8 karakter!';
+            }
+
+            if (errorMessage) {
+                e.preventDefault(); // Stop form submission
+                alert(errorMessage);
+            }
+        });
+    </script>
 @endsection
