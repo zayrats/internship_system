@@ -314,7 +314,7 @@
                 <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-6 relative">
                     <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Tambah Pengajuan KP</h3>
 
-                    <form id="applicationForm" action="{{ route('internshipapply', ['id' => $item->vacancy_id]) }}"
+                    <form id="applicationForm" action="{{ route('internshipapply', ['id' => $item->vacancy_id ?? '']) }}"
                         method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
 
