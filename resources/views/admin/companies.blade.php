@@ -72,6 +72,7 @@
                 <table id="vacanciesTable" class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-100 text-gray-600 uppercase text-sm">
                         <tr>
+                            <th class="px-6 py-3 text-left">Perusahaan</th>
                             <th class="px-6 py-3 text-left">Divisi</th>
                             <th class="px-6 py-3 text-left">Jenis</th>
                             <th class="px-6 py-3 text-left">Durasi</th>
@@ -82,6 +83,7 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                         @foreach ($vacancies as $vacancy)
                             <tr>
+                                <td class="px-6 py-4">{{ $vacancy->company->name }}</td>
                                 <td class="px-6 py-4">{{ $vacancy->division }}</td>
                                 <td class="px-6 py-4">{{ strtoupper($vacancy->type) }}</td>
                                 <td class="px-6 py-4">{{ $vacancy->duration }} bulan</td>

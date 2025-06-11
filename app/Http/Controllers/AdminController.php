@@ -298,8 +298,8 @@ class AdminController
         // dd($request->all());
         $company = new Company();
         $company->name = $request->name;
-        $company->email = $request->email;
-        $company->phone = $request->phone;
+        $company->contact_email = $request->email;
+        $company->contact_phone = $request->phone;
         $company->address = $request->address;
         $company->x_coordinate = $request->x_coordinate;
         $company->y_coordinate = $request->y_coordinate;
