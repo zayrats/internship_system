@@ -91,7 +91,7 @@
                         Informasi KP</a></li>
                 <li><a href="{{ route('history') }}"
                         class="transition-all duration-300 hover:text-blue-600 {{ Request::routeIs('history') ? 'text-blue-600 font-bold' : 'text-gray-700 dark:text-gray-300' }}">
-                        Riwayat</a></li>
+                        Pengajuan KP</a></li>
                 <li><a href="{{ route('internexperience') }}"
                         class="transition-all duration-300 hover:text-blue-600 {{ Request::routeIs('internexperience') ? 'text-blue-600 font-bold' : 'text-gray-700 dark:text-gray-300' }}">
                         Laporan KP</a></li>
