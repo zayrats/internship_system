@@ -36,7 +36,7 @@
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         <i class="fa fa-envelope mr-1"></i>Email
                     </label>
-                    <input type="email" name="email" id="email" placeholder="your@email.com"
+                    <input type="email" name="email" id="email" placeholder="contoh@email.com"
                         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         required>
                 </div>

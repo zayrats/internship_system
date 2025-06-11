@@ -58,7 +58,6 @@ class LoginController
     }
 
 
-
     public function logout()
     {
         Auth::logout();
@@ -79,7 +78,7 @@ class LoginController
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required',
+            // 'role' => 'required',
         ]);
         try {
             // 🔹 Simpan data user
@@ -87,7 +86,7 @@ class LoginController
                 'email' => $request->input('email'),
                 'username' => $request->input('username'),
                 'password' => Hash::make($request->input('password')),
-                'role' => $request->input('role'),
+                'role' => ('Mahasiswa'),
             ]);
             // 🔹 Jika user mendaftar sebagai mahasiswa, tambahkan ke tabel students
             if ($user->role === 'Mahasiswa') {
@@ -97,12 +96,12 @@ class LoginController
             }
 
             //jika user mendaftar sebagai perusahaan, tambahkan ke tabel company
-            if ($user->role === 'Perusahaan') {
-                Company::create([
-                    'user_id' => $user->user_id, // 🔹 Pastikan tabel company punya kolom user_id
-                ]);
-                // dd(request()->all());
-            }
+            // if ($user->role === 'Perusahaan') {
+            //     Company::create([
+            //         'user_id' => $user->user_id, // 🔹 Pastikan tabel company punya kolom user_id
+            //     ]);
+            //     // dd(request()->all());
+            // }
             DB::commit(); // 🔹 Simpan perubahan jika semua berhasil
 
             Session::flash('message', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');

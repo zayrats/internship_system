@@ -47,7 +47,7 @@
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             <i class="fa fa-envelope mr-1"></i>Email
                         </label>
-                        <input type="email" name="email" id="email" placeholder="your@email.com"
+                        <input type="email" name="email" id="email" placeholder="contoh@email.com"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             required>
                     </div>
@@ -56,7 +56,7 @@
                         <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             <i class="fa fa-user mr-1"></i>Username
                         </label>
-                        <input type="text" name="username" id="username" placeholder="your_username"
+                        <input type="text" name="username" id="username" placeholder="nama123"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             required>
                     </div>
@@ -69,7 +69,7 @@
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             required>
                     </div>
-
+{{--
                     <div>
                         <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             <i class="fa fa-briefcase mr-1"></i>Role
@@ -80,7 +80,7 @@
                                 <option value="{{ $role }}">{{ ucfirst($role) }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
 
                     <button type="submit"
                         class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800">
@@ -111,7 +111,7 @@
             const email = document.getElementById('email').value.trim();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
-            const role = document.getElementById('role').value;
+            // const role = document.getElementById('role').value;
 
             let errorMessage = '';
 

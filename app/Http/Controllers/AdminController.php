@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Internship;
+use App\Models\User;
 use App\Models\Vacancy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Request;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController
 {
@@ -252,6 +255,7 @@ class AdminController
     }
     public function updateCompany(Request $request, $id)
     {
+        $company = Company::findOrFail($id);
         $request->validate([
             'name' => 'required',
             'description' => 'required',
@@ -270,9 +274,32 @@ class AdminController
             'address' => $request->address,
             'x_coordinate' => $request->x_coordinate,
             'y_coordinate' => $request->y_coordinate,
-            'logo' => $request->logo
+            // 'logo' => $request->logo
         ]);
+        // try {
+                $logo = $request->file('logo');
 
+                // Hapus logo lama jika ada
+                if ($company->logo) {
+                    $oldPath = str_replace(url('/storage'), '', $company->logo);
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                // Generate nama file unik
+                $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
+
+                // Simpan file ke storage
+                $path = $logo->storeAs('company_logos', $fileName, 'public');
+
+                // Dapatkan URL publik
+                $logoUrl = Storage::url($path);
+
+                // Update database
+                $company->logo = $logoUrl;
+                $company->save();
+
+                return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
+            // }
 
         return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
     }
@@ -305,7 +332,25 @@ class AdminController
         $company->y_coordinate = $request->y_coordinate;
         $company->logo = $request->logo;
         $company->save();
+// try {
+                $logo = $request->file('logo');
 
+
+                // Generate nama file unik
+                $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
+
+                // Simpan file ke storage
+                $path = $logo->storeAs('company_logos', $fileName, 'public');
+
+                // Dapatkan URL publik
+                $logoUrl = Storage::url($path);
+
+                // Update database
+                $company->logo = $logoUrl;
+                $company->save();
+
+                // return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
+            // };
 
         return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil ditambahkan');
     }
