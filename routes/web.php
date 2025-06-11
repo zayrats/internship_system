@@ -5,7 +5,7 @@ use App\Http\Controllers\ApplicationsController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InternshipController;
-use App\Http\Controllers\Logincontroller;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
@@ -17,10 +17,10 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/', [Controller::class, 'index'])->name('home');
     // Route::get('/chat/messages', [ChatController::class, 'index']); // Ambil semua chat terbaru
-    Route::get('/login', [Logincontroller::class, 'login'])->name('login');
+    Route::get('/login', [LoginController::class, 'login'])->name('login');
     Route::post('actionlogin', [LoginController::class, 'actionlogin'])->name('actionlogin');
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/register', [Logincontroller::class, 'register'])->name('register');
+    Route::get('/register', [LoginController::class, 'register'])->name('register');
     Route::post('actionregister', [LoginController::class, 'actionregister'])->name('actionregister');
 
     Route::group(['middleware' => ['auth', 'role:Mahasiswa']], function () {

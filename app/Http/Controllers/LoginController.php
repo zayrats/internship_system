@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 // use Session;
 
-class Logincontroller
+class LoginController
 {
     public function login()
     {
