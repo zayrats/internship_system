@@ -38,8 +38,8 @@
                         @foreach ($companies as $company)
                             <tr>
                                 <td class="px-6 py-4">{{ $company->name }}</td>
-                                <td class="px-6 py-4">{{ $company->email }}</td>
-                                <td class="px-6 py-4">{{ $company->phone }}</td>
+                                <td class="px-6 py-4">{{ $company->contact_email }}</td>
+                                <td class="px-6 py-4">{{ $company->contact_phone }}</td>
                                 <td class="px-6 py-4 flex gap-2">
                                     <!-- Tombol Edit -->
                                     <button type="button" data-modal-target="modalEditCompany-{{ $company->company_id }}"
