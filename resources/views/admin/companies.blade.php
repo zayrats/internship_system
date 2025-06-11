@@ -258,12 +258,12 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Email</label>
-                                <input type="email" name="email" value="{{ $company->email }}" required
+                                <input type="email" name="email" value="{{ $company->contact_email }}" required
                                     class="w-full mt-1 p-2 border rounded-md" />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Telepon</label>
-                                <input type="text" name="phone" value="{{ $company->phone }}" required
+                                <input type="text" name="phone" value="{{ $company->contact_phone }}" required
                                     class="w-full mt-1 p-2 border rounded-md" />
                             </div>
                             <div>

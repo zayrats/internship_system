@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminController
 {
@@ -250,59 +251,56 @@ class AdminController
 
         $companies = $query->paginate(10);
         $vacancies = Vacancy::all();
-
+        // dd($companies->toArray());
         return view('admin.companies', compact('companies', 'vacancies', 'internships'));
     }
+
     public function updateCompany(Request $request, $id)
     {
         $company = Company::findOrFail($id);
+
         $request->validate([
             'name' => 'required',
-            'description' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required',
+            'description' => 'nullable',
+            'email' => 'nullable|email',
+            'phone' => 'nullable',
             'address' => 'required',
             'x_coordinate' => 'required',
             'y_coordinate' => 'required',
-            'logo' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
         ]);
         // dd($request->all());
-        DB::table('companies')->where('company_id', $id)->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'x_coordinate' => $request->x_coordinate,
-            'y_coordinate' => $request->y_coordinate,
-            // 'logo' => $request->logo
-        ]);
-        // try {
-                $logo = $request->file('logo');
+        // Update semua field kecuali logo
+        $company->name = $request->name;
+        $company->description = $request->description;
+        $company->contact_email = $request->email;
+        $company->contact_phone = $request->phone;
+        $company->address = $request->address;
+        $company->x_coordinate = $request->x_coordinate;
+        $company->y_coordinate = $request->y_coordinate;
+        // dd($request->all());
+        // Proses logo jika ada
+        if ($request->hasFile('logo')) {
+            $logo = $request->file('logo');
 
-                // Hapus logo lama jika ada
-                if ($company->logo) {
-                    $oldPath = str_replace(url('/storage'), '', $company->logo);
-                    Storage::disk('public')->delete($oldPath);
-                }
+            // Hapus logo lama jika ada
+            if ($company->logo) {
+                $oldPath = str_replace('/storage', '', parse_url($company->logo, PHP_URL_PATH));
+                Storage::disk('public')->delete($oldPath);
+            }
 
-                // Generate nama file unik
-                $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
+            // Simpan logo baru
+            $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
+            $path = $logo->storeAs('company_logos', $fileName, 'public');
+            $company->logo = Storage::url($path);
+        }
 
-                // Simpan file ke storage
-                $path = $logo->storeAs('company_logos', $fileName, 'public');
-
-                // Dapatkan URL publik
-                $logoUrl = Storage::url($path);
-
-                // Update database
-                $company->logo = $logoUrl;
-                $company->save();
-
-                return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
-            // }
+        // Simpan semua perubahan
+        $company->save();
 
         return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
     }
+
 
     public function deleteCompany($id)
     {
@@ -328,29 +326,30 @@ class AdminController
         $company->contact_email = $request->email;
         $company->contact_phone = $request->phone;
         $company->address = $request->address;
+        $company->description = $request->description;
         $company->x_coordinate = $request->x_coordinate;
         $company->y_coordinate = $request->y_coordinate;
         $company->logo = $request->logo;
         $company->save();
-// try {
-                $logo = $request->file('logo');
+        // try {
+        $logo = $request->file('logo');
 
 
-                // Generate nama file unik
-                $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
+        // Generate nama file unik
+        $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
 
-                // Simpan file ke storage
-                $path = $logo->storeAs('company_logos', $fileName, 'public');
+        // Simpan file ke storage
+        $path = $logo->storeAs('company_logos', $fileName, 'public');
 
-                // Dapatkan URL publik
-                $logoUrl = Storage::url($path);
+        // Dapatkan URL publik
+        $logoUrl = Storage::url($path);
 
-                // Update database
-                $company->logo = $logoUrl;
-                $company->save();
+        // Update database
+        $company->logo = $logoUrl;
+        $company->save();
 
-                // return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
-            // };
+        // return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
+        // };
 
         return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil ditambahkan');
     }
