@@ -42,13 +42,12 @@
                             <td class="px-6 py-4 items-start text-start">
                                 <div
                                     class="mx-auto font-medium text-sm
-                                    {{ strtolower($item->status) === 'Pending' ? 'text-yellow-500 dark:text-yellow-600' : '' }}
-                                    {{ strtolower($item->status) === 'Approved' ? 'text-green-500 dark:text-green-600' : '' }}
-                                    {{ strtolower($item->status) === 'Rejected' ? 'text-red-500 dark:text-red-600' : '' }}">
+                        {{ strtolower($item->status) === 'pending' ? 'text-yellow-500 dark:text-yellow-600' : '' }}
+                        {{ strtolower($item->status) === 'approved' ? 'text-green-500 dark:text-green-600' : '' }}
+                        {{ strtolower($item->status) === 'rejected' ? 'text-red-500 dark:text-red-600' : '' }}">
                                     {{ ucfirst($item->status) }}
                                 </div>
                             </td>
-
                             <td class="px-6 py-4">{{ $item->application_date }}</td>
                             <td class="px-6 py-4">{{ $item->division }}</td>
                             <td class="px-6 py-4 text-center">
@@ -63,358 +62,412 @@
                                     data-application_date="{{ $item->application_date }}">
                                     Lihat
                                 </a>
+
                                 <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                                     onclick="openEditApplicationModal('{{ $item->id }}',
-                                    '{{ $item->vacancy_id }}',
-                                    '{{ $item->status }}',
-                                    '{{ $item->application_date }}',
-                                    '{{ basename($item->document) }}')">
+                            '{{ $item->vacancy_id }}',
+                            '{{ $item->status }}',
+                            '{{ $item->application_date }}',
+                            '{{ basename($item->document) }}')">
                                     Edit Pengajuan
                                 </button>
+
                                 <a href="{{ route('deleteHistory', $item->id) }}"
                                     class="text-white hover:underline rounded bg-red-500 px-3 py-1"
                                     onclick="return confirm('Yakin ingin menghapus pengajuan ini?')">
                                     Hapus
                                 </a>
+
                                 @if (strtolower(trim($item->status)) === 'finished')
-                                    {{-- <p>{{ json_encode($item) }}</p> --}}
                                     @if ($item->internship_id)
                                         <button class="text-green-600 hover:underline bg-green-500 rounded px-3 py-1"
                                             onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
-                                            '{{ $item->id }}',
-                                            '{{ $item->company_id }}',
-                                            '{{ $item->company_name }}', '{{ $item->title }}', '{{ $item->start_date }}', '{{ $item->end_date }}', '{{ $item->position }}', '{{ $item->feedback }}', '{{ $item->rating }}',
-                                            '{{ $item->kp_book }}',
-                                            '{{ $item->vacancy_id }}',)">
+                                    '{{ $item->id }}',
+                                    '{{ $item->company_id }}',
+                                    '{{ $item->company_name }}',
+                                    '{{ $item->title }}',
+                                    '{{ $item->start_date }}',
+                                    '{{ $item->end_date }}',
+                                    '{{ $item->position }}',
+                                    '{{ $item->feedback }}',
+                                    '{{ $item->rating }}',
+                                    '{{ $item->kp_book }}',
+                                    '{{ $item->vacancy_id }}')">
                                             Lihat Rating
                                         </button>
                                         <input type="hidden" id="currentKpBookUrl" value="{{ asset($item->kp_book) }}">
                                     @else
                                         <button class="text-white hover:underline bg-green-500 rounded px-3 py-1 mx-1"
                                             onclick="openFeedbackModal('{{ $item->internship_id_useless ?? '' }}',
-                                            '{{ $item->id }}',
-                                            '{{ $item->company_id }}',
-                                            '{{ $item->company_name ?? '' }}',
-                                            '{{ $item->title ?? '' }}',
-                                            '{{ $item->start_date_vacancy }}',
-                                            '{{ $item->end_date_vacancy }}','{{ $item->division }}',
-                                            '{{ $item->feedback ?? '' }}',
-                                            '{{ $item->rating ?? '' }}',
-                                            '{{ $item->kp_book ?? '' }}',
-                                            '{{ $item->vacancy_id ?? '' }}',
-                                        )">
+                                    '{{ $item->id }}',
+                                    '{{ $item->company_id }}',
+                                    '{{ $item->company_name ?? '' }}',
+                                    '{{ $item->title ?? '' }}',
+                                    '{{ $item->start_date_vacancy }}',
+                                    '{{ $item->end_date_vacancy }}',
+                                    '{{ $item->division }}',
+                                    '{{ $item->feedback ?? '' }}',
+                                    '{{ $item->rating ?? '' }}',
+                                    '{{ $item->kp_book ?? '' }}',
+                                    '{{ $item->vacancy_id ?? '' }}')">
                                             Unggah Pengalaman
-                                        </button>
-                                    @endif
+                                            </ <!-- Modal Detail -->
+                                            <div id="detailModal"
+                                                class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+                                                <div
+                                                    class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+                                                    <h2
+                                                        class="text-lg text-center font-bold text-center mb-4 text-gray-900 dark:text-white ">
+                                                        Detail
+                                                        Perusahaan</h2>
 
-                                    @if ($item->kp_book)
-                                        {{-- <button class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
-                                            onclick="openKpBookModal('{{ $item->kp_book }}')">
-                                            Lihat Buku KP
-                                        </button> --}}
-                                    @else
-                                        <button class="text-white hover:underline bg-yellow-500 rounded px-3 py-1"
-                                            onclick="openUploadKpModal('{{ $item->internship_id }}', '{{ $item->id }}')">
-                                            Unggah Buku KP
-                                        </button>
-                                    @endif
-                                @endif
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <!-- Modal Detail -->
-            <div id="detailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
-                    <h2 class="text-lg text-center font-bold text-center mb-4 text-gray-900 dark:text-white ">Detail
-                        Perusahaan</h2>
+                                                    <!-- Logo Perusahaan di Tengah -->
+                                                    <div class="flex justify-center mb-4">
+                                                        <img id="modalLogo" class="w-32 h-32 object-cover rounded-full"
+                                                            alt="Logo Perusahaan">
+                                                    </div>
 
-                    <!-- Logo Perusahaan di Tengah -->
-                    <div class="flex justify-center mb-4">
-                        <img id="modalLogo" class="w-32 h-32 object-cover rounded-full" alt="Logo Perusahaan">
-                    </div>
+                                                    <hr class="my-4 border-gray-300">
 
-                    <hr class="my-4 border-gray-300">
+                                                    <!-- Informasi Perusahaan -->
+                                                    <div
+                                                        class="grid grid-cols-2 gap-4 font-semibold mt-4  text-gray-700 dark:text-gray-300">
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Nama
+                                                            Perusahaan:</p>
+                                                        <p class="text-gray-900 dark:text-white" id="modalName"></p>
 
-                    <!-- Informasi Perusahaan -->
-                    <div class="grid grid-cols-2 gap-4 font-semibold mt-4  text-gray-700 dark:text-gray-300">
-                        <p class="font-semibold text-gray-900 dark:text-white">Nama Perusahaan:</p>
-                        <p class="text-gray-900 dark:text-white" id="modalName"></p>
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Alamat:</p>
+                                                        <p class="text-gray-900 dark:text-white" id="modalAddress"></p>
 
-                        <p class="font-semibold text-gray-900 dark:text-white">Alamat:</p>
-                        <p class="text-gray-900 dark:text-white" id="modalAddress"></p>
-
-                        <p class="font-semibold text-gray-900 dark:text-white">Persyaratan:</p>
-                        <p class="text-gray-900 dark:text-white" id="modalRequirements"></p>
-                    </div>
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Persyaratan:
+                                                        </p>
+                                                        <p class="text-gray-900 dark:text-white" id="modalRequirements"></p>
+                                                    </div>
 
 
 
-                    <!-- Informasi Tambahan -->
-                    <div class="grid grid-cols-2 text-lg gap-4  text-gray-700 dark:text-gray-300">
-                        <p class="font-semibold text-gray-900 dark:text-white">Divisi:</p>
-                        <p id="modalDivision" class="text-gray-900 dark:text-white"></p>
+                                                    <!-- Informasi Tambahan -->
+                                                    <div
+                                                        class="grid grid-cols-2 text-lg gap-4  text-gray-700 dark:text-gray-300">
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Divisi:</p>
+                                                        <p id="modalDivision" class="text-gray-900 dark:text-white"></p>
 
-                        <p class="font-semibold text-gray-900 dark:text-white">Durasi:</p>
-                        <p id="modalDuration" class="text-gray-900 dark:text-white"></p>
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Durasi:</p>
+                                                        <p id="modalDuration" class="text-gray-900 dark:text-white"></p>
 
-                        <p class="font-semibold text-gray-900 dark:text-white">Tipe:</p>
-                        <p id="modalType" class="text-gray-900 dark:text-white"></p>
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Tipe:</p>
+                                                        <p id="modalType" class="text-gray-900 dark:text-white"></p>
 
-                        <p class="font-semibold text-gray-900 dark:text-white">Status:</p>
-                        <p id="modalStatus" class="text-gray-900 dark:text-white"></p>
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Status:</p>
+                                                        <p id="modalStatus" class="text-gray-900 dark:text-white"></p>
 
-                        <p class="font-semibold text-gray-900 dark:text-white">Tanggal Pengajuan:</p>
-                        <p id="modalApplicationDate" class="text-gray-900 dark:text-white"></p>
-                    </div>
+                                                        <p class="font-semibold text-gray-900 dark:text-white">Tanggal
+                                                            Pengajuan:</p>
+                                                        <p id="modalApplicationDate" class="text-gray-900 dark:text-white">
+                                                        </p>
+                                                    </div>
 
-                    <!-- Tombol Tutup -->
-                    <div class="flex justify-center mt-6">
-                        <button id="closeModal" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">
-                            Tutup
-                        </button>
-                    </div>
-                </div>
-            </div>
+                                                    <!-- Tombol Tutup -->
+                                                    <div class="flex justify-center mt-6">
+                                                        <button id="closeModal"
+                                                            class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">
+                                                            Tutup
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-            <!-- Modal Feedback -->
-            <div id="feedbackModal"
-                class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center mt-24">
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 w-96">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center"
-                        id="feedbackModalTitle">
-                        Feedback Magang
-                    </h2>
+                                            <!-- Modal Feedback -->
+                                            <div id="feedbackModal"
+                                                class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center mt-24">
+                                                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 w-96">
+                                                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center"
+                                                        id="feedbackModalTitle">
+                                                        Feedback Magang
+                                                    </h2>
 
-                    <form method="POST" action="#" enctype="multipart/form-data" id="feedbackForm">
-                        @csrf
-                        <input type="hidden" name="internship_id" id="internshipId">
-                        <input type="hidden" name="company_id" id="modalCompanyId">
-                        <input type="hidden" name="vacancy_id" class="hidden" id="modalVacancyId">
-                        <input type="hidden" id="currentKpBookUrl">
+                                                    <form method="POST" action="#" enctype="multipart/form-data"
+                                                        id="feedbackForm">
+                                                        @csrf
+                                                        <input type="hidden" name="internship_id" id="internshipId">
+                                                        <input type="hidden" name="company_id" id="modalCompanyId">
+                                                        <input type="hidden" name="vacancy_id" class="hidden"
+                                                            id="modalVacancyId">
+                                                        <input type="hidden" id="currentKpBookUrl">
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Perusahaan</label>
-                        <input type="text" disabled id="companyName"
-                            class="w-full p-2 border rounded bg-gray-100 dark:text-black" readonly>
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Perusahaan</label>
+                                                        <input type="text" disabled id="companyName"
+                                                            class="w-full p-2 border rounded bg-gray-100 dark:text-black"
+                                                            readonly>
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Judul Buku KP</label>
-                        <input type="text" name="title" id="title"
-                            class="w-full p-2 border rounded dark:text-black">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Judul
+                                                            Buku KP</label>
+                                                        <input type="text" name="title" id="title"
+                                                            class="w-full p-2 border rounded dark:text-black">
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Mulai</label>
-                        <input type="date" name="start_date" id="startDate"
-                            class="w-full p-2 border rounded dark:text-black">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal
+                                                            Mulai</label>
+                                                        <input type="date" name="start_date" id="startDate"
+                                                            class="w-full p-2 border rounded dark:text-black">
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Selesai</label>
-                        <input type="date" name="end_date" id="endDate"
-                            class="w-full p-2 border rounded dark:text-black">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal
+                                                            Selesai</label>
+                                                        <input type="date" name="end_date" id="endDate"
+                                                            class="w-full p-2 border rounded dark:text-black">
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Posisi Magang</label>
-                        <input type="text" name="position" id="position"
-                            class="w-full p-2 border rounded dark:text-black">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Posisi
+                                                            Magang</label>
+                                                        <input type="text" name="position" id="position"
+                                                            class="w-full p-2 border rounded dark:text-black">
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Rating</label>
-                        <div id="ratingContainer" class="flex space-x-1 text-yellow-500 text-2xl cursor-pointer">
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                        <input type="hidden" name="rating" id="ratingValue" value="0">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Rating</label>
+                                                        <div id="ratingContainer"
+                                                            class="flex space-x-1 text-yellow-500 text-2xl cursor-pointer">
+                                                            <span class="star" data-value="1">★</span>
+                                                            <span class="star" data-value="2">★</span>
+                                                            <span class="star" data-value="3">★</span>
+                                                            <span class="star" data-value="4">★</span>
+                                                            <span class="star" data-value="5">★</span>
+                                                        </div>
+                                                        <input type="hidden" name="rating" id="ratingValue"
+                                                            value="0">
 
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Feedback</label>
-                        <textarea name="feedback" id="feedback" class="w-full p-2 border rounded dark:text-black"></textarea>
-
-
-                        {{-- if else for uploaded file --}}
-
-                        <div id="kpBookReader" class="">
-                            <button type="button" class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
-                                onclick="openKpBookModal()">
-                                Lihat Buku KP
-                            </button>
-                        </div>
-                        <!-- Tambahkan Upload Buku KP -->
-                        <div id="kpBookUpload" class="">
-                            <label class="block text-sm font-medium text-gray-900 dark:text-white mt-4">Unggah Buku KP
-                                (PDF)</label>
-                            <input type="file" name="kp_book" accept="application/pdf"
-                                class="w-full p-2 border rounded dark:text-black">
-                        </div>
-
-                        <div class="flex justify-center mt-6">
-                            <button type="button" id="closeModalFeedback"
-                                class="bg-red-700 text-white p-2 rounded-lg mr-2">Tutup</button>
-                            <button type="submit" id="submitFeedbackBtn"
-                                class="bg-blue-500 text-white p-2 rounded">Kirim</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Feedback</label>
+                                                        <textarea name="feedback" id="feedback" class="w-full p-2 border rounded dark:text-black"></textarea>
 
 
+                                                        {{-- if else for uploaded file --}}
 
-            <!-- Modal Unggah Buku KP -->
-            <div id="uploadKpModal"
-                class="hidden flex fixed inset-0 bg-gray-600 bg-opacity-50  items-center justify-center">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Unggah Buku KP</h2>
+                                                        <div id="kpBookReader" class="">
+                                                            <button type="button"
+                                                                class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
+                                                                onclick="openKpBookModal()">
+                                                                Lihat Buku KP
+                                                            </button>
+                                                        </div>
+                                                        <!-- Tambahkan Upload Buku KP -->
+                                                        <div id="kpBookUpload" class="">
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-900 dark:text-white mt-4">Unggah
+                                                                Buku KP
+                                                                (PDF)</label>
+                                                            <input type="file" name="kp_book" accept="application/pdf"
+                                                                class="w-full p-2 border rounded dark:text-black">
+                                                        </div>
 
-                    <form id="uploadKpForm" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="id" id="applicationId">
-
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Pilih File (PDF):</label>
-                        <input type="file" name="kp_book" accept="application/pdf"
-                            class="w-full p-2 border rounded mb-4" required>
-
-                        {{-- <div class="flex justify-end gap-2"> --}}
-                        <button type="button" id="closeUploadKpModal"
-                            class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                            Batal
-                        </button>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                            Unggah
-                        </button>
-                        {{-- </div> --}}
-                    </form>
-                </div>
-            </div>
-            <!-- Modal Lihat Buku KP -->
-            <div id="kpBookModal"
-                class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center mt-24">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Buku KP</h2>
-
-                    <iframe id="kpBookFrame" class="w-full h-[500px]"></iframe>
-
-                    <div class="flex justify-center mt-6">
-                        <button id="closeKpBookModal"
-                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                            Tutup
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Tambah Pengajuan KP -->
-            <div id="applicationModal"
-                class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
-                <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-6 relative">
-                    <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Tambah Pengajuan KP</h3>
-
-                    <form id="applicationForm" action="{{ route('internshipapply', ['id' => $item->vacancy_id]) }}"
-                        method="POST" enctype="multipart/form-data" class="space-y-4">
-                        @csrf
-
-                        <!-- Pilih Lowongan -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Pilih
-                                Lowongan</label>
-                            <select name="vacancy_id" required
-                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white">
-                                @foreach ($vacancies as $vacancy)
-                                    <option value="{{ $vacancy->vacancy_id }}">{{ $vacancy->division }} -
-                                        {{ $vacancy->company_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Upload Surat Pengantar -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Surat Pengantar
-                                (PDF)</label>
-                            <input type="file" name="document" accept="application/pdf" required
-                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
-                        </div>
-
-                        <!-- Tombol -->
-                        <div class="space-y-2">
-                            <button type="submit"
-                                class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition duration-200">
-                                Simpan Pengajuan
-                            </button>
-                            <button type="button" onclick="closeModal('applicationModal')"
-                                class="w-full text-center text-red-500 hover:underline">Batal</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal Edit Pengajuan -->
-            <div id="editApplicationModal"
-                class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
-                    <h2 class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">Edit Pengajuan</h2>
-                    <form id="editApplicationForm" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-
-                        <input type="hidden" id="editApplicationId" name="application_id">
-
-                        <!-- Lowongan (disabled) -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Lowongan KP</label>
-                            <select disabled name="vacancy_id" id="editVacancySelect"
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                                @foreach ($vacancies as $vacancy)
-                                    <option value="{{ $vacancy->vacancy_id }}">
-                                        {{ $vacancy->division }} - {{ $vacancy->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Status -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Status</label>
-                            {{-- @dump($data)($item->status) --}}
-                            <select name="status" id="editStatusSelect" required
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Rejected">Rejected</option>
-                                <option value="Finished">Finished</option>
-                            </select>
-                        </div>
-
-                        <!-- Tanggal Pengajuan -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal Pengajuan</label>
-                            <input type="date" name="application_date" id="editApplicationDate"
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                        </div>
-
-                        <!-- Unggah Surat Lamaran -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">
-                                Unggah Surat Lamaran Baru
-                            </label>
-
-                            <!-- Tampilkan file lama -->
-                            <p id="existingDocumentName" class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
-
-                            <!-- Input file baru -->
-                            <input type="file" name="document" accept="application/pdf"
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                        </div>
+                                                        <div class="flex justify-center mt-6">
+                                                            <button type="button" id="closeModalFeedback"
+                                                                class="bg-red-700 text-white p-2 rounded-lg mr-2">Tutup</button>
+                                                            <button type="submit" id="submitFeedbackBtn"
+                                                                class="bg-blue-500 text-white p-2 rounded">Kirim</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
 
 
-                        <!-- Tombol -->
-                        <div class="flex justify-end mt-6 gap-2">
-                            <button type="button" onclick="closeEditApplicationModal()"
-                                class="bg-red-700 text-white px-4 py-2 rounded-lg">
-                                Batal
-                            </button>
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                                Simpan Perubahan
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+
+                                            <!-- Modal Unggah Buku KP -->
+                                            <div id="uploadKpModal"
+                                                class="hidden flex fixed inset-0 bg-gray-600 bg-opacity-50  items-center justify-center">
+                                                <div
+                                                    class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+                                                    <h2
+                                                        class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
+                                                        Unggah Buku KP</h2>
+
+                                                    <form id="uploadKpForm" method="post" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <input type="hidden" name="id" id="applicationId">
+
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-900 dark:text-white">Pilih
+                                                            File (PDF):</label>
+                                                        <input type="file" name="kp_book" accept="application/pdf"
+                                                            class="w-full p-2 border rounded mb-4" required>
+
+                                                        {{-- <div class="flex justify-end gap-2"> --}}
+                                                        <button type="button" id="closeUploadKpModal"
+                                                            class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                                                            Batal
+                                                        </button>
+                                                        <button type="submit"
+                                                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                                            Unggah
+                                                        </button>
+                                                        {{-- </div> --}}
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <!-- Modal Lihat Buku KP -->
+                                            <div id="kpBookModal"
+                                                class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center mt-24">
+                                                <div
+                                                    class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
+                                                    <h2
+                                                        class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
+                                                        Buku KP</h2>
+
+                                                    <iframe id="kpBookFrame" class="w-full h-[500px]"></iframe>
+
+                                                    <div class="flex justify-center mt-6">
+                                                        <button id="closeKpBookModal"
+                                                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                                                            Tutup
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal Tambah Pengajuan KP -->
+                                            <div id="applicationModal"
+                                                class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+                                                <div
+                                                    class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-6 relative">
+                                                    <h3
+                                                        class="text-2xl font-bold text-center text-gray-800 dark:text-white">
+                                                        Tambah Pengajuan KP</h3>
+
+                                                    <form id="applicationForm"
+                                                        action="{{ route('internshipapply', ['id' => $item->vacancy_id]) }}"
+                                                        method="POST" enctype="multipart/form-data" class="space-y-4">
+                                                        @csrf
+
+                                                        <!-- Pilih Lowongan -->
+                                                        <div>
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-600 dark:text-gray-300">Pilih
+                                                                Lowongan</label>
+                                                            <select name="vacancy_id" required
+                                                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white">
+                                                                @foreach ($vacancies as $vacancy)
+                                                                    <option value="{{ $vacancy->vacancy_id }}">
+                                                                        {{ $vacancy->division }} -
+                                                                        {{ $vacancy->company_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <!-- Upload Surat Pengantar -->
+                                                        <div>
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-600 dark:text-gray-300">Surat
+                                                                Pengantar
+                                                                (PDF)</label>
+                                                            <input type="file" name="document"
+                                                                accept="application/pdf" required
+                                                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                                                        </div>
+
+                                                        <!-- Tombol -->
+                                                        <div class="space-y-2">
+                                                            <button type="submit"
+                                                                class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition duration-200">
+                                                                Simpan Pengajuan
+                                                            </button>
+                                                            <button type="button"
+                                                                onclick="closeModal('applicationModal')"
+                                                                class="w-full text-center text-red-500 hover:underline">Batal</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal Edit Pengajuan -->
+                                            <div id="editApplicationModal"
+                                                class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+                                                <div
+                                                    class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
+                                                    <h2
+                                                        class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">
+                                                        Edit Pengajuan</h2>
+                                                    <form id="editApplicationForm" method="POST"
+                                                        enctype="multipart/form-data">
+                                                        @csrf
+                                                        @method('PUT')
+
+                                                        <input type="hidden" id="editApplicationId"
+                                                            name="application_id">
+
+                                                        <!-- Lowongan (disabled) -->
+                                                        <div class="mb-4">
+                                                            <label
+                                                                class="block font-semibold text-gray-900 dark:text-white mb-1">Lowongan
+                                                                KP</label>
+                                                            <select disabled name="vacancy_id" id="editVacancySelect"
+                                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                                                @foreach ($vacancies as $vacancy)
+                                                                    <option value="{{ $vacancy->vacancy_id }}">
+                                                                        {{ $vacancy->division }} -
+                                                                        {{ $vacancy->company_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <!-- Status -->
+                                                        <div class="mb-4">
+                                                            <label
+                                                                class="block font-semibold text-gray-900 dark:text-white mb-1">Status</label>
+                                                            {{-- @dump($data)($item->status) --}}
+                                                            <select name="status" id="editStatusSelect" required
+                                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                                                <option value="Pending">Pending</option>
+                                                                <option value="Approved">Approved</option>
+                                                                <option value="Rejected">Rejected</option>
+                                                                <option value="Finished">Finished</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <!-- Tanggal Pengajuan -->
+                                                        <div class="mb-4">
+                                                            <label
+                                                                class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal
+                                                                Pengajuan</label>
+                                                            <input type="date" name="application_date"
+                                                                id="editApplicationDate"
+                                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                                        </div>
+
+                                                        <!-- Unggah Surat Lamaran -->
+                                                        <div class="mb-4">
+                                                            <label
+                                                                class="block font-semibold text-gray-900 dark:text-white mb-1">
+                                                                Unggah Surat Lamaran Baru
+                                                            </label>
+
+                                                            <!-- Tampilkan file lama -->
+                                                            <p id="existingDocumentName"
+                                                                class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
+
+                                                            <!-- Input file baru -->
+                                                            <input type="file" name="document"
+                                                                accept="application/pdf"
+                                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                                        </div>
+
+
+                                                        <!-- Tombol -->
+                                                        <div class="flex justify-end mt-6 gap-2">
+                                                            <button type="button" onclick="closeEditApplicationModal()"
+                                                                class="bg-red-700 text-white px-4 py-2 rounded-lg">
+                                                                Batal
+                                                            </button>
+                                                            <button type="submit"
+                                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                                                Simpan Perubahan
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
         </div>
 
     </div>
