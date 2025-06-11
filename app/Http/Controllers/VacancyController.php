@@ -18,7 +18,7 @@ class VacancyController extends Controller
             ->latest()
             ->get();
 
-        return view('company.vacancy', compact('vacancies'));
+        return view('company.vacancy', compact('vacancies', 'company'));
     }
 
     public function store(Request $request)
@@ -32,8 +32,12 @@ class VacancyController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
+        $company = Company::where('user_id', Auth::id())->first();
+
+        $attributes = $request->id ? ['id' => $request->id, 'company_id' => $company->company_id] : ['company_id' => $company->company_id];
+
         $vacancy = Vacancy::updateOrCreate(
-            ['id' => $request->id, 'company_id' => Auth::id()],
+            $attributes,
             $request->all()
         );
 
@@ -46,7 +50,7 @@ class VacancyController extends Controller
         $vacancy = Vacancy::where('company_id', $company->company_id)->findOrFail($id);
 
         if ($vacancy->applications()->count() > 0) {
-            return redirect()->back()->with('error', 'Lowongan tidak bisa dihapus karena sudah ada pengajuan.');    
+            return redirect()->back()->with('error', 'Lowongan tidak bisa dihapus karena sudah ada pengajuan.');
         }
         // DB::table('vacancy')->where('id', $id)->delete();
         // $vacancy->delete();
@@ -66,10 +70,7 @@ class VacancyController extends Controller
         })->whereIn('status', ['Approved', 'Finished'])
             ->with(['student', 'vacancy'])
             ->get();
-            // dd($applications);
-        return view('company.monitor', compact('applications'));
+        // dd($applications);
+        return view('company.monitor', compact('applications', 'company'));
     }
-
-
-
 }

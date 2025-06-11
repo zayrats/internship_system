@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Students;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -95,6 +96,13 @@ class Logincontroller
                 ]);
             }
 
+            //jika user mendaftar sebagai perusahaan, tambahkan ke tabel company
+            if ($user->role === 'Perusahaan') {
+                Company::create([
+                    'user_id' => $user->user_id, // 🔹 Pastikan tabel company punya kolom user_id
+                ]);
+                // dd(request()->all());
+            }
             DB::commit(); // 🔹 Simpan perubahan jika semua berhasil
 
             Session::flash('message', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');

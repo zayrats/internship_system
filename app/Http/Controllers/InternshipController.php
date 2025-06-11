@@ -6,6 +6,7 @@ use App\Models\Applications;
 use App\Models\Company;
 use App\Models\Internship;
 use App\Models\Students;
+use App\Models\User;
 use App\Services\FirebaseService;
 use Illuminate\Console\View\Components\Success;
 use Illuminate\Http\Client\Factory;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Jetstream\Role as JetstreamRole;
 use Laravel\Jetstream\Rules\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use setasign\Fpdi\Fpdi;
 
 use function Symfony\Component\Clock\now;
 
@@ -51,6 +54,29 @@ class InternshipController
     public function internshipapply(Request $request, $id)
     {
         $student = Students::where('user_id', Auth::user()->user_id)->firstOrFail();
+        $user = User::where('user_id', Auth::user()->user_id)->firstOrFail();
+
+        // Validasi kelengkapan data
+        foreach (['name', 'prodi', 'department', 'student_number', 'cv'] as $field) {
+            if (empty($student->$field)) {
+                return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: {$field} belum diisi.");
+            }
+        }
+
+        if (empty($user->email)) {
+            return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: Email belum diisi.");
+        }
+
+        // Cek apakah sudah pernah apply ke lowongan ini
+        $existing = DB::table('applications')
+            ->where('student_id', $student->student_id)
+            ->where('vacancy_id', $id)
+            ->first();
+
+        if ($existing) {
+            return redirect()->back()->with('error', 'Anda sudah pernah mengajukan lamaran untuk lowongan ini.');
+        }
+
         // Validasi file
         $request->validate([
             'document' => 'required|file|mimes:pdf|max:2048',
@@ -58,40 +84,51 @@ class InternshipController
 
         try {
             $document = $request->file('document');
-            $localFolder = public_path('firebase-temp-uploads') . '/';
-            $extension = $document->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
-            $document->move($localFolder, $fileName);
+            $path = $document->store('cover_letter', 'public');
+            $fileUrl = Storage::url($path);
 
-            $uploadedFile = fopen($localFolder . $fileName, 'r');
-
-            // Upload ke Firebase Storage
-            app('firebase.storage')->getBucket()->upload($uploadedFile, [
-                'name' => 'documents/' . $fileName,
-            ]);
-
-            unlink($localFolder . $fileName);
-
-            // Dapatkan URL publik
-            $fileUrl = "https://firebasestorage.googleapis.com/v0/b/proyekakhir-7f1e1.firebasestorage.app/o/" . urlencode('documents/' . $fileName) . "?alt=media";
-
-            // Simpan data ke database
             DB::table('applications')->insert([
                 'user_id' => Auth::user()->user_id,
                 'student_id' => $student->student_id,
                 'vacancy_id' => $id,
                 'application_date' => now(),
-                'document' => $fileUrl, // Simpan URL Firebase
+                'document' => $fileUrl,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
 
-            return redirect()->back()->with('success', 'Application submitted successfully!');
+            return redirect()->back()->with('success', 'Pengajuan berhasil dikirim!');
         } catch (\Exception $e) {
             Log::error('Error saat apply internship: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to submit application: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengirim pengajuan: ' . $e->getMessage());
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        $application = Applications::findOrFail($id);
+
+        // Validasi file baru jika ada
+        $request->validate([
+            'vacancy_id' => 'required|exists:vacancies,id',
+            'status' => 'required',
+            'application_date' => 'required',
+            'document' => 'nullable|file|mimes:pdf|max:2048'
+        ]);
+
+        // Update surat lamaran jika diunggah ulang
+        if ($request->hasFile('document')) {
+            $file = $request->file('document');
+            $path = $file->store('cover_letter', 'public');
+            $application->document = Storage::url($path);
+        }
+
+        $application->vacancy_id = $request->vacancy_id;
+        $application->updated_at = now();
+        $application->save();
+        return redirect()->back()->with('success', 'Pengajuan berhasil diperbarui.');
+    }
+
 
     public function history()
     {
@@ -106,16 +143,21 @@ class InternshipController
                 'applications.vacancy_id',
                 'applications.application_date',
                 'applications.status as status',
+                'applications.internship_id',
+                'applications.document as document',
                 'vacancy.division',
                 'vacancy.duration',
                 'vacancy.type',
                 'vacancy.requirements',
                 'vacancy.company_id',
+                'vacancy.division',
+                'vacancy.start_date as start_date_vacancy',
+                'vacancy.end_date  as end_date_vacancy',
                 'companies.name as company_name',
                 'companies.address as company_address',
                 'companies.logo as company_logo',
-                'internships.internship_id',
-                'internships.kp_book',
+                'internships.internship_id as internship_id_useless',
+                'internships.kp_book as kp_book',
                 'internships.feedback',
                 'internships.start_date',
                 'internships.end_date',
@@ -124,9 +166,26 @@ class InternshipController
                 'internships.rating'
             )
             ->get();
-            // dd($data);
+        $vacancies = DB::table('vacancy')
+            ->leftJoin('companies', 'vacancy.company_id', '=', 'companies.company_id')
+            // ->where('vacancy.company_id', '=', 'companies.company_id')
+            ->select(
+                'vacancy.vacancy_id as vacancy_id',
+                'vacancy.division',
+                'vacancy.duration',
+                'vacancy.type',
+                'vacancy.requirements',
+                'vacancy.start_date',
+                'vacancy.end_date',
+                'companies.name as company_name',
+                'companies.address as company_address',
+                'companies.logo as company_logo',
+                'companies.contact_email as company_email',
+            )
+            ->get();
+        // dd($data);
         $companies = Company::all();
-        return view('history', compact('data', 'companies'));
+        return view('history', compact('data', 'companies', 'vacancies'));
     }
 
     public function deleteHistory($id)
@@ -138,20 +197,71 @@ class InternshipController
     }
 
     public function submitHistoryFeedback(Request $request, $id)
-    {
+{
+    $data = $request->all();
+
+    $request->validate([
+        'company_id' => 'required|exists:companies,company_id',
+        'vacancy_id' => 'required',
+        'title' => 'required|string|max:255',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+        'position' => 'required|string|max:255',
+        'feedback' => 'required|string',
+        'kp_book' => 'nullable|file|mimes:pdf|max:10240', // Validasi file PDF max 10MB
+    ]);
+
+    DB::beginTransaction();
+    try {
         $user = Auth::user();
         $student = Students::where('user_id', $user->user_id)->firstOrFail();
-        $request->validate([
-            'company_id' => 'required|exists:companies,company_id',
-            'title' => 'required|string|max:255',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'position' => 'required|string|max:255',
-            'feedback' => 'required|string',
-            'rating' => 'required|integer|min:1|max:5'
-        ]);
 
-        Internship::create([
+        // Proses file PDF terlebih dahulu
+        $fileUrl = null;
+        if ($request->hasFile('kp_book')) {
+            $file = $request->file('kp_book');
+            $fileName = 'kp_' . time() . '_' . Str::random(8) . '.pdf';
+            $filePath = $file->store('public');
+            $absolutePath = Storage::path($filePath);
+
+            // Proses watermark PDF
+            $pdf = new Fpdi();
+            $pageCount = $pdf->setSourceFile($absolutePath);
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $tplId = $pdf->importPage($i);
+                $size = $pdf->getTemplateSize($tplId);
+
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($tplId);
+
+                // Tambahkan watermark
+                $pdf->SetFont('Helvetica', 'I', 24);
+                $pdf->SetTextColor(255, 0, 0);
+                $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
+                $pdf->Cell($size['width'], 10, '© 2025 - SURYA IT 22', 0, 0, 'C');
+            }
+
+            // Simpan file dengan watermark
+            $publicPath = 'kp_books/' . $fileName;
+            $finalFullPath = storage_path('app/public/' . $publicPath);
+
+            // Pastikan direktori ada
+            if (!is_dir(dirname($finalFullPath))) {
+                mkdir(dirname($finalFullPath), 0755, true);
+            }
+
+            $pdf->Output($finalFullPath, 'F');
+
+            // Dapatkan URL publik
+            $fileUrl = Storage::url($publicPath);
+
+            // Hapus file temporary
+            Storage::delete($filePath);
+        };
+
+        // Simpan data internship
+        $internshipId = DB::table('internships')->insertGetId([
             'student_id' => $student->student_id,
             'company_id' => $request->company_id,
             'title' => $request->title,
@@ -159,17 +269,43 @@ class InternshipController
             'end_date' => $request->end_date,
             'position' => $request->position,
             'feedback' => $request->feedback,
+            'created_at' => now(),
+            'updated_at' => now(),
             'rating' => $request->rating,
-            'application_id' => $id
+            'application_id' => $id,
+            'vacancy_id' => $request->vacancy_id,
+            'kp_book' => $fileUrl // Simpan URL file atau null jika tidak ada file
         ]);
 
-        Applications::update([
-            'internship_id' => $id,
-            'updated_at' => now()
-        ]);
+        // PERBAIKAN: Update applications dengan sintaks yang benar
+        $apps = DB::table('applications')
+            ->where('application_id', $id)
+            ->update(['internship_id' => $internshipId,
+            'updated_at' => now()]); // Perbaikan sintaks di sini
 
-        return redirect()->back()->with('success', 'Berhasil kirimkan rating!');
+        // Ambil data internship yang baru dibuat
+        $internship = DB::table('internships')
+            ->where('internship_id', $internshipId)
+            ->first();
+
+        DB::commit();
+
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Feedback dan Buku KP berhasil disimpan.',
+        //     'internship' => $internship,
+        //     'apps_updated' => $apps
+        // ]);
+        return redirect()->back()->with('success', 'Feedback dan Buku KP berhasil disimpan.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     public function internexperience()
     {
@@ -225,9 +361,9 @@ class InternshipController
             'phone' => 'required|string|max:15',
             'address' => 'required|string|max:255',
             'instagram' => 'nullable|string|max:255',
-            'birthdate' => 'nullable|date',
+            'birthdate' => 'required|date|before:now',
             'gender' => 'required|in:Laki-laki,Perempuan',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'cv' => 'nullable|mimes:pdf|max:2048',
         ]);
         // dd($request ->all());
@@ -268,66 +404,54 @@ class InternshipController
 
         // Upload Foto Profil (Jika ada)
         if ($request->hasFile('profile_picture')) {
-            if ($student->profile_picture) {
-                app('firebase.storage')->getBucket()->object('profile_picture/' . $student->profile_picture)->delete();
-            }
-            $profilePictureFile = $request->file('profile_picture');
-            $localFolder = public_path('firebase-temp-uploads') . '/';
-            $extension = $profilePictureFile->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
+            try {
+                // Hapus file lama jika ada
+                if ($student->profile_picture) {
+                    $oldPath = str_replace(url('/storage'), '', $student->profile_picture);
+                    Storage::disk('public')->delete($oldPath);
+                }
 
-            if (!file_exists($localFolder)) {
-                mkdir($localFolder, 0777, true);
-            }
+                // Upload file baru ke storage/app/public
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $profilePictureUrl = Storage::url($path);
 
-            if ($profilePictureFile->move($localFolder, $fileName)) {
-                $uploadedFile = fopen($localFolder . $fileName, 'r');
-                app('firebase.storage')->getBucket()->upload($uploadedFile, [
-                    'name' => 'profile_picture/' . $fileName
-                ]);
-                unlink($localFolder . $fileName);
-                $photoUrl = "https://firebasestorage.googleapis.com/v0/b/proyekakhir-7f1e1.firebasestorage.app/o/" . urlencode('profile_picture/' . $fileName) . "?alt=media";
-                $updateData['profile_picture'] = $photoUrl;
-
-                Log::info('Profile picture uploaded to Firebase Storage' . $photoUrl);
-            }else{
-                throw new \Exception('Gagal memindahkan file CV ke folder sementara.');
+                $updateData['profile_picture'] = $profilePictureUrl;
+                Log::info('Profile picture uploaded to: ' . $profilePictureUrl);
+            } catch (\Exception $e) {
+                Log::error('Upload error: ' . $e->getMessage());
+                return back()->with('error', 'Gagal mengupload foto profil');
             }
+        } else {
+            Log::info('Tidak ada perubahan data pada tabel students.');
         }
 
         // Upload CV ke Firebase Storage
         if ($request->hasFile('cv')) {
-            // Simpan file ke folder sementara
-            $cvFile = $request->file('cv');
-            $localFolder = public_path('firebase-temp-uploads') . '/';
-            $extension = $cvFile->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
+            try {
+                // Hapus CV lama jika ada
+                if ($student->cv) {
+                    $oldPath = str_replace(url('/storage'), '', $student->cv);
+                    Storage::disk('public')->delete($oldPath);
+                }
 
-            // Pastikan folder sementara ada
-            if (!file_exists($localFolder)) {
-                mkdir($localFolder, 0777, true);
-            }
+                // Upload file baru
+                $cvFile = $request->file('cv');
 
-            if ($cvFile->move($localFolder, $fileName)) {
-                // Buka file untuk upload
-                $uploadedFile = fopen($localFolder . $fileName, 'r');
+                // Generate nama file unik
+                $fileName = time() . '_' . Str::random(10) . '.' . $cvFile->getClientOriginalExtension();
 
-                // Upload ke Firebase Storage
-                app('firebase.storage')->getBucket()->upload($uploadedFile, [
-                    'name' => 'cv/' . $fileName
-                ]);
+                // Simpan file ke storage
+                $path = $cvFile->storeAs('cv', $fileName, 'public');
 
-                // Hapus file sementara
-                unlink($localFolder . $fileName);
+                // Dapatkan URL publik
+                $cvUrl = Storage::url($path);
 
-                // Dapatkan URL untuk disimpan di database
-                $cvUrl = "https://firebasestorage.googleapis.com/v0/b/proyekakhir-7f1e1.firebasestorage.app/o/" . urlencode('cv/' . $fileName) . "?alt=media";
+                // Update database
                 $updateData['cv'] = $cvUrl;
-
-                // Log berhasil
-                Log::info('Berhasil upload CV ke Firebase: ' . $cvUrl);
-            } else {
-                throw new \Exception('Gagal memindahkan file CV ke folder sementara.');
+                Log::info('CV berhasil diupload: ' . $cvUrl);
+            } catch (\Exception $e) {
+                Log::error('Error upload CV: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal mengupload CV: ' . $e->getMessage());
             }
         }
 
@@ -377,45 +501,72 @@ class InternshipController
         return response()->json(['message' => 'Feedback magang berhasil disimpan']);
     }
 
-    public function uploadKPBook(Request $request, $id)
+
+
+    public function uploadKpBook(Request $request, $id)
     {
         $request->validate([
-            'kp_book' => 'required|mimes:pdf|max:2048'
+            'kp_book' => 'required|file|mimes:pdf|max:2048'
         ]);
 
-        $user = Auth::user();
-        $student = Students::where('user_id', $user->user_id)->firstOrFail();
-        if (!$student) {
-            return response()->json(['message' => 'Mahasiswa tidak ditemukan'], 404);
-        }
-
         try {
-            $kp_book = $request->file('kp_book');
-            $localFolder = public_path('firebase-temp-uploads') . '/';
-            $extension = $kp_book->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
-            $kp_book->move($localFolder, $fileName);
-            $uploadedFile = fopen($localFolder . $fileName, 'r');
+            $user = Auth::user();
+            $student = Students::where('user_id', $user->user_id)->firstOrFail();
+            $internship = DB::table('internships')->where('application_id', $id)->firstOrFail();
 
-            // Upload file ke Firebase Storage
+            // Hapus file lama jika ada
+            if ($internship->kp_book) {
+                $oldPath = str_replace('/storage/', '', parse_url($internship->kp_book, PHP_URL_PATH));
+                Storage::disk('public')->delete($oldPath);
+            }
 
+            $file = $request->file('kp_book');
+            $fileName = 'kp_' . time() . '.' . $file->getClientOriginalExtension();
 
-            app('firebase.storage')->getBucket()->upload($uploadedFile, [
-                'name' => 'kp_books/' . $fileName,
-            ]);
+            // Simpan file sementara
+            $tempPath = $file->storeAs('temp', $fileName, 'local');
+            $tempFullPath = storage_path('app/' . $tempPath);
 
-            unlink($localFolder . $fileName);
+            // Proses watermark
+            $pdf = new \setasign\Fpdi\Fpdi();
+            $pageCount = $pdf->setSourceFile($tempFullPath);
 
-            // Dapatkan URL untuk disimpan di database
-            $fileUrl = "https://firebasestorage.googleapis.com/v0/b/proyekakhir-7f1e1.firebasestorage.app/o/" . urlencode('kp_books/' . $fileName) . "?alt=media";
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $tplId = $pdf->importPage($i);
+                $size = $pdf->getTemplateSize($tplId);
 
-            // Update database dengan URL Firebase
-            DB::table('internships')->where('application_id', $id)->update(['kp_book' => $fileUrl]);
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($tplId);
 
-            return redirect()->back()->with('success', 'Buku KP berhasil diunggah');
+                $pdf->SetFont('Helvetica', 'I', 24);
+                $pdf->SetTextColor(255, 0, 0);
+                $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
+                $pdf->Cell($size['width'], 10, 'COPYRIGHT - SURYA INFORMATIKA', 0, 0, 'C');
+            }
+
+            // Simpan hasil watermark ke storage publik
+            $watermarkedPath = 'kp_books/' . $fileName;
+            $finalPath = storage_path('app/public/' . $watermarkedPath);
+            $pdf->Output($finalPath, 'F');
+
+            // Dapatkan URL publik
+            $fileUrl = Storage::url($watermarkedPath);
+
+            // Simpan ke DB
+            DB::table('internships')
+                ->where('application_id', $id)
+                ->update([
+                    'kp_book' => $fileUrl,
+                    'updated_at' => now()
+                ]);
+
+            // Hapus file temp
+            Storage::disk('local')->delete($tempPath);
+
+            return redirect()->back()->with('success', 'Buku KP berhasil diunggah dan diberi watermark.');
         } catch (\Exception $e) {
-            Log::error('Error saat upload buku kp: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to upload buku kp: ' . $e->getMessage());
+            Log::error('Gagal upload KP Book: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah: ' . $e->getMessage());
         }
     }
 }

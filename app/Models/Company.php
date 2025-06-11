@@ -30,4 +30,14 @@ class Company extends Model
     {
         return $this->hasMany(Internship::class, 'company_id', 'company_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    public function vacancies()
+    {
+        return $this->hasMany(Vacancy::class, 'company_id', 'company_id');
+    }
 }

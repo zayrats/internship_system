@@ -14,7 +14,8 @@
                         <th class="px-6 py-3 cursor-pointer" onclick="sortTable(0)">Nama Perusahaan</th>
                         <th class="px-6 py-3 cursor-pointer" onclick="sortTable(1)">Mahasiswa</th>
                         <th class="px-6 py-3 cursor-pointer" onclick="sortTable(2)">Pengalaman</th>
-                        <th class="px-6 py-3 cursor-pointer" onclick="sortTable(3)">Rating</th>
+                        <th class="px-6 py-3 cursor-pointer" onclick="sortTable(3)">Periode Magang</th>
+                        <th class="px-6 py-3 cursor-pointer" onclick="sortTable(4)">Rating</th>
                         <th class="px-6 py-3"><span class="sr-only">Detail</span></th>
                     </tr>
                 </thead>
@@ -26,6 +27,7 @@
                             </td>
                             <td class="px-6 py-4">{{ $item->student_name }}</td>
                             <td class="px-6 py-4">{{ $item->feedback }}</td>
+                            <td class="px-6 py-4">{{ $item->start_date }} - {{ $item->end_date }}</td>
 
                             {{-- Warna rating --}}
                             <td class="px-6 py-4 font-bold text-yellow-500">{{ $item->rating }}</td>
@@ -34,7 +36,7 @@
                             <td class="px-6 py-4 text-center">
                                 <button class="text-blue-600 hover:underline open-modal"
                                     data-company_name="{{ $item->company_name }}" data-feedback="{{ $item->feedback }}"
-                                    data-company_logo="{{ asset('storage/' . $item->company_logo) }}"
+                                    data-company_logo="{{ asset($item->company_logo) }}"
                                     data-student_name="{{ $item->student_name }}" data-position="{{ $item->position }}"
                                     data-start_date="{{ $item->start_date }}" data-end_date="{{ $item->end_date }}"
                                     data-duration="{{ \Carbon\Carbon::parse($item->start_date)->diffInMonths(\Carbon\Carbon::parse($item->end_date)) }} bulan"
@@ -95,7 +97,9 @@
                 <!-- Buku KP -->
                 <div class="mt-6 flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                     <p class="text-gray-900 dark:text-white font-medium">Buku KP:</p>
-                    <button id="modalKpBook" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:underline" onclick="openKpBookModal('{{ $item->kp_book }}')">
+                    <button id="modalKpBook"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:underline"
+                        onclick="openKpBookModal('{{ $item->kp_book }}')">
                         Lihat Buku KP
                     </button>
                 </div>
@@ -110,11 +114,11 @@
             </div>
         </div>
         <!-- Modal Lihat Buku KP -->
-        <div id="kpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div id="kpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center mt-24">
             <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
-                <h2 class="text-xl font-bold text-center mb-4">Buku KP</h2>
+                <h2 class="text-xl font-bold text-center mb-4 text-black">Buku KP</h2>
 
-                <iframe id="kpBookFrame" class="w-full h-[500px]"></iframe>
+                <iframe id="kpBookFrame" src="#toolbar=0" class="w-full h-[500px]"></iframe>
 
                 <div class="flex justify-center mt-6">
                     <button id="closeKpBookModal" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
@@ -182,7 +186,7 @@
 
             // Fungsi untuk menampilkan modal dan menampilkan PDF
             window.openKpBookModal = function(kpBookUrl) {
-                kpBookFrame.src = kpBookUrl; // Load Buku KP di iframe
+                kpBookFrame.src = kpBookUrl + '#toolbar=0'; // Load Buku KP di iframe
                 kpBookModal.classList.remove("hidden"); // Tampilkan modal
             };
 
@@ -190,6 +194,26 @@
             closeKpBookModalBtn.addEventListener("click", function() {
                 kpBookModal.classList.add("hidden");
                 kpBookFrame.src = ""; // Kosongkan iframe saat modal ditutup
+            });
+        });
+    </script>
+    <script>
+        // DataTables Init
+        $(document).ready(function() {
+            $('#experienceTable').DataTable({
+                responsive: true,
+                ordering: true,
+                paging: true,
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    paginate: {
+                        previous: "Sebelumnya",
+                        next: "Berikutnya"
+                    },
+                    zeroRecords: "Tidak ditemukan data yang cocok"
+                }
             });
         });
     </script>

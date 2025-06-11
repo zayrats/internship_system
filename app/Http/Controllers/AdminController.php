@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
+use App\Models\Internship;
 use App\Models\Vacancy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,33 +19,48 @@ class AdminController
 
     public function monitoringMahasiswa(Request $request)
     {
-        $query = DB::table('internships')
-            ->join('students', 'internships.student_id', '=', 'students.student_id')
-            ->join('companies', 'internships.company_id', '=', 'companies.company_id')
-            ->select('students.name', 'students.student_number', 'students.prodi', 'companies.name as company_name', 'internships.start_date', 'internships.end_date');
+        $query = DB::table('applications') // Perhatikan: apakah nama tabel benar 'applications' atau 'applications'?
+            ->join('students', 'applications.student_id', '=', 'students.student_id')
+            ->join('vacancy', 'applications.vacancy_id', '=', 'vacancy.vacancy_id')
+            ->join('companies', 'vacancy.company_id', '=', 'companies.company_id')
+            ->select([
+                'applications.*',
+                'students.name as name',
+                'students.student_number as student_number',
+                'students.prodi as prodi',
+                'vacancy.start_date',
+                'vacancy.end_date',
+                'companies.name as company_name'
+            ]);
 
         // Filter berdasarkan perusahaan
-        if (request()->has('company_id') && $request->company_id != '') {
+        if ($request->filled('company_id')) {
             $query->where('companies.company_id', $request->company_id);
         }
 
         // Filter berdasarkan status
-        if (request()->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $now = now();
-            if ($request->status == 'sedang') {
-                $query->whereDate('internships.start_date', '<=', $now)->whereDate('internships.end_date', '>=', $now);
-            } elseif ($request->status == 'belum') {
-                $query->whereDate('internships.start_date', '>', $now);
-            } elseif ($request->status == 'selesai') {
-                $query->whereDate('internships.end_date', '<', $now);
+            switch ($request->status) {
+                case 'sedang':
+                    $query->whereDate('vacancy.start_date', '<=', $now)
+                        ->whereDate('vacancy.end_date', '>=', $now);
+                    break;
+                case 'belum':
+                    $query->whereDate('vacancy.start_date', '>', $now);
+                    break;
+                case 'selesai':
+                    $query->whereDate('vacancy.end_date', '<', $now);
+                    break;
             }
         }
 
         // Pencarian mahasiswa
-        if (request()->has('search') && $request->search != '') {
-            $query->where(function ($q) use ($request) {
-                $q->where('students.name', 'like', "%{$request->search}%")
-                    ->orWhere('students.nrp', 'like', "%{$request->search}%");
+        if ($request->filled('search')) {
+            $searchTerm = "%{$request->search}%";
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('students.name', 'like', $searchTerm)
+                    ->orWhere('students.nrp', 'like', $searchTerm);
             });
         }
 
@@ -55,33 +72,31 @@ class AdminController
 
     public function manageJobs(Request $request)
     {
-        $query = DB::table('vacancy')
-            ->join('companies', 'vacancy.company_id', '=', 'companies.company_id')
-            ->select('vacancy.*', 'companies.name as company_name');
+        $query = Vacancy::with('company');
 
         // Filter berdasarkan perusahaan
         if ($request->filled('company_id')) {
-            $query->where('companies.company_id', $request->company_id);
+            $query->where('company_id', $request->company_id);
         }
 
         // Filter status lowongan
         if ($request->filled('status')) {
             $now = now();
             if ($request->status == 'aktif') {
-                $query->whereDate('vacancy.end_date', '>=', $now);
+                $query->whereDate('end_date', '>=', $now);
             } elseif ($request->status == 'berakhir') {
-                $query->whereDate('vacancy.end_date', '<', $now);
+                $query->whereDate('end_date', '<', $now);
             }
         }
 
         // Pencarian berdasarkan posisi
         if ($request->filled('search')) {
-            $query->where('vacancy.division', 'like', "%{$request->search}%");
+            $query->where('division', 'like', "%{$request->search}%");
         }
 
-        $jobs = Vacancy::with('company')->paginate(10);
-        $companies = DB::table('companies')->get();
-        // dd($companies, $jobs);
+        $jobs = $query->paginate(10);
+        $companies = Company::all();
+        // dd($jobs->toArray());
         return view('admin.jobs', compact('jobs', 'companies'));
     }
     public function updateJob(Request $request, $id)
@@ -203,5 +218,153 @@ class AdminController
         $user = User::find($id);
         $user->delete();
         return redirect()->route('admindashboard');
+    }
+
+    public function manageCompanies(Request $request)
+    {
+        $query = Company::with('vacancies');
+        $internships = Vacancy::with(['internships.student'])->get();
+
+        // Filter berdasarkan perusahaan
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        // Filter status lowongan
+        if ($request->filled('status')) {
+            $now = now();
+            if ($request->status == 'aktif') {
+                $query->whereDate('end_date', '>=', $now);
+            } elseif ($request->status == 'tidak aktif') {
+                $query->whereDate('end_date', '<', $now);
+            }
+        }
+
+        // Pencarian berdasarkan posisi
+        if ($request->filled('search')) {
+            $query->where('division', 'like', "%{$request->search}%");
+        }
+
+        $companies = $query->paginate(10);
+        $vacancies = Vacancy::all();
+
+        return view('admin.companies', compact('companies', 'vacancies', 'internships'));
+    }
+    public function updateCompany(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'address' => 'required',
+            'x_coordinate' => 'required',
+            'y_coordinate' => 'required',
+            'logo' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+        ]);
+        // dd($request->all());
+        DB::table('companies')->where('company_id', $id)->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'x_coordinate' => $request->x_coordinate,
+            'y_coordinate' => $request->y_coordinate,
+            'logo' => $request->logo
+        ]);
+
+
+        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
+    }
+
+    public function deleteCompany($id)
+    {
+        DB::table('companies')->where('company_id', $id)->delete();
+        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil dihapus');
+    }
+    public function addCompany(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'address' => 'required',
+            'x_coordinate' => 'required',
+            'y_coordinate' => 'required',
+            'logo' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+
+        ]);
+        // dd($request->all());
+        $company = new Company();
+        $company->name = $request->name;
+        $company->email = $request->email;
+        $company->phone = $request->phone;
+        $company->address = $request->address;
+        $company->x_coordinate = $request->x_coordinate;
+        $company->y_coordinate = $request->y_coordinate;
+        $company->logo = $request->logo;
+        $company->save();
+
+
+        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil ditambahkan');
+    }
+
+    public function addVacancy(Request $request)
+    {
+        $request->validate([
+            'company_id' => 'required',
+            'division' => 'required',
+            'type' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'duration' => 'required',
+            'requirements' => 'required',
+        ]);
+        // dd($request->all());
+        $vacancy = new Vacancy();
+        $vacancy->company_id = $request->company_id;
+        $vacancy->division = $request->division;
+        $vacancy->type = $request->type;
+        $vacancy->start_date = $request->start_date;
+        $vacancy->end_date = $request->end_date;
+        $vacancy->duration = $request->duration;
+        $vacancy->requirements = $request->requirements;
+        $vacancy->save();
+
+
+        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil ditambahkan');
+    }
+
+    public function updateVacancy(Request $request, $id)
+    {
+        $request->validate([
+            'company_id' => 'required',
+            'division' => 'required',
+            'type' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'duration' => 'required',
+            'requirements' => 'required',
+        ]);
+        // dd($request->all());
+        DB::table('vacancy')->where('vacancy_id', $id)->update([
+            'company_id' => $request->company_id,
+            'division' => $request->division,
+            'type' => $request->type,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'duration' => $request->duration,
+            'requirements' => $request->requirements,
+        ]);
+
+
+        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
+    }
+
+    public function deleteVacancy($id)
+    {
+        DB::table('vacancy')->where('vacancy_id', $id)->delete();
+        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil dihapus');
     }
 }

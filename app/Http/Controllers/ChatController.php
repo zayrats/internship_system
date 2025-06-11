@@ -25,11 +25,33 @@ class ChatController
     {
         $request->validate([
             'message' => 'required|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        $image = $request->file('image');
+        $localFolder = public_path('firebase-temp-uploads') . '/';
+        $extension = $image->getClientOriginalExtension();
+        $fileName = time() . '.' . $extension;
+
+        // $tempPath = storage_path('app/temp/' . $fileName);
+        $image->move($localFolder, $fileName);
+
+        // Upload ke Firebase
+        $uploadedFile = fopen($localFolder . $fileName, 'r');
+        app('firebase.storage')->getBucket()->upload($uploadedFile, [
+            'name' => 'image/' . $fileName,
+        ]);
+
+        // Hapus file lokal
+        unlink($localFolder . $fileName);
+
+        // Dapatkan URL untuk disimpan di database
+        $fileUrl = "https://firebasestorage.googleapis.com/v0/b/proyekakhir-7f1e1.firebasestorage.app/o/" . urlencode('image/' . $fileName) . "?alt=media";
 
         $chat = Chat::create([
             'user_id' => Auth::id(),
             'message' => $request->message,
+            'image' => $fileUrl
         ]);
 
         return response()->json($chat, 201);

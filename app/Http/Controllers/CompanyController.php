@@ -8,7 +8,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 
 class CompanyController extends Controller
@@ -28,7 +32,7 @@ class CompanyController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'address' => 'nullable|string',
             'contact_email' => 'nullable|email',
-            'contact_phone' => 'nullable|string|max:20',
+            'contact_phone' => 'nullable|string|max:20|',
             'description' => 'nullable|string',
             'x_coordinate' => 'nullable|numeric',
             'y_coordinate' => 'nullable|numeric',
@@ -41,30 +45,35 @@ class CompanyController extends Controller
 
         // Jika ada logo yang diunggah, simpan ke storage
         if ($request->hasFile('logo')) {
-            $logo = $request->file('logo');
-            $localFolder = public_path('firebase-temp-uploads') . '/';
-            $extension = $logo->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
-            // $logo->move($localFolder, $fileName);
+            try {
+                $logo = $request->file('logo');
 
-            // Hapus logo lama jika ada
-            if ($company->logo) {
-                app('firebase.storage')->getBucket()->object('company_logo/' . $company->logo)->delete();
-            }
+                // Hapus logo lama jika ada
+                if ($company->logo) {
+                    $oldPath = str_replace(url('/storage'), '', $company->logo);
+                    Storage::disk('public')->delete($oldPath);
+                }
 
-            if($logo->move($localFolder, $fileName)){
-                $uploadedFile = fopen($localFolder . $fileName, 'r');
-                app('firebase.storage')->getBucket()->upload($uploadedFile, [
-                    'name' => 'company_logo/' . $fileName
-                ]);
-                unlink($localFolder . $fileName);
-                $photoUrl = "https://firebasestorage.googleapis.com/v0/b/proyekakhir-7f1e1.firebasestorage.app/o/" . urlencode('company_logo/' . $fileName) . "?alt=media";
-                $company->logo = $photoUrl;
+                // Generate nama file unik
+                $fileName = 'company_' . Str::slug($company->name) . '_' . time() . '.' . $logo->getClientOriginalExtension();
+
+                // Simpan file ke storage
+                $path = $logo->storeAs('company_logos', $fileName, 'public');
+
+                // Dapatkan URL publik
+                $logoUrl = Storage::url($path);
+
+                // Update database
+                $company->logo = $logoUrl;
                 $company->save();
+
+                return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
+            } catch (\Exception $e) {
+                Log::error('Error upload logo: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal mengupload logo: ' . $e->getMessage());
             }
         }
 
         return redirect()->route('companydashboard')->with('success', 'Profil berhasil diperbarui.');
     }
-
 }

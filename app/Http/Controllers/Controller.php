@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chat;
+use App\Models\Company;
+use App\Models\Internship;
+use Faker\Core\Coordinates;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -10,15 +13,61 @@ use Illuminate\Support\Facades\Session;
 
 use function Laravel\Prompts\select;
 
-
 class Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
 
-    return view('homepage');
+        if ($user && in_array($user->role, ['Perusahaan', 'Admin'])) {
+            return redirect()->back();
+        }
 
+        // Ambil semua perusahaan yang punya koordinat
+        $companies = Company::with(['internships.student'])
+            ->whereNotNull('x_coordinate')
+            ->whereNotNull('y_coordinate')
+            ->get();
+
+        $initialMarkers = [];
+
+        foreach ($companies as $company) {
+            $students = [];
+
+            foreach ($company->internships as $internship) {
+                if ($internship->student) {
+                    $fullName = $internship->student->name;
+                    $nameParts = explode(' ', $fullName);
+
+                    if (count($nameParts) >= 3) {
+                        $middleIndex = floor(count($nameParts) / 2);
+                        $highlighted = $nameParts;
+                        $highlighted[$middleIndex] = '<strong>' . $highlighted[$middleIndex] . '</strong>';
+                        $displayName = implode(' ', $highlighted);
+                    } else {
+                        $displayName = $fullName;
+                    }
+
+                    $students[] = $displayName;
+                }
+            }
+
+
+            $initialMarkers[] = [
+                'position' => [
+                    'lat' => (float) $company->x_coordinate,
+                    'lng' => (float) $company->y_coordinate,
+                ],
+                'draggable' => false,
+                'name' => $company->name,
+                'total_intern' => count($students),
+                'students' => $students
+            ];
+        }
+
+        return view('homepage', compact('initialMarkers'));
     }
+
 
     public function history(Request $request)
     {
@@ -26,38 +75,29 @@ class Controller
     }
     public function maps()
     {
-        $initialMarkers = [
-            [
-                'position' => [
-                    'lat' => -7.8052485,
-                    'lng' => 110.3642824
-                ],
-                'draggable' => false
-            ],
-            [
-                'position' => [
-                    'lat' => -7.7925927,
-                    'lng' => 110.3658812
-                ],
-                'draggable' => false
-            ],
-            [
-                'position' => [
-                    'lat' => -7.283026,
-                    'lng' => 112.750282
-                ],
-                'draggable' => false
-            ],
-            [
-                'position' => [
-                    'lat' => -7.8118994,
-                    'lng' => 110.3632557
-                ],
-                'draggable' => false
-            ]
-        ];
+        // Ambil semua data internship beserta relasi ke company
+        $internships = Internship::with('company')->get();
+
+        // Inisialisasi array markers
+        $initialMarkers = [];
+
+        // Loop tiap internship dan ambil koordinat perusahaannya
+        foreach ($internships as $internship) {
+            if ($internship->company && $internship->company->x_coordinate && $internship->company->y_coordinate) {
+                $initialMarkers[] = [
+                    'position' => [
+                        'lat' => (float) $internship->company->x_coordinate,
+                        'lng' => (float) $internship->company->y_coordinate,
+                    ],
+                    'draggable' => false,
+                    'name' => $internship->company->name
+                ];
+            }
+        }
+
         return view('maps', compact('initialMarkers'));
     }
+
     public function profile(Request $request)
     {
         return view('profile');

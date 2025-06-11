@@ -15,8 +15,12 @@
 
 
 
-        <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center my-5">Riwayat Pengajuan Magang</h3>
-
+        <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center my-5">Riwayat Pengajuan KP</h3>
+        <!-- Tombol trigger (optional placement) -->
+        <button onclick="openAddApplicationModal()"
+            class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2">
+            Tambah Pengajuan KP
+        </button>
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-600 dark:text-gray-400">
@@ -49,39 +53,67 @@
                             <td class="px-6 py-4">{{ $item->division }}</td>
                             <td class="px-6 py-4 text-center">
                                 <a href="#"
-                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline detail-btn"
+                                    class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline detail-btn"
                                     data-id="{{ $item->company_id }}" data-name="{{ $item->company_name }}"
                                     data-address="{{ $item->company_address }}"
-                                    data-logo="{{ asset('storage/' . $item->company_logo) }}"
+                                    data-logo="{{ asset($item->company_logo) }}"
                                     data-requirements="{{ $item->requirements }}" data-division="{{ $item->division }}"
                                     data-duration="{{ $item->duration }}" data-type="{{ $item->type }}"
                                     data-status="{{ $item->status }}"
                                     data-application_date="{{ $item->application_date }}">
                                     Lihat
                                 </a>
-                                <a href="{{ route('deleteHistory', $item->id) }}" class="text-red-600 hover:underline">
+                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                                    onclick="openEditApplicationModal('{{ $item->id }}',
+                                    '{{ $item->vacancy_id }}',
+                                    '{{ $item->status }}',
+                                    '{{ $item->application_date }}',
+                                    '{{ basename($item->document) }}')">
+                                    Edit Pengajuan
+                                </button>
+                                <a href="{{ route('deleteHistory', $item->id) }}"
+                                    class="text-white hover:underline rounded bg-red-500 px-3 py-1"
+                                    onclick="return confirm('Yakin ingin menghapus pengajuan ini?')">
                                     Hapus
                                 </a>
-
                                 @if (strtolower(trim($item->status)) === 'finished')
-                                    @if ($item->feedback)
-                                        <button class="text-green-600 hover:underline"
-                                            onclick="openFeedbackModal('{{ $item->company_name }}', '{{ $item->title }}', '{{ $item->start_date }}', '{{ $item->end_date }}', '{{ $item->position }}', '{{ $item->feedback }}', '{{ $item->rating }}')">
+                                    {{-- <p>{{ json_encode($item) }}</p> --}}
+                                    @if ($item->internship_id)
+                                        <button class="text-green-600 hover:underline bg-green-500 rounded px-3 py-1"
+                                            onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
+                                            '{{ $item->id }}',
+                                            '{{ $item->company_id }}',
+                                            '{{ $item->company_name }}', '{{ $item->title }}', '{{ $item->start_date }}', '{{ $item->end_date }}', '{{ $item->position }}', '{{ $item->feedback }}', '{{ $item->rating }}',
+                                            '{{ $item->kp_book }}',
+                                            '{{ $item->vacancy_id }}',)">
                                             Lihat Rating
                                         </button>
+                                        <input type="hidden" id="currentKpBookUrl" value="{{ asset($item->kp_book) }}">
                                     @else
-                                        <button class="text-green-600 hover:underline" onclick="openFeedbackModal()">
-                                            Isi Pengalaman
+                                        <button class="text-white hover:underline bg-green-500 rounded px-3 py-1 mx-1"
+                                            onclick="openFeedbackModal('{{ $item->internship_id_useless ?? '' }}',
+                                            '{{ $item->id }}',
+                                            '{{ $item->company_id }}',
+                                            '{{ $item->company_name ?? '' }}',
+                                            '{{ $item->title ?? '' }}',
+                                            '{{ $item->start_date_vacancy }}',
+                                            '{{ $item->end_date_vacancy }}','{{ $item->division }}',
+                                            '{{ $item->feedback ?? '' }}',
+                                            '{{ $item->rating ?? '' }}',
+                                            '{{ $item->kp_book ?? '' }}',
+                                            '{{ $item->vacancy_id ?? '' }}',
+                                        )">
+                                            Unggah Pengalaman
                                         </button>
                                     @endif
 
                                     @if ($item->kp_book)
-                                        <button class="text-yellow-500 hover:underline"
+                                        {{-- <button class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
                                             onclick="openKpBookModal('{{ $item->kp_book }}')">
                                             Lihat Buku KP
-                                        </button>
+                                        </button> --}}
                                     @else
-                                        <button class="text-yellow-500 hover:underline"
+                                        <button class="text-white hover:underline bg-yellow-500 rounded px-3 py-1"
                                             onclick="openUploadKpModal('{{ $item->internship_id }}', '{{ $item->id }}')">
                                             Unggah Buku KP
                                         </button>
@@ -95,7 +127,8 @@
             <!-- Modal Detail -->
             <div id="detailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
-                    <h2 class="text-lg text-center font-bold text-center mb-4 text-gray-900 dark:text-white ">Detail Perusahaan</h2>
+                    <h2 class="text-lg text-center font-bold text-center mb-4 text-gray-900 dark:text-white ">Detail
+                        Perusahaan</h2>
 
                     <!-- Logo Perusahaan di Tengah -->
                     <div class="flex justify-center mb-4">
@@ -146,28 +179,40 @@
             </div>
 
             <!-- Modal Feedback -->
-            <div id="feedbackModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center">
+            <div id="feedbackModal"
+                class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center mt-24">
                 <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 w-96">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center" id="feedbackModalTitle">Feedback Magang</h2>
+                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center"
+                        id="feedbackModalTitle">
+                        Feedback Magang
+                    </h2>
 
-                    <form method="POST" action="{{ route('submitHistoryFeedback') }}" id="feedbackForm">
+                    <form method="POST" action="#" enctype="multipart/form-data" id="feedbackForm">
                         @csrf
                         <input type="hidden" name="internship_id" id="internshipId">
+                        <input type="hidden" name="company_id" id="modalCompanyId">
+                        <input type="hidden" name="vacancy_id" class="hidden" id="modalVacancyId">
+                        <input type="hidden" id="currentKpBookUrl">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Perusahaan</label>
-                        <input type="text" id="companyName" class="w-full p-2 border rounded bg-gray-100" readonly>
+                        <input type="text" disabled id="companyName"
+                            class="w-full p-2 border rounded bg-gray-100 dark:text-black" readonly>
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Judul Buku KP</label>
-                        <input type="text" name="title" id="title" class="w-full p-2 border rounded">
+                        <input type="text" name="title" id="title"
+                            class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Mulai</label>
-                        <input type="date" name="start_date" id="startDate" class="w-full p-2 border rounded">
+                        <input type="date" name="start_date" id="startDate"
+                            class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Selesai</label>
-                        <input type="date" name="end_date" id="endDate" class="w-full p-2 border rounded">
+                        <input type="date" name="end_date" id="endDate"
+                            class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Posisi Magang</label>
-                        <input type="text" name="position" id="position" class="w-full p-2 border rounded">
+                        <input type="text" name="position" id="position"
+                            class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Rating</label>
                         <div id="ratingContainer" class="flex space-x-1 text-yellow-500 text-2xl cursor-pointer">
@@ -180,7 +225,24 @@
                         <input type="hidden" name="rating" id="ratingValue" value="0">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Feedback</label>
-                        <textarea name="feedback" id="feedback" class="w-full p-2 border rounded"></textarea>
+                        <textarea name="feedback" id="feedback" class="w-full p-2 border rounded dark:text-black"></textarea>
+
+
+                        {{-- if else for uploaded file --}}
+
+                        <div id="kpBookReader" class="">
+                            <button type="button" class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
+                                onclick="openKpBookModal()">
+                                Lihat Buku KP
+                            </button>
+                        </div>
+                        <!-- Tambahkan Upload Buku KP -->
+                        <div id="kpBookUpload" class="">
+                            <label class="block text-sm font-medium text-gray-900 dark:text-white mt-4">Unggah Buku KP
+                                (PDF)</label>
+                            <input type="file" name="kp_book" accept="application/pdf"
+                                class="w-full p-2 border rounded dark:text-black">
+                        </div>
 
                         <div class="flex justify-center mt-6">
                             <button type="button" id="closeModalFeedback"
@@ -191,6 +253,7 @@
                     </form>
                 </div>
             </div>
+
 
 
             <!-- Modal Unggah Buku KP -->
@@ -220,7 +283,8 @@
                 </div>
             </div>
             <!-- Modal Lihat Buku KP -->
-            <div id="kpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+            <div id="kpBookModal"
+                class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center mt-24">
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
                     <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Buku KP</h2>
 
@@ -235,11 +299,168 @@
                 </div>
             </div>
 
+            <!-- Modal Tambah Pengajuan KP -->
+            <div id="applicationModal"
+                class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+                <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-6 relative">
+                    <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Tambah Pengajuan KP</h3>
 
+                    <form id="applicationForm" action="{{ route('internshipapply', ['id' => $item->vacancy_id]) }}"
+                        method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+
+                        <!-- Pilih Lowongan -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Pilih
+                                Lowongan</label>
+                            <select name="vacancy_id" required
+                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white">
+                                @foreach ($vacancies as $vacancy)
+                                    <option value="{{ $vacancy->vacancy_id }}">{{ $vacancy->division }} -
+                                        {{ $vacancy->company_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Upload Surat Pengantar -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Surat Pengantar
+                                (PDF)</label>
+                            <input type="file" name="document" accept="application/pdf" required
+                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                        </div>
+
+                        <!-- Tombol -->
+                        <div class="space-y-2">
+                            <button type="submit"
+                                class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition duration-200">
+                                Simpan Pengajuan
+                            </button>
+                            <button type="button" onclick="closeModal('applicationModal')"
+                                class="w-full text-center text-red-500 hover:underline">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Edit Pengajuan -->
+            <div id="editApplicationModal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
+                    <h2 class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">Edit Pengajuan</h2>
+                    <form id="editApplicationForm" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+
+                        <input type="hidden" id="editApplicationId" name="application_id">
+
+                        <!-- Lowongan (disabled) -->
+                        <div class="mb-4">
+                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Lowongan KP</label>
+                            <select disabled name="vacancy_id" id="editVacancySelect"
+                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                @foreach ($vacancies as $vacancy)
+                                    <option value="{{ $vacancy->vacancy_id }}">
+                                        {{ $vacancy->division }} - {{ $vacancy->company_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-4">
+                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Status</label>
+                            {{-- @dump($data)($item->status) --}}
+                            <select name="status" id="editStatusSelect" required
+                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Finished">Finished</option>
+                            </select>
+                        </div>
+
+                        <!-- Tanggal Pengajuan -->
+                        <div class="mb-4">
+                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal Pengajuan</label>
+                            <input type="date" name="application_date" id="editApplicationDate"
+                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                        </div>
+
+                        <!-- Unggah Surat Lamaran -->
+                        <div class="mb-4">
+                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">
+                                Unggah Surat Lamaran Baru
+                            </label>
+
+                            <!-- Tampilkan file lama -->
+                            <p id="existingDocumentName" class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
+
+                            <!-- Input file baru -->
+                            <input type="file" name="document" accept="application/pdf"
+                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                        </div>
+
+
+                        <!-- Tombol -->
+                        <div class="flex justify-end mt-6 gap-2">
+                            <button type="button" onclick="closeEditApplicationModal()"
+                                class="bg-red-700 text-white px-4 py-2 rounded-lg">
+                                Batal
+                            </button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
     </div>
     <script>
+        function openEditApplicationModal(applicationId, vacancyId, status, applicationDate, documentName) {
+            const modal = document.getElementById('editApplicationModal');
+            const form = document.getElementById('editApplicationForm');
+
+            // Ubah form action ke endpoint yang sesuai
+            form.action = "/applications/" + applicationId;
+
+            // Isi field
+            document.getElementById('editApplicationId').value = applicationId;
+            document.getElementById('editVacancySelect').value = vacancyId;
+            document.getElementById('editStatusSelect').value = status;
+            document.getElementById('editApplicationDate').value = applicationDate;
+
+            // Tampilkan nama file dokumen lama
+            const docNameElement = document.getElementById('existingDocumentName');
+            if (documentName && documentName !== 'null') {
+                docNameElement.textContent = "File sebelumnya: " + documentName;
+            } else {
+                docNameElement.textContent = "Belum ada file surat lamaran.";
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditApplicationModal() {
+            document.getElementById('editApplicationModal').classList.add('hidden');
+        }
+    </script>
+
+
+
+    <script>
+        function openAddApplicationModal() {
+            document.getElementById("applicationModal").classList.remove("hidden");
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add("hidden");
+        }
+    </script>
+    <script>
+        //lihat detail
         document.addEventListener('DOMContentLoaded', function() {
             const detailButtons = document.querySelectorAll('.detail-btn');
             const modal = document.getElementById('detailModal');
@@ -278,126 +499,194 @@
         });
     </script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const modal = document.getElementById("feedbackModal");
-            const closeModalFeedback = document.getElementById("closeModalFeedback");
-            const internshipIdInput = document.getElementById("internshipId");
+        //feedback upload
+        // document.addEventListener("DOMContentLoaded", function() {
+        //     const modal = document.getElementById("feedbackModal");
+        //     const closeModalFeedback = document.getElementById("closeModalFeedback");
+        //     const internshipIdInput = document.getElementById("internshipId");
 
-            // Saat tombol "Isi Pengalaman" diklik, modal terbuka
-            document.querySelectorAll(".open-modal").forEach(button => {
-                button.addEventListener("click", function() {
-                    const internshipId = this.getAttribute("data-id");
-                    internshipIdInput.value = internshipId;
-                    modal.classList.remove("hidden");
-                });
-            });
+        //     // Saat tombol "Isi Pengalaman" diklik, modal terbuka
+        //     document.querySelectorAll(".open-modal").forEach(button => {
+        //         button.addEventListener("click", function() {
+        //             const internshipId = this.getAttribute("data-id");
+        //             internshipIdInput.value = internshipId;
+        //             modal.classList.remove("hidden");
+        //         });
+        //     });
 
-            // Tutup modal saat tombol "Batal" diklik
-            closeModalFeedback.addEventListener("click", function() {
-                modal.classList.add("hidden");
-            });
+        //     // Tutup modal saat tombol "Batal" diklik
+        //     closeModalFeedback.addEventListener("click", function() {
+        //         modal.classList.add("hidden");
+        //     });
 
-            // Tutup modal jika klik di luar modal
-            window.addEventListener("click", function(event) {
-                if (event.target === modal) {
-                    modal.classList.add("hidden");
-                }
-            });
-        });
+        //     // Tutup modal jika klik di luar modal
+        //     window.addEventListener("click", function(event) {
+        //         if (event.target === modal) {
+        //             modal.classList.add("hidden");
+        //         }
+        //     });
+        // });
 
-        // Ambil elemen modal dan tombol close
-        const uploadKpModal = document.getElementById("uploadKpModal");
-        const closeUploadModalBtn = document.getElementById("closeUploadKpModal");
+        // // Ambil elemen modal dan tombol close
+        // const uploadKpModal = document.getElementById("uploadKpModal");
+        // const closeUploadModalBtn = document.getElementById("closeUploadKpModal");
 
-        // Pastikan fungsi ini global agar bisa dipanggil dari `onclick`
-        function openUploadKpModal(internshipId, applicationId) {
-            document.getElementById("applicationId").value = applicationId;
+        // // Pastikan fungsi ini global agar bisa dipanggil dari `onclick`
+        // function openUploadKpModal(internshipId, applicationId) {
+        //     document.getElementById("applicationId").value = applicationId;
 
-            let routeUrl = "{{ route('uploadKpBook', ['id' => ':id']) }}".replace(':id', applicationId);
-            document.getElementById("uploadKpForm").action = routeUrl;
+        //     let routeUrl = "{{ route('uploadKpBook', ['id' => ':id']) }}".replace(':id', applicationId);
+        //     document.getElementById("uploadKpForm").action = routeUrl;
 
-            uploadKpModal.classList.remove("hidden");
-        }
+        //     uploadKpModal.classList.remove("hidden");
+        // }
 
-        // Tutup modal saat tombol "Batal" ditekan
-        closeUploadModalBtn.addEventListener("click", function() {
-            uploadKpModal.classList.add("hidden");
-        });
+        // // Tutup modal saat tombol "Batal" ditekan
+        // closeUploadModalBtn.addEventListener("click", function() {
+        //     uploadKpModal.classList.add("hidden");
+        // });
 
-        // Tutup modal saat klik di luar modal
-        window.addEventListener("click", function(event) {
-            if (event.target === uploadKpModal) {
-                uploadKpModal.classList.add("hidden");
-            }
-        });
+        // // Tutup modal saat klik di luar modal
+        // window.addEventListener("click", function(event) {
+        //     if (event.target === uploadKpModal) {
+        //         uploadKpModal.classList.add("hidden");
+        //     }
+        // });
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const kpBookModal = document.getElementById("kpBookModal");
-            const kpBookFrame = document.getElementById("kpBookFrame");
-            const closeKpBookModalBtn = document.getElementById("closeKpBookModal");
+            // const kpBookModal = document.getElementById("kpBookModal");
+            // // const kpBookFrame = document.getElementById("kpBookFrame");
+            // const closeKpBookModalBtn = document.getElementById("closeKpBookModal");
 
             // Fungsi untuk menampilkan modal dan menampilkan PDF
-            window.openKpBookModal = function(kpBookUrl) {
-                kpBookFrame.src = kpBookUrl; // Load Buku KP di iframe
-                kpBookModal.classList.remove("hidden"); // Tampilkan modal
-            };
+            // window.openKpBookModal = function(kpBookUrl) {
+            //     kpBookFrame.src = kpBookUrl; // Load Buku KP di iframe
+            //     kpBookModal.classList.remove("hidden"); // Tampilkan modal
+            // };
 
             // Tutup modal saat tombol "Tutup" ditekan
-            closeKpBookModalBtn.addEventListener("click", function() {
-                kpBookModal.classList.add("hidden");
-                kpBookFrame.src = ""; // Kosongkan iframe saat modal ditutup
-            });
+            // closeKpBookModalBtn.addEventListener("click", function() {
+            //     kpBookModal.classList.add("hidden");
+            //     kpBookFrame.src = ""; // Kosongkan iframe saat modal ditutup
+            // });
         });
     </script>
     <script>
+        // lihat dan isi feedback
         document.addEventListener("DOMContentLoaded", function() {
             const feedbackModal = document.getElementById("feedbackModal");
-            const closeModalBtn = document.getElementById("closeModal");
+            const closeModalBtn = document.getElementById("closeModalFeedback");
+            const closeModalPdf = document.getElementById("closeKpBookModal");
             const feedbackForm = document.getElementById("feedbackForm");
             const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
             const stars = document.querySelectorAll("#ratingContainer .star");
             const ratingInput = document.getElementById("ratingValue");
 
             // Fungsi membuka modal (Mode Isi Pengalaman atau Lihat Rating)
-            window.openFeedbackModal = function(companyName = '', title = '', startDate = '', endDate = '',
-                position = '', feedback = '', rating = 0) {
+            window.openFeedbackModal = function(internshipId, applicationId, companyId, companyName = '', title =
+                '', startDate =
+                '', endDate = '', position = '', feedback = '', rating = 0, kpBookUrl = '', vacancyId = null
+            ) {
+                console.log("🚀 ~ document.addEventListener ~ kpBook:", internshipId)
+                if (!internshipId) {
+                    feedbackForm.method = 'post'
+                    feedbackForm.action = `/history/${applicationId}/submit-feedback`
+                    document.getElementById("modalVacancyId").value = vacancyId;
+                    console.log(`🚀 ~ document.addEventListener ~  document.getElementById("modalVacancyId"):`,
+                        document.getElementById("modalVacancyId"))
+
+                } else {
+                    feedbackForm.method = 'get'
+                }
+                console.log(feedbackForm) // Set ID aplikasi dan perusahaan
+                document.getElementById("internshipId").value = internshipId;
+                document.getElementById("applicationId").value = applicationId;
+                document.getElementById("modalCompanyId").value = companyId;
+
+                // Isi data ke dalam form
                 document.getElementById("companyName").value = companyName;
                 document.getElementById("title").value = title;
                 document.getElementById("startDate").value = startDate;
                 document.getElementById("endDate").value = endDate;
                 document.getElementById("position").value = position;
-                document.getElementById("feedback").value = feedback;
-                setRating(rating);
-
-                // Jika feedback sudah ada, ubah modal menjadi mode "Lihat Rating"
-                if (feedback || rating > 0) {
-                    document.getElementById("feedbackModalTitle").textContent = "Lihat Rating";
-                    submitFeedbackBtn.classList.add("hidden"); // Sembunyikan tombol Kirim
-                    feedbackForm.querySelectorAll("input, textarea").forEach(el => el.setAttribute("readonly",
-                        true));
-
-                    // Nonaktifkan rating interaction
-                    stars.forEach(star => star.style.pointerEvents = "none");
+                document.getElementById("feedback").value = feedback || '';
+                setRating(rating || 0);
+                if (!internshipId) {
+                    document.getElementById("kpBookUpload").classList.remove("hidden");
+                    document.getElementById("kpBookReader").classList.add("hidden");
                 } else {
-                    document.getElementById("feedbackModalTitle").textContent = "Isi Pengalaman";
-                    submitFeedbackBtn.classList.remove("hidden"); // Tampilkan tombol Kirim
-                    feedbackForm.querySelectorAll("input, textarea").forEach(el => el.removeAttribute(
-                        "readonly"));
+                    //tampil buku kp
+                    document.getElementById("kpBookUpload").classList.add("hidden");
+                    document.getElementById("kpBookReader").classList.remove("hidden");
+                    const kpBookModal = document.getElementById("kpBookModal");
+                    const kpBookFrame = document.getElementById("kpBookFrame");
+                    const closeKpBookModalBtn = document.getElementById("closeKpBookModal");
+                    // set value untuk currentKpBookUrl
+                    document.getElementById('currentKpBookUrl').value = kpBookUrl;
+                    // Fungsi untuk menampilkan modal dan menampilkan PDF
+                    window.openKpBookModal = function() {
 
-                    // Aktifkan rating interaction
-                    stars.forEach(star => star.style.pointerEvents = "auto");
+                        // const kpBookModal = document.getElementById("kpBookModal");
+                        // const kpBookFrame = document.getElementById("kpBookFrame");
+
+                        const url = document.getElementById("currentKpBookUrl").value;
+                        console.log("URL yang dimasukkan ke iframe:", url);
+                        kpBookFrame.src = url;
+                        kpBookModal.classList.remove("hidden"); // Tampilkan modal
+                    };
+
+
+                    // Tutup modal saat tombol "Batal" ditekan
+                    // closeKpBookModalBtn.addEventListener("click", function() {
+                    //     kpBookModal.classList.add("hidden");
+                    // Kosongkan iframe saat modal ditutup
+                    // kpBookFrame.src = "";
+                    // });
+                    document.getElementById("closeKpBookModal").addEventListener("click", function() {
+                        // const kpBookModal = document.getElementById("kpBookModal");
+                        // const kpBookFrame = document.getElementById("kpBookFrame");
+                        kpBookModal.classList.add("hidden");
+                        kpBookFrame.src = ""; // Kosongkan iframe
+                    });
                 }
 
+                const isReadOnly = (feedback && feedback.trim() !== '') || (parseInt(rating) > 0);
+
+                document.getElementById("feedbackModalTitle").textContent = isReadOnly ? "Lihat Rating" :
+                    "Isi Pengalaman";
+                document.getElementById("submitFeedbackBtn").classList.toggle("hidden", isReadOnly);
+
+                feedbackForm.querySelectorAll("input, textarea").forEach(el => {
+                    if (el.id !== 'internshipId' && el.id !== 'modalCompanyId') {
+                        isReadOnly ? el.setAttribute("readonly", true) : el.removeAttribute("readonly");
+                    }
+                });
+
+                stars.forEach(star => {
+                    star.style.pointerEvents = isReadOnly ? "none" : "auto";
+                });
+
                 feedbackModal.classList.remove("hidden");
+
+                // Tutup modal feedback saat tombol "Batal" ditekan
+                // closeModalFeedback
+
+                // // Tutup modal saat klik di luar modal
+                // window.addEventListener("click", function(event) {
+                //     if (event.target === uploadKpModal) {
+                //         uploadKpModal.classList.add("hidden");
+                //     }
             };
+
+
 
             // Fungsi untuk mengatur rating (highlight bintang)
             function setRating(value) {
                 ratingInput.value = value;
                 stars.forEach(star => {
                     star.style.color = star.dataset.value <= value ? "#FFD700" :
-                    "#D1D5DB"; // Warna emas jika aktif, abu-abu jika tidak
+                        "#D1D5DB"; // Warna emas jika aktif, abu-abu jika tidak
                 });
             }
 
@@ -412,6 +701,39 @@
             closeModalBtn.addEventListener("click", function() {
                 feedbackModal.classList.add("hidden");
             });
+
+            // Validasi file PDF saat submit form
+            feedbackForm.addEventListener("submit", function(event) {
+                const internshipId = document.getElementById("internshipId").value;
+
+                // Hanya validasi jika mode ISI (bukan Lihat Rating)
+                if (!internshipId) {
+                    const fileInput = feedbackForm.querySelector('input[type="file"]');
+                    if (fileInput && fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const fileType = file.type;
+
+                        if (fileType !== "application/pdf") {
+                            event.preventDefault();
+                            alert("File buku KP atau surat pengalaman harus berupa PDF.");
+                            return false;
+                        }
+                    } else {
+                        // Tidak ada file diunggah
+                        event.preventDefault();
+                        alert("Silakan unggah file PDF untuk buku KP atau surat pengalaman.");
+                        return false;
+                    }
+                }
+            });
+
         });
+    </script>
+    <script>
+        // Menghilangkan alert
+        setTimeout(() => {
+            document.getElementById('alert-success')?.remove();
+            document.getElementById('alert-error')?.remove();
+        }, 4000);
     </script>
 @endsection

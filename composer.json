@@ -12,7 +12,9 @@
         "laravel/jetstream": "^5.3",
         "laravel/tinker": "^2.9",
         "lcobucci/jwt": "5.3",
-        "livewire/livewire": "^3.0"
+        "livewire/livewire": "^3.0",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

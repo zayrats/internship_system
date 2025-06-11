@@ -27,7 +27,7 @@ class ApplicationsController extends Controller
         })->wherein('status', ['Pending', 'Approved', 'Rejected'])
         ->with(['student', 'vacancy'])->get();
         // dd($applications);
-        return view('company.applications', compact('applications'));
+        return view('company.applications', compact('applications', 'company'));
     }
 
 

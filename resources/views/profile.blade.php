@@ -17,31 +17,32 @@
             <h3 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-6">Halaman Profil</h3>
 
             <div class="bg-white dark:bg-gray-900 shadow-xl rounded-lg p-8">
-                <!-- Foto Profil -->
-                <div class="flex items-center justify-center mb-6">
-                    <div class="relative w-32 h-32">
-                        <!-- Cek apakah ada foto profil, jika tidak gunakan default -->
-                        <img id="profileImage"
-                            src="{{ $student->profile_picture ? $student->profile_picture : asset('images/default_profile.jpg') }}"
-                            alt="Foto Profil"
-                            class="w-full h-full object-cover rounded-full border-4 border-gray-300 dark:border-gray-600">
-
-                        <!-- Input file hidden -->
-                        <input type="file" id="uploadProfile" name="profile_picture" class="hidden" accept="image/*">
-
-                        <!-- Tombol upload -->
-                        <label for="uploadProfile"
-                            class="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full cursor-pointer">
-                            📷
-                        </label>
-                    </div>
-                </div>
-
-
                 <!-- Form Profil -->
                 <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}"
                     enctype="multipart/form-data">
                     @csrf
+                    <!-- Foto Profil -->
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <!-- Cek apakah ada foto profil, jika tidak gunakan default -->
+                            <img id="profileImage"
+                                src="{{ $student->profile_picture ? $student->profile_picture : asset('images/default_profile.jpg') }}"
+                                alt="Foto Profil"
+                                class="w-full h-full object-cover rounded-full border-4 border-gray-300 dark:border-gray-600">
+
+                            <!-- Input file hidden -->
+                            <input type="file" id="uploadProfile" name="profile_picture" class="hidden" accept="image/*">
+
+                            <!-- Tombol upload -->
+                            <label for="uploadProfile"
+                                class="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full cursor-pointer">
+                                📷
+                            </label>
+                        </div>
+                    </div>
+
+
+
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Nama -->
                         <div>
@@ -190,9 +191,13 @@
                             </label>
 
                             @if ($student->cv)
-                                <a href="{{ $student->cv }}" target="_blank" class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
+                                <a href="{{ $student->cv }}" target="_blank"
+                                    class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
                                     CV</a>
                             @endif
+                            <!-- Tempat preview nama file -->
+                            <span id="cvFileName" class="text-sm text-gray-600 dark:text-gray-300 mt-2 md:mt-0"></span>
+
                         </div>
                     </div>
 
@@ -204,18 +209,25 @@
 
 
     <script>
+        document.getElementById('uploadCv')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const fileNameSpan = document.getElementById('cvFileName');
 
-        document.getElementById('uploadProfile').addEventListener('change', function(event) {
-            const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileImage').src = e.target.result;
+                if (file.type !== 'application/pdf') {
+                    alert('CV harus berupa file PDF.');
+                    e.target.value = '';
+                    fileNameSpan.textContent = ''; // kosongkan preview
+                    return;
                 }
-                reader.readAsDataURL(file);
+
+                fileNameSpan.textContent = `File dipilih: ${file.name}`;
+            } else {
+                fileNameSpan.textContent = '';
             }
         });
     </script>
+
     <script>
         // Menghilangkan alert
         setTimeout(() => {

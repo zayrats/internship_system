@@ -11,11 +11,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\VacancyController;
+use App\Http\Controllers\QnAController;
 
 Route::middleware(['web'])->group(function () {
 
     Route::get('/', [Controller::class, 'index'])->name('home');
-    Route::get('/chat/messages', [ChatController::class, 'index']); // Ambil semua chat terbaru
+    // Route::get('/chat/messages', [ChatController::class, 'index']); // Ambil semua chat terbaru
     Route::get('/login', [Logincontroller::class, 'login'])->name('login');
     Route::post('actionlogin', [LoginController::class, 'actionlogin'])->name('actionlogin');
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -27,10 +28,11 @@ Route::middleware(['web'])->group(function () {
         Route::get('/studentdashboard', [Controller::class, 'studentdashboard'])->name('studentdashboard');
         Route::get('/internship', [InternshipController::class, 'internship'])->name('internship');
         Route::post('/internship/{id}', [InternshipController::class, 'internshipapply'])->name('internshipapply');
+        Route::put('/applications/{application}', [InternshipController::class, 'update'])->name('applications.update');
         Route::get('/internship/{id}/document', [Controller::class, 'internshipdocument'])->name('internshipdocument');
         Route::get('/history', [InternshipController::class, 'history'])->name('history');
         Route::post('/history/{id}/delete', [InternshipController::class, 'deleteHistory'])->name('deleteHistory');
-        Route::post('/history/submit-feedback', [InternshipController::class, 'submitHistoryFeedback'])->name('submitHistoryFeedback');
+        Route::post('/history/{id}/submit-feedback', [InternshipController::class, 'submitHistoryFeedback'])->name('submitHistoryFeedback');
         Route::post('/history/{id}/upload-kp-book', [InternshipController::class, 'uploadKpBook'])->name('uploadKpBook');
         Route::get('/maps', [Controller::class, 'maps'])->name('maps');
         Route::get('/profile', [InternshipController::class, 'profile'])->name('profile');
@@ -41,7 +43,16 @@ Route::middleware(['web'])->group(function () {
 
         //chat
 
-        Route::post('/chat/send', [ChatController::class, 'store']); // Kirim chat baru
+        // Route::post('/chat/send', [ChatController::class, 'store']); // Kirim chat baru
+
+        Route::prefix('qna')->middleware('auth')->group(function () {
+            Route::get('/', [QnAController::class, 'index'])->name('qna.index');
+            Route::get('/buat', [QnAController::class, 'create'])->name('qna.create');
+            Route::post('/buat', [QnAController::class, 'store'])->name('qna.store');
+            Route::get('/{question}', [QnAController::class, 'show'])->name('qna.show');
+            Route::post('/{question}/jawab', [QnAController::class, 'answer'])->name('qna.answer');
+            Route::get('/pertanyaan/search', [QnAController::class, 'search'])->name('questions.search');
+        });
     });
 
 
@@ -101,5 +112,13 @@ Route::middleware(['web'])->group(function () {
         Route::get('/admin/jobs', [AdminController::class, 'manageJobs'])->name('admin.jobs');
         Route::put('/admin/jobs/{id}', [AdminController::class, 'updateJob'])->name('admin.jobs.update');
         Route::delete('/admin/jobs/{id}', [AdminController::class, 'deleteJob'])->name('admin.jobs.delete');
+
+        Route::get('/admin/perusahaan', [AdminController::class, 'manageCompanies'])->name('admin.companies');
+        Route::put('/admin/perusahaan/{id}', [AdminController::class, 'updateCompany'])->name('admin.companies.update');
+        Route::delete('/admin/perusahaan/{id}', [AdminController::class, 'deleteCompany'])->name('admin.companies.destroy');
+        Route::post('/admin/perusahaan/tambah', [AdminController::class, 'addCompany'])->name('admin.companies.store');
+        Route::post('/admin/perusahaan/tambah-lowongan', [AdminController::class, 'addVacancy'])->name('admin.companies.store-vacancy');
+        Route::put('/admin/perusahaan/update-lowongan', [AdminController::class, 'updateVacancy'])->name('admin.vacancies.update');
+        Route::post('/admin/perusahaan/hapus-lowongan', [AdminController::class, 'deleteVacancy'])->name('admin.vacancies.destroy');
     });
 });

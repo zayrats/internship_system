@@ -1,5 +1,16 @@
 @extends('master')
 @section('content')
+    @if (session('success'))
+        <div id="alert-success" class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div id="alert-error" class="bg-red-500 text-white p-3 rounded mb-4 text-center">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="block  p-3 bg-white border border-gray-200  shadow-sm  dark:bg-gray-800 dark:border-gray-700 ">
 
 
@@ -10,8 +21,8 @@
             <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Cari</label>
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                     </svg>
@@ -52,13 +63,14 @@
                             {{ $intern->type }}</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Durasi: <span
                                 class="font-bold">{{ $intern->duration }}</span> Bulan</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Mulai Magang: {{ $intern->start_date }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Mulai Magang: {{ $intern->start_date }}
+                        </p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Akhir Magang: {{ $intern->end_date }}</p>
                         <div class="flex justify-between items-center mt-4">
-                            <button
+                            {{-- <button
                                 onclick="openApplyModal('{{ $student->user_id }}', '{{ $student->name }}', '{{ $student->student_number }}', '{{ $student->prodi }}', '{{ $student->department }}', '{{ $intern->vacancy_id }}')"
                                 class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg px-4 py-2">Daftar
-                            </button>
+                            </button> --}}
                             <button
                                 onclick="openDetailModal('{{ $intern->company_name }}', '{{ $intern->company_logo }}', '{{ $intern->company_address }}', '{{ $intern->company_email }}', '{{ $intern->division }}', '{{ $intern->start_date }}', '{{ $intern->end_date }}', '{{ $intern->requirements }}', '{{ $intern->type }}')"
                                 class="text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg px-4 py-2">Selengkapnya</button>
@@ -70,79 +82,132 @@
     </div>
 
     <!-- Modal Pendaftaran -->
-    <div id="applyModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Pendaftaran Magang</h3>
-            <form id="applyForm" method="post" enctype="multipart/form-data">
+    <div id="applyModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-6 relative">
+            <!-- Header -->
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white text-center">Pendaftaran Magang</h3>
+
+            <form id="applyForm" method="post" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <input type="hidden" name="vacancy_id" id="vacancyId">
 
-                <!-- Nama -->
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-900 dark:text-white">Nama</label>
-                    <input type="text" id="modalName" disabled class="w-full p-2 border rounded">
-                </div>
-
-                <!-- NRP/NIM -->
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-900 dark:text-white">NRP/NIM</label>
-                    <input type="text" id="modalNrp" disabled class="w-full p-2 border rounded">
-                </div>
-
-                <!-- Program Studi -->
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-900 dark:text-white">Program Studi</label>
-                    <input type="text" id="modalProdi" disabled class="w-full p-2 border rounded">
-                </div>
-
-                <!-- Departemen -->
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-900 dark:text-white">Departemen</label>
-                    <input type="text" id="modalDepartment" disabled class="w-full p-2 border rounded">
-                </div>
-
-                <!-- Email -->
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                    <input type="text" id="modalEmail" disabled class="w-full p-2 border rounded">
+                <!-- Informasi Mahasiswa -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Nama</label>
+                        <input type="text" id="modalName" disabled
+                            class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">NRP/NIM</label>
+                        <input type="text" id="modalNrp" disabled
+                            class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Program Studi</label>
+                        <input type="text" id="modalProdi" disabled
+                            class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Departemen</label>
+                        <input type="text" id="modalDepartment" disabled
+                            class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Email</label>
+                        <input type="text" id="modalEmail" disabled
+                            class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
                 </div>
 
                 <!-- Upload Surat Lamaran -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-900 dark:text-white">Surat Lamaran (PDF)</label>
-                    <input accept="application/pdf" type="file" name="document" class="w-full border rounded p-1 bg-white hover:bg-white-100" required>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Surat Lamaran (PDF)</label>
+                    <input type="file" name="document" accept="application/pdf" required
+                        class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
                 </div>
 
-                <!-- Tombol Submit -->
-                <button type="submit" class="w-full bg-blue-700 text-white rounded-lg px-4 py-2">Submit</button>
+                <!-- Tombol -->
+                <div class="space-y-2">
+                    <button type="submit"
+                        class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition duration-200">
+                        Submit
+                    </button>
+                    <button type="button" onclick="closeModal('applyModal')"
+                        class="w-full text-center text-red-500 hover:underline">Cancel</button>
+                </div>
             </form>
-
-            <!-- Tombol Cancel -->
-            <button onclick="closeModal('applyModal')" class="mt-4 text-red-500 w-full text-center">Cancel</button>
         </div>
     </div>
+
 
 
     <!-- Modal Detail -->
-    <div id="detailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-xl">
-            <h3 class="text-lg font-semibold mb-4 text-center text-gray-900 dark:text-white">Detail Perusahaan</h3>
-            <img id="detailCompanyLogo" class="mx-auto w-24 h-24 rounded-full">
-            <p class="text-gray-900 dark:text-white"><strong>Nama Perusahaan:</strong> <span id="detailCompanyName"></span></p>
-            <p class="text-gray-900 dark:text-white"><strong>Alamat:</strong> <span id="detailCompanyAddress"></span></p>
-            <p class="text-gray-900 dark:text-white"><strong>Email:</strong> <span id="detailCompanyEmail"></span></p>
+    <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-2xl p-6 space-y-6 relative">
+            <!-- Header -->
+            <div class="text-center">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Detail Perusahaan</h3>
+                <img id="detailCompanyLogo"
+                    class="mx-auto w-24 h-24 rounded-full border-4 border-gray-300 shadow-md object-cover" />
+            </div>
 
-            <h3 class="text-lg font-semibold mt-4 text-center text-gray-700 dark:text-gray-300">Detail Lowongan</h3>
-            <p class="text-gray-900 dark:text-white"><strong>Divisi:</strong> <span id="detailDivision"></span></p>
-            <p class="text-gray-900 dark:text-white"><strong>Mulai Magang:</strong> <span id="detailStart"></span></p>
-            <p class="text-gray-900 dark:text-white"><strong>Akhir Magang:</strong> <span id="detailEnd"></span></p>
-            <p class="text-gray-900 dark:text-white"><strong>Persyaratan:</strong> <span id="detailRequirements"></span></p>
-            <p class="text-gray-900 dark:text-white"><strong>Jenis:</strong> <span id="detailType"></span></p>
+            <!-- Company Info -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-gray-600 dark:text-gray-300 font-semibold">Nama Perusahaan</p>
+                    <p id="detailCompanyName" class="text-gray-800 dark:text-white font-medium"></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 dark:text-gray-300 font-semibold">Alamat</p>
+                    <p id="detailCompanyAddress" class="text-gray-800 dark:text-white font-medium"></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 dark:text-gray-300 font-semibold">Email</p>
+                    <p id="detailCompanyEmail" class="text-gray-800 dark:text-white font-medium"></p>
+                </div>
+            </div>
 
-            <button onclick="closeModal('detailModal')"
-                class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full">Tutup</button>
+            <!-- Divider -->
+            <hr class="border-gray-300 dark:border-gray-700" />
+
+            <!-- Job Info -->
+            <div>
+                <h4 class="text-lg font-semibold text-center text-gray-700 dark:text-gray-200 mb-4">Detail Lowongan</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold">Divisi</p>
+                        <p id="detailDivision" class="text-gray-800 dark:text-white font-medium"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold">Jenis</p>
+                        <p id="detailType" class="text-gray-800 dark:text-white font-medium"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold">Mulai Magang</p>
+                        <p id="detailStart" class="text-gray-800 dark:text-white font-medium"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold">Akhir Magang</p>
+                        <p id="detailEnd" class="text-gray-800 dark:text-white font-medium"></p>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold">Persyaratan</p>
+                        <p id="detailRequirements" class="text-gray-800 dark:text-white font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Close Button -->
+            <div class="pt-4">
+                <button onclick="closeModal('detailModal')"
+                    class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md transition duration-200">
+                    Tutup
+                </button>
+            </div>
         </div>
     </div>
+
 
     <!-- Sorting dan Modal Script -->
     <script>
@@ -200,5 +265,12 @@
         function closeModal(id) {
             document.getElementById(id).classList.add("hidden");
         }
+    </script>
+    <script>
+        // Menghilangkan alert
+        setTimeout(() => {
+            document.getElementById('alert-success')?.remove();
+            document.getElementById('alert-error')?.remove();
+        }, 4000);
     </script>
 @endsection
