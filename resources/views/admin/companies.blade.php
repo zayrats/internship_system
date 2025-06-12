@@ -112,11 +112,13 @@
                                     </button>
 
                                     <!-- Tombol Hapus -->
-                                    <form action="{{ route('admin.vacancies.destroy', $vacancy->vacancy_id) }}"
-                                        method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?')">
-                                        @csrf
+                                    <form action="{{ route('admin.vacancies.destroy', ['id' => $vacancy->vacancy_id]) }}"
+                                        method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
                                         @method('DELETE')
-                                        <button class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700">
+                                        @csrf
+
+                                        <button type="submit"
+                                            class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700">
                                             Hapus
                                         </button>
                                     </form>
@@ -326,7 +328,7 @@
                     </div>
 
                     <!-- Form -->
-                    <form action="{{ route('admin.vacancies.update', $vacancy->vacancy_id) }}" method="POST"
+                    <form action="{{ route('admin.vacancies.update', ['id' => $vacancy->vacancy_id]) }}" method="POST"
                         class="px-6 py-6 space-y-4">
                         @csrf
                         @method('PUT')
@@ -563,6 +565,81 @@
 
 
 
+    <style>
+        /* Modern Tailwind-like DataTable Styles */
+        table.dataTable {
+            border-collapse: separate !important;
+            border-spacing: 0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            font-size: 0.95rem;
+        }
+
+        table.dataTable thead th {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            padding: 14px 16px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        table.dataTable tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: right;
+            margin-top: 12px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 8px 14px;
+            margin-left: 4px;
+            border-radius: 8px;
+            background-color: #e5e7eb;
+            color: #111827 !important;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #3b82f6;
+            color: white !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info {
+            margin-bottom: 16px;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            border-radius: 6px;
+            margin-left: 6px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #d1d5db;
+            padding: 6px;
+            border-radius: 6px;
+            margin-left: 6px;
+        }
+    </style>
+
     <script>
         $(document).ready(function() {
             $('#companiesTable').DataTable({
@@ -575,8 +652,8 @@
                     info: "Menampilkan _START_ - _END_ dari _TOTAL_ entri",
                     infoEmpty: "Tidak ada data tersedia",
                     paginate: {
-                        previous: "Sebelumnya",
-                        next: "Selanjutnya"
+                        previous: "← Sebelumnya",
+                        next: "Selanjutnya →"
                     }
                 }
             });
@@ -591,13 +668,14 @@
                     info: "Menampilkan _START_ - _END_ dari _TOTAL_ entri",
                     infoEmpty: "Tidak ada data tersedia",
                     paginate: {
-                        previous: "Sebelumnya",
-                        next: "Selanjutnya"
+                        previous: "← Sebelumnya",
+                        next: "Selanjutnya →"
                     }
                 }
             });
         });
     </script>
+
     <script>
         function openPdfPreview(url) {
             document.getElementById('pdfPreviewFrame').src = url;

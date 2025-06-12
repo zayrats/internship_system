@@ -22,18 +22,9 @@
             </button>
         </div>
 
-        <!-- Filter Pencarian -->
-        <form method="GET" class="flex mb-4 space-x-2">
-            <input type="text" name="search" placeholder="🔍 Cari user..."
-                class="flex-1 border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                value="{{ request('search') }}">
-            <button type="submit"
-                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded shadow transition">Cari</button>
-        </form>
-
         <!-- Tabel User -->
         <div class="overflow-x-auto rounded">
-            <table class="min-w-full table-auto border border-gray-200">
+            <table id="userTable" class="min-w-full table-auto border border-gray-200">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th class="border px-4 py-2">Nama</th>
@@ -57,8 +48,8 @@
                                         <option value="Admin" {{ $user->role == 'Admin' ? 'selected' : '' }}>Admin</option>
                                         <option value="Mahasiswa" {{ $user->role == 'Mahasiswa' ? 'selected' : '' }}>
                                             Mahasiswa</option>
-                                        <option value="Perusahaan" {{ $user->role == 'Perusahaan' ? 'selected' : '' }}>
-                                            Perusahaan</option>
+                                        {{-- <option value="Perusahaan" {{ $user->role == 'Perusahaan' ? 'selected' : '' }}>
+                                            Perusahaan</option> --}}
                                     </select>
                             </td>
                             <td class="border px-4 py-2 text-center">
@@ -72,11 +63,6 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-6">
-            {{ $users->links() }}
         </div>
     </div>
 
@@ -96,7 +82,7 @@
                 <select name="role" class="w-full border p-2 mb-4 rounded focus:ring-2 focus:ring-blue-400">
                     <option value="admin">Admin</option>
                     <option value="mahasiswa">Mahasiswa</option>
-                    <option value="perusahaan">Perusahaan</option>
+                    {{-- <option value="perusahaan">Perusahaan</option> --}}
                 </select>
                 <div class="flex justify-end space-x-2">
                     <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded"
@@ -117,5 +103,32 @@
         function closeModal() {
             document.getElementById('userModal').classList.add('hidden');
         }
+    </script>
+
+    <!-- jQuery & DataTables -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Inisialisasi DataTable -->
+    <script>
+        $(document).ready(function() {
+            $('#userTable').DataTable({
+                responsive: true,
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data per halaman",
+                    zeroRecords: "Tidak ditemukan",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Data kosong",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "→",
+                        previous: "←"
+                    }
+                }
+            });
+        });
     </script>
 @endsection

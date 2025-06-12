@@ -18,8 +18,8 @@ class UserController
         $request->validate([
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'role' => 'required|in:Admin,Mahasiswa,Perusahaan',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:Admin,Mahasiswa',
         ]);
 
         User::create([

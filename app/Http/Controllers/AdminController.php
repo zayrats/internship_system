@@ -71,7 +71,7 @@ class AdminController
         $internships = $query->paginate(10);
         $companies = DB::table('companies')->get();
 
-        return view('admin.monitoringMahasiswa', compact('internships', 'companies'));
+        return view('admin.monitoringmahasiswa', compact('internships', 'companies'));
     }
 
     public function manageJobs(Request $request)
@@ -382,31 +382,34 @@ class AdminController
 
     public function updateVacancy(Request $request, $id)
     {
+        // dd($request->all());
         $request->validate([
-            'company_id' => 'required',
+            // 'company_id' => 'required',
             'division' => 'required',
             'type' => 'required',
             'start_date' => 'required',
+            'status' => 'required',
             'end_date' => 'required',
             'duration' => 'required',
             'requirements' => 'required',
         ]);
         // dd($request->all());
         DB::table('vacancy')->where('vacancy_id', $id)->update([
-            'company_id' => $request->company_id,
+            // 'company_id' => $request->company_id,
             'division' => $request->division,
             'type' => $request->type,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'duration' => $request->duration,
             'requirements' => $request->requirements,
+            'status' => $request->status,
         ]);
 
 
         return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
     }
 
-    public function deleteVacancy($id)
+    public function deleteVacancy(Request $request, $id)
     {
         DB::table('vacancy')->where('vacancy_id', $id)->delete();
         return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil dihapus');

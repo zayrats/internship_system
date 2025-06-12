@@ -118,7 +118,7 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/admin/perusahaan/{id}', [AdminController::class, 'deleteCompany'])->name('admin.companies.destroy');
         Route::post('/admin/perusahaan/tambah', [AdminController::class, 'addCompany'])->name('admin.companies.store');
         Route::post('/admin/perusahaan/tambah-lowongan', [AdminController::class, 'addVacancy'])->name('admin.companies.store-vacancy');
-        Route::put('/admin/perusahaan/update-lowongan', [AdminController::class, 'updateVacancy'])->name('admin.vacancies.update');
-        Route::post('/admin/perusahaan/hapus-lowongan', [AdminController::class, 'deleteVacancy'])->name('admin.vacancies.destroy');
+        Route::put('/admin/perusahaan/update-lowongan/{id}', [AdminController::class, 'updateVacancy'])->name('admin.vacancies.update');
+        Route::delete('/admin/perusahaan/hapus-lowongan/{id}', [AdminController::class, 'deleteVacancy'])->name('admin.vacancies.destroy');
     });
 });
