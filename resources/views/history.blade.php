@@ -80,7 +80,7 @@
 
                                 @if (strtolower(trim($item->status)) === 'finished')
                                     @if ($item->internship_id)
-                                    @dump($item->book_status)
+                                        @dump($item->book_status)
                                         {{-- jika status buku Rejected, maka tampil revisi --}}
                                         @if (strtolower(trim($item->book_status)) === 'rejected')
                                             <button class="text-white hover:underline bg-red-500 rounded px-3 py-1 mx-1"
@@ -438,72 +438,76 @@
                 class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
                     <h2 class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">Edit Pengajuan</h2>
-                    <form id="editApplicationForm" method="POST" enctype="multipart/form-data"
-                        {{ route('applications.update', ['id' => $item->id ?? '']) }}>
-                        @csrf
-                        @method('PUT')
+                    @if (isset($item))
+                        <form id="editApplicationForm" method="POST" enctype="multipart/form-data"
+                            action="{{ route('applications.update', ['id' => $item->id]) }}">
+                            @csrf
+                            @method('PUT')
 
-                        <input type="hidden" id="editApplicationId" name="application_id">
+                            <input type="hidden" id="editApplicationId" name="application_id">
 
-                        <!-- Lowongan (disabled) -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Lowongan KP</label>
-                            <select disabled name="vacancy_id" id="editVacancySelect"
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                                @foreach ($vacancies as $vacancy)
-                                    <option value="{{ $vacancy->vacancy_id }}">
-                                        {{ $vacancy->division }} - {{ $vacancy->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <!-- Lowongan (disabled) -->
+                            <div class="mb-4">
+                                <label class="block font-semibold text-gray-900 dark:text-white mb-1">Lowongan KP</label>
+                                <select disabled name="vacancy_id" id="editVacancySelect"
+                                    class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                    @foreach ($vacancies as $vacancy)
+                                        <option value="{{ $vacancy->vacancy_id }}">
+                                            {{ $vacancy->division }} - {{ $vacancy->company_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <!-- Status -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Status</label>
-                            {{-- @dump($data)($item->status) --}}
-                            <select name="status" id="editStatusSelect" required
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Rejected">Rejected</option>
-                                <option value="Finished">Finished</option>
-                            </select>
-                        </div>
+                            <!-- Status -->
+                            <div class="mb-4">
+                                <label class="block font-semibold text-gray-900 dark:text-white mb-1">Status</label>
+                                {{-- @dump($data)($item->status) --}}
+                                <select name="status" id="editStatusSelect" required
+                                    class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Rejected">Rejected</option>
+                                    <option value="Finished">Finished</option>
+                                </select>
+                            </div>
 
-                        <!-- Tanggal Pengajuan -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal Pengajuan</label>
-                            <input type="date" name="application_date" id="editApplicationDate"
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                        </div>
+                            <!-- Tanggal Pengajuan -->
+                            <div class="mb-4">
+                                <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal
+                                    Pengajuan</label>
+                                <input type="date" name="application_date" id="editApplicationDate"
+                                    class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                            </div>
 
-                        <!-- Unggah Surat Lamaran -->
-                        <div class="mb-4">
-                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">
-                                Unggah Surat Lamaran Baru
-                            </label>
+                            <!-- Unggah Surat Lamaran -->
+                            <div class="mb-4">
+                                <label class="block font-semibold text-gray-900 dark:text-white mb-1">
+                                    Unggah Surat Lamaran Baru
+                                </label>
 
-                            <!-- Tampilkan file lama -->
-                            <p id="existingDocumentName" class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
+                                <!-- Tampilkan file lama -->
+                                <p id="existingDocumentName" class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
 
-                            <!-- Input file baru -->
-                            <input type="file" name="document" accept="application/pdf"
-                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                        </div>
+                                <!-- Input file baru -->
+                                <input type="file" name="document" accept="application/pdf"
+                                    class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                            </div>
 
 
-                        <!-- Tombol -->
-                        <div class="flex justify-end mt-6 gap-2">
-                            <button type="button" onclick="closeEditApplicationModal()"
-                                class="bg-red-700 text-white px-4 py-2 rounded-lg">
-                                Batal
-                            </button>
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                                Simpan Perubahan
-                            </button>
-                        </div>
-                    </form>
+                            <!-- Tombol -->
+                            <div class="flex justify-end mt-6 gap-2">
+                                <button type="button" onclick="closeEditApplicationModal()"
+                                    class="bg-red-700 text-white px-4 py-2 rounded-lg">
+                                    Batal
+                                </button>
+                                <button type="submit"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                    Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
