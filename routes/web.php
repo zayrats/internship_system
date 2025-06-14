@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\PustakawanController;
 use App\Http\Controllers\VacancyController;
 use App\Http\Controllers\QnAController;
 
@@ -28,7 +29,8 @@ Route::middleware(['web'])->group(function () {
         Route::get('/studentdashboard', [Controller::class, 'studentdashboard'])->name('studentdashboard');
         Route::get('/internship', [InternshipController::class, 'internship'])->name('internship');
         Route::post('/internship/{id}', [InternshipController::class, 'internshipapply'])->name('internshipapply');
-        Route::put('/applications/{application}', [InternshipController::class, 'update'])->name('applications.update');
+        Route::put('/applications/{id}', [InternshipController::class, 'update'])->name('applications.update');
+        Route::post('/applications/add', [InternshipController::class, 'store'])->name('applications.store');
         Route::get('/internship/{id}/document', [Controller::class, 'internshipdocument'])->name('internshipdocument');
         Route::get('/history', [InternshipController::class, 'history'])->name('history');
         Route::post('/history/{id}/delete', [InternshipController::class, 'deleteHistory'])->name('deleteHistory');
@@ -120,5 +122,12 @@ Route::middleware(['web'])->group(function () {
         Route::post('/admin/perusahaan/tambah-lowongan', [AdminController::class, 'addVacancy'])->name('admin.companies.store-vacancy');
         Route::put('/admin/perusahaan/update-lowongan/{id}', [AdminController::class, 'updateVacancy'])->name('admin.vacancies.update');
         Route::delete('/admin/perusahaan/hapus-lowongan/{id}', [AdminController::class, 'deleteVacancy'])->name('admin.vacancies.destroy');
+    });
+
+    Route::group(['middleware' => ['auth', 'role:Pustakawan']], function () {
+        Route::get('/pustakawan', [PustakawanController::class, 'pustakawan'])->name('pustakawan');
+        Route::get('/pustakawan/before', [PustakawanController::class, 'before'])->name('pustakawan.before');
+        Route::get('/pustakawan/after', [PustakawanController::class, 'after'])->name('pustakawan.after');
+        Route::put('/pustakawan/update/{id}', [PustakawanController::class, 'update'])->name('pustakawan.update');
     });
 });

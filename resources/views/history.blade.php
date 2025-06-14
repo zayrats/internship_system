@@ -18,7 +18,7 @@
         <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center my-5">Riwayat Pengajuan KP</h3>
         <!-- Tombol trigger (optional placement) -->
         <button onclick="openAddApplicationModal()"
-            class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2">
+            class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 mb-4">
             Tambah Pengajuan KP
         </button>
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -80,22 +80,51 @@
 
                                 @if (strtolower(trim($item->status)) === 'finished')
                                     @if ($item->internship_id)
-                                        <button class="text-green-600 hover:underline bg-green-500 rounded px-3 py-1"
-                                            onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
-                                    '{{ $item->id }}',
-                                    '{{ $item->company_id }}',
-                                    '{{ $item->company_name }}',
-                                    '{{ $item->title }}',
-                                    '{{ $item->start_date }}',
-                                    '{{ $item->end_date }}',
-                                    '{{ $item->position }}',
-                                    '{{ $item->feedback }}',
-                                    '{{ $item->rating }}',
-                                    '{{ $item->kp_book }}',
-                                    '{{ $item->vacancy_id }}')">
-                                            Lihat Rating
-                                        </button>
-                                        <input type="hidden" id="currentKpBookUrl" value="{{ asset($item->kp_book) }}">
+                                    @dump($item->book_status)
+                                        {{-- jika status buku Rejected, maka tampil revisi --}}
+                                        @if (strtolower(trim($item->book_status)) === 'rejected')
+                                            <button class="text-white hover:underline bg-red-500 rounded px-3 py-1 mx-1"
+                                                onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
+                                            '{{ $item->id }}',
+                                            '{{ $item->company_id }}',
+                                            '{{ $item->company_name }}',
+                                            '{{ $item->title }}',
+                                            '{{ $item->start_date }}',
+                                            '{{ $item->end_date }}',
+                                            '{{ $item->position }}',
+                                            '{{ $item->feedback }}',
+                                            '{{ $item->rating }}',
+                                            '{{ $item->kp_book }}',
+                                            '{{ $item->vacancy_id }}',
+                                            '{{ $item->draft_kp_book }}',
+                                            '{{ $item->book_status }}',
+                                            '{{ $item->message }}')">
+                                                Revisi
+                                            </button>
+                                        @else
+                                            <button class="text-green-600 hover:underline bg-green-500 rounded px-3 py-1"
+                                                onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
+                                            '{{ $item->id }}',
+                                            '{{ $item->company_id }}',
+                                            '{{ $item->company_name }}',
+                                            '{{ $item->title }}',
+                                            '{{ $item->start_date }}',
+                                            '{{ $item->end_date }}',
+                                            '{{ $item->position }}',
+                                            '{{ $item->feedback }}',
+                                            '{{ $item->rating }}',
+                                            '{{ $item->kp_book }}',
+                                            '{{ $item->vacancy_id }}',
+                                            '{{ $item->draft_kp_book }}',
+                                            '{{ $item->book_status }}',
+                                            '{{ $item->message }}')">
+                                                Lihat Rating
+                                            </button>
+                                            <input type="hidden" id="currentKpBookUrl"
+                                                value="{{ asset($item->kp_book) }}">
+                                            <input type="hidden" id="currentdraftKpBookUrl"
+                                                value="{{ asset($item->draft_kp_book) }}">
+                                        @endif
                                     @else
                                         <button class="text-white hover:underline bg-green-500 rounded px-3 py-1 mx-1"
                                             onclick="openFeedbackModal('{{ $item->internship_id_useless ?? '' }}',
@@ -115,10 +144,10 @@
                                     @endif
 
                                     @if (!$item->kp_book)
-                                        <button class="text-white hover:underline bg-yellow-500 rounded px-3 py-1"
+                                        {{-- <button class="text-white hover:underline bg-yellow-500 rounded px-3 py-1"
                                             onclick="openUploadKpModal('{{ $item->internship_id }}', '{{ $item->id }}')">
                                             Unggah Buku KP
-                                        </button>
+                                        </button> --}}
                                     @endif
                                 @endif
                             </td>
@@ -199,9 +228,11 @@
                     <form method="POST" action="#" enctype="multipart/form-data" id="feedbackForm">
                         @csrf
                         <input type="hidden" name="internship_id" id="internshipId">
+                        <input type="hidden" name="application_id" id="applicationId">
                         <input type="hidden" name="company_id" id="modalCompanyId">
                         <input type="hidden" name="vacancy_id" class="hidden" id="modalVacancyId">
                         <input type="hidden" id="currentKpBookUrl">
+                        <input type="hidden" id="currentdraftKpBookUrl">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Perusahaan</label>
                         <input type="text" disabled id="companyName"
@@ -237,12 +268,26 @@
                         <textarea name="feedback" id="feedback" class="w-full p-2 border rounded dark:text-black"></textarea>
 
 
+
                         {{-- if else for uploaded file --}}
 
                         <div id="kpBookReader" class="">
+                            <label for="bookStatus" class="block text-sm font-medium text-gray-900 dark:text-white">Status
+                                Buku KP</label>
+                            {{-- sesuaikan nama status, jika Pending = Menunggu, Jika Approved = Disetujui , Jika Rejected = Ditolak --}}
+                            <select disabled id="bookStatus"
+                                class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-800 dark:text-white">
+                                <option value="Pending">Menunggu</option>
+                                <option value="Approved">Disetujui</option>
+                                <option value="Rejected">Ditolak</option>
+                            </select>
                             <button type="button" class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
                                 onclick="openKpBookModal()">
                                 Lihat Buku KP
+                            </button>
+                            <button type="button" class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
+                                onclick="openDraftKpBookModal()">
+                                Lihat Draft Buku KP
                             </button>
                         </div>
                         <!-- Tambahkan Upload Buku KP -->
@@ -251,6 +296,26 @@
                                 (PDF)</label>
                             <input type="file" name="kp_book" accept="application/pdf"
                                 class="w-full p-2 border rounded dark:text-black">
+                            <label class="block text-sm font-medium text-gray-900 dark:text-white mt-4">Unggah Draft
+                                (Judul & Abstract)</label>
+                            <input type="file" name="draft_kp_book" accept="application/pdf"
+                                class="w-full p-2 border rounded dark:text-black">
+                        </div>
+                        <div id='revision' class="">
+                            <label for="bookStatus" class="block text-sm font-medium text-gray-900 dark:text-white">Status
+                                Buku KP</label>
+                            {{-- sesuaikan nama status, jika Pending = Menunggu, Jika Approved = Disetujui , Jika Rejected = Ditolak --}}
+                            <select disabled id="bookStatus"
+                                class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-800 dark:text-white">
+                                <option value="Pending">Menunggu</option>
+                                <option value="Approved">Disetujui</option>
+                                <option value="Rejected">Ditolak</option>
+                            </select>
+
+                            <label for="message" class="block text-sm font-medium text-gray-900 dark:text-white">Pesan
+                                Buku
+                                KP</label>
+                            <textarea id="message" class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-800 dark:text-white" readonly></textarea>
                         </div>
 
                         <div class="flex justify-center mt-6">
@@ -308,20 +373,37 @@
                 </div>
             </div>
 
+            <!-- Modal Draft KP Book -->
+            <div id="draftKpBookModal"
+                class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center mt-24">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Draft Buku KP</h2>
+
+                    <iframe id="draftKpBookFrame" class="w-full h-[500px]"></iframe>
+
+                    <div class="flex justify-center mt-6">
+                        <button id="closeDraftKpBookModal"
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal Tambah Pengajuan KP -->
             <div id="applicationModal"
                 class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
                 <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-6 relative">
                     <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Tambah Pengajuan KP</h3>
 
-                    <form id="applicationForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <form id="applicationForm" method="POST" action="{{ route('applications.store') }}"
+                        enctype="multipart/form-data" class="space-y-4">
                         @csrf
-
                         <!-- Pilih Lowongan -->
                         <div>
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Pilih
                                 Lowongan</label>
-                            <select name="vacancy_id" required
+                            <select name="vacancy_id" id="vacancySelect" required
                                 class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white">
                                 @foreach ($vacancies as $vacancy)
                                     <option value="{{ $vacancy->vacancy_id }}">{{ $vacancy->division }} -
@@ -356,7 +438,8 @@
                 class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
                     <h2 class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">Edit Pengajuan</h2>
-                    <form id="editApplicationForm" method="POST" enctype="multipart/form-data">
+                    <form id="editApplicationForm" method="POST" enctype="multipart/form-data"
+                        {{ route('applications.update', ['id' => $item->id]) }}>
                         @csrf
                         @method('PUT')
 
@@ -459,14 +542,6 @@
 
 
     <script>
-        const form = document.getElementById('applicationForm');
-        const select = document.getElementById('vacancySelect');
-
-        form.addEventListener('submit', function(e) {
-            const id = select.value;
-            form.action = `/internship/${id}`;
-        });
-
         function openAddApplicationModal() {
             document.getElementById("applicationModal").classList.remove("hidden");
         }
@@ -474,7 +549,53 @@
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add("hidden");
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('applicationForm');
+
+            form.addEventListener('submit', function(e) {
+                const select = document.getElementById('vacancySelect');
+                if (select) {
+                    form.action = '/applications/add';
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('applicationForm');
+            const select = document.getElementById('vacancySelect');
+            const fileInput = form.querySelector('input[name="document"]');
+
+            form.addEventListener('submit', function(e) {
+                let errors = [];
+
+                // Validasi pilihan lowongan
+                if (!select.value) {
+                    errors.push("Silakan pilih lowongan terlebih dahulu.");
+                }
+
+                // Validasi file
+                const file = fileInput.files[0];
+                if (!file) {
+                    errors.push("Silakan unggah surat pengantar (PDF).");
+                } else {
+                    const allowedTypes = ['application/pdf'];
+                    if (!allowedTypes.includes(file.type)) {
+                        errors.push("File harus berupa PDF.");
+                    }
+
+                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    if (file.size > maxSize) {
+                        errors.push("Ukuran file tidak boleh lebih dari 2MB.");
+                    }
+                }
+
+                if (errors.length > 0) {
+                    e.preventDefault(); // Hentikan submit
+                    alert(errors.join('\n'));
+                }
+            });
+        });
     </script>
+
     <script>
         //lihat detail
         document.addEventListener('DOMContentLoaded', function() {
@@ -602,9 +723,11 @@
             // Fungsi membuka modal (Mode Isi Pengalaman atau Lihat Rating)
             window.openFeedbackModal = function(internshipId, applicationId, companyId, companyName = '', title =
                 '', startDate =
-                '', endDate = '', position = '', feedback = '', rating = 0, kpBookUrl = '', vacancyId = null
+                '', endDate = '', position = '', feedback = '', rating = 0, kpBookUrl = '', vacancyId = null,
+                draftKpBookUrl = '', bookStatus = '', message = ''
             ) {
                 console.log("🚀 ~ document.addEventListener ~ kpBook:", internshipId)
+                console.log("🚀 ~ book_status:", bookStatus)
                 if (!internshipId) {
                     feedbackForm.method = 'post'
                     feedbackForm.action = `/history/${applicationId}/submit-feedback`
@@ -627,50 +750,88 @@
                 document.getElementById("endDate").value = endDate;
                 document.getElementById("position").value = position;
                 document.getElementById("feedback").value = feedback || '';
+                document.getElementById("bookStatus").value = bookStatus;
+                document.getElementById("message").value = message || '';
                 setRating(rating || 0);
                 if (!internshipId) {
                     document.getElementById("kpBookUpload").classList.remove("hidden");
                     document.getElementById("kpBookReader").classList.add("hidden");
+                    document.getElementById("revision").classList.add("hidden");
                 } else {
-                    //tampil buku kp
-                    document.getElementById("kpBookUpload").classList.add("hidden");
-                    document.getElementById("kpBookReader").classList.remove("hidden");
-                    const kpBookModal = document.getElementById("kpBookModal");
-                    const kpBookFrame = document.getElementById("kpBookFrame");
-                    const closeKpBookModalBtn = document.getElementById("closeKpBookModal");
-                    // set value untuk currentKpBookUrl
-                    document.getElementById('currentKpBookUrl').value = kpBookUrl;
-                    // Fungsi untuk menampilkan modal dan menampilkan PDF
-                    window.openKpBookModal = function() {
+                    if (bookStatus === 'Rejected') {
+                        document.getElementById("kpBookUpload").classList.remove("hidden");
+                        document.getElementById("kpBookReader").classList.add("hidden");
+                        document.getElementById("revision").classList.remove("hidden");
+                    } else {
+                        //tampil buku kp
+                        document.getElementById("kpBookUpload").classList.add("hidden");
+                        document.getElementById("kpBookReader").classList.remove("hidden");
+                        document.getElementById("revision").classList.add("hidden");
+                        const kpBookModal = document.getElementById("kpBookModal");
+                        const kpBookFrame = document.getElementById("kpBookFrame");
+                        const closeKpBookModalBtn = document.getElementById("closeKpBookModal");
+                        // const draftKpBookUrl = document.getElementById("draftKpBookUrl").value;
+                        const draftKpBookModal = document.getElementById("draftKpBookModal");
+                        const draftKpBookFrame = document.getElementById("draftKpBookFrame");
+                        const closeDraftKpBookModalBtn = document.getElementById("closeDraftKpBookModal");
+                        // set value untuk currentKpBookUrl
+                        document.getElementById('currentKpBookUrl').value = kpBookUrl;
 
-                        // const kpBookModal = document.getElementById("kpBookModal");
-                        // const kpBookFrame = document.getElementById("kpBookFrame");
+                        // set value untuk draftKpBookUrl
+                        document.getElementById('currentdraftKpBookUrl').value = draftKpBookUrl;
+                        // Fungsi untuk menampilkan modal dan menampilkan PDF
+                        window.openKpBookModal = function() {
 
-                        const url = document.getElementById("currentKpBookUrl").value;
-                        console.log("URL yang dimasukkan ke iframe:", url);
-                        kpBookFrame.src = url;
-                        kpBookModal.classList.remove("hidden"); // Tampilkan modal
-                    };
+                            // const kpBookModal = document.getElementById("kpBookModal");
+                            // const kpBookFrame = document.getElementById("kpBookFrame");
+
+                            const url = document.getElementById("currentKpBookUrl").value;
+                            console.log("URL yang dimasukkan ke iframe:", url);
+                            kpBookFrame.src = kpBookUrl;
+                            kpBookModal.classList.remove("hidden"); // Tampilkan modal
+                        };
+                        window.openDraftKpBookModal = function() {
+
+                            // const kpBookModal = document.getElementById("kpBookModal");
+                            // const kpBookFrame = document.getElementById("kpBookFrame");
+
+                            const url = document.getElementById("currentdraftKpBookUrl").value;
+                            console.log("URL yang dimasukkan ke iframe:", url);
+                            draftKpBookFrame.src = draftKpBookUrl;
+                            draftKpBookModal.classList.remove("hidden"); // Tampilkan modal
+                        };
 
 
-                    // Tutup modal saat tombol "Batal" ditekan
-                    // closeKpBookModalBtn.addEventListener("click", function() {
-                    //     kpBookModal.classList.add("hidden");
-                    // Kosongkan iframe saat modal ditutup
-                    // kpBookFrame.src = "";
-                    // });
-                    document.getElementById("closeKpBookModal").addEventListener("click", function() {
-                        // const kpBookModal = document.getElementById("kpBookModal");
-                        // const kpBookFrame = document.getElementById("kpBookFrame");
-                        kpBookModal.classList.add("hidden");
-                        kpBookFrame.src = ""; // Kosongkan iframe
-                    });
+                        // Tutup modal saat tombol "Batal" ditekan
+                        // closeKpBookModalBtn.addEventListener("click", function() {
+                        //     kpBookModal.classList.add("hidden");
+                        // Kosongkan iframe saat modal ditutup
+                        // kpBookFrame.src = "";
+                        // });
+                        document.getElementById("closeKpBookModal").addEventListener("click", function() {
+                            // const kpBookModal = document.getElementById("kpBookModal");
+                            // const kpBookFrame = document.getElementById("kpBookFrame");
+                            kpBookModal.classList.add("hidden");
+                            kpBookFrame.src = ""; // Kosongkan iframe
+                        });
+                        document.getElementById("closeDraftKpBookModal").addEventListener("click", function() {
+                            // const kpBookModal = document.getElementById("kpBookModal");
+                            // const kpBookFrame = document.getElementById("kpBookFrame");
+                            draftKpBookModal.classList.add("hidden");
+                            draftKpBookFrame.src = ""; // Kosongkan iframe
+                        });
+                    }
                 }
 
                 const isReadOnly = (feedback && feedback.trim() !== '') || (parseInt(rating) > 0);
+                const isRevision = bookStatus === "Rejected";
 
-                document.getElementById("feedbackModalTitle").textContent = isReadOnly ? "Lihat Rating" :
+                document.getElementById("feedbackModalTitle").textContent = isReadOnly ?
+                    "Lihat Rating" :
+                    isRevision ?
+                    "Revisi" :
                     "Isi Pengalaman";
+
                 document.getElementById("submitFeedbackBtn").classList.toggle("hidden", isReadOnly);
 
                 feedbackForm.querySelectorAll("input, textarea").forEach(el => {
