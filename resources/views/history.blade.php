@@ -439,7 +439,7 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
                     <h2 class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">Edit Pengajuan</h2>
                     <form id="editApplicationForm" method="POST" enctype="multipart/form-data"
-                        {{ route('applications.update', ['id' => $item->id]) }}>
+                        {{ route('applications.update', ['id' => $item->id ?? '']) }}>
                         @csrf
                         @method('PUT')
 

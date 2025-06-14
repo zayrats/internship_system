@@ -59,7 +59,7 @@ class InternshipController
         // Validasi kelengkapan data
         foreach (['name', 'prodi', 'department', 'student_number', 'cv'] as $field) {
             if (empty($student->$field)) {
-                return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: {$field} belum diisi.");
+                return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: {$field} di bagian data diri belum diisi.");
             }
         }
 
@@ -110,6 +110,26 @@ class InternshipController
         $student = Students::where('user_id', Auth::user()->user_id)->firstOrFail();
         $user = User::where('user_id', Auth::user()->user_id)->firstOrFail();
 
+        // Validasi kelengkapan data
+        foreach (['name', 'prodi', 'department', 'student_number', 'cv'] as $field) {
+            if (empty($student->$field)) {
+                return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: {$field} di bagian data diri belum diisi.");
+            }
+        }
+
+        if (empty($user->email)) {
+            return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: Email belum diisi.");
+        }
+
+        // Cek apakah sudah pernah apply ke lowongan ini
+        $existing = DB::table('applications')
+            ->where('student_id', $student->student_id)
+            ->where('vacancy_id', $request->vacancy_id)
+            ->first();
+
+        if ($existing) {
+            return redirect()->back()->with('error', 'Anda sudah pernah mengajukan lamaran untuk lowongan ini.');
+        }
         $request->validate([
             // 'user_id' => 'required|exists:users,id',
             'vacancy_id' => 'required|exists:vacancy,vacancy_id',
@@ -205,7 +225,7 @@ class InternshipController
                 'internships.rating'
             )
             ->get();
-            // dd($data);
+        // dd($data);
         $vacancies = DB::table('vacancy')
             ->leftJoin('companies', 'vacancy.company_id', '=', 'companies.company_id')
             // ->where('vacancy.company_id', '=', 'companies.company_id')
@@ -237,163 +257,164 @@ class InternshipController
     }
 
     public function submitHistoryFeedback(Request $request, $id)
-{
-    $data = $request->all();
+    {
+        $data = $request->all();
 
-    $request->validate([
-        'company_id' => 'required|exists:companies,company_id',
-        'vacancy_id' => 'required',
-        'title' => 'required|string|max:255',
-        'start_date' => 'required|date',
-        'end_date' => 'required|date|after_or_equal:start_date',
-        'position' => 'required|string|max:255',
-        'feedback' => 'required|string',
-        'kp_book' => 'nullable|file|mimes:pdf|max:10240', // Validasi file PDF max 10MB
-        'draft_kp_book' => 'nullable|file|mimes:pdf|max:10240',
-    ]);
-
-    DB::beginTransaction();
-    try {
-        $user = Auth::user();
-        $student = Students::where('user_id', $user->user_id)->firstOrFail();
-
-        // Proses file PDF terlebih dahulu
-        $fileUrl = null;
-        if ($request->hasFile('kp_book')) {
-            $file = $request->file('kp_book');
-            $fileName = 'kp_' . time() . '_' . Str::random(8) . '.pdf';
-            $filePath = $file->store('public');
-            $absolutePath = Storage::path($filePath);
-
-            // Proses watermark PDF
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile($absolutePath);
-
-            for ($i = 1; $i <= $pageCount; $i++) {
-                $tplId = $pdf->importPage($i);
-                $size = $pdf->getTemplateSize($tplId);
-
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($tplId);
-
-                // Tambahkan watermark
-                $pdf->SetFont('Helvetica', 'I', 24);
-                $pdf->SetTextColor(255, 0, 0);
-                $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
-                $pdf->Cell($size['width'], 10, '© 2025 - PENS', 0, 0, 'C');
-            }
-
-            // Simpan file dengan watermark
-            $publicPath = 'kp_books/' . $fileName;
-            $finalFullPath = storage_path('app/public/' . $publicPath);
-
-            // Pastikan direktori ada
-            if (!is_dir(dirname($finalFullPath))) {
-                mkdir(dirname($finalFullPath), 0755, true);
-            }
-
-            $pdf->Output($finalFullPath, 'F');
-
-            // Dapatkan URL publik
-            $fileUrl = Storage::url($publicPath);
-
-            // Hapus file temporary
-            Storage::delete($filePath);
-        };
-
-        // Proses file PDF terlebih dahulu
-        $draftFileUrl = null;
-        if ($request->hasFile('draft_kp_book')) {
-            $file = $request->file('draft_kp_book');
-            $fileName = 'draft_kp_' . time() . '_' . Str::random(8) . '.pdf';
-            $filePath = $file->storeAs('draft_kp_book', 'public');
-            $absolutePath = Storage::path($filePath);
-
-            // Proses watermark PDF
-            $pdf = new \setasign\Fpdi\Fpdi();
-            $pageCount = $pdf->setSourceFile($absolutePath);
-
-            for ($i = 1; $i <= $pageCount; $i++) {
-                $tplId = $pdf->importPage($i);
-                $size = $pdf->getTemplateSize($tplId);
-
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($tplId);
-
-                // Tambahkan watermark
-                $pdf->SetFont('Helvetica', 'I', 24);
-                $pdf->SetTextColor(255, 0, 0);
-                $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
-                $pdf->Cell($size['width'], 10, '© 2025 - PENS', 0, 0, 'C');
-            }
-
-            // Simpan file dengan watermark
-            $publicPath = 'draft_kp_books/' . $fileName;
-            $finalFullPath = storage_path('app/public/' . $publicPath);
-
-            // Pastikan direktori ada
-            if (!is_dir(dirname($finalFullPath))) {
-                mkdir(dirname($finalFullPath), 0755, true);
-            }
-
-            $pdf->Output($finalFullPath, 'F');
-
-            // Dapatkan URL publik
-            $fileUrl = Storage::url($publicPath);
-
-            // Hapus file temporary
-            Storage::delete($filePath);
-
-            $draftFileUrl = $fileUrl;
-        };
-
-        // Simpan data internship
-        $internshipId = DB::table('internships')->insertGetId([
-            'student_id' => $student->student_id,
-            'company_id' => $request->company_id,
-            'title' => $request->title,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'position' => $request->position,
-            'feedback' => $request->feedback,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'rating' => $request->rating,
-            'application_id' => $id,
-            'vacancy_id' => $request->vacancy_id,
-            'kp_book' => $fileUrl, // Simpan URL file atau null jika tidak ada file
-            'draft_kp_book' => $draftFileUrl
+        $request->validate([
+            'company_id' => 'required|exists:companies,company_id',
+            'vacancy_id' => 'required',
+            'title' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'position' => 'required|string|max:255',
+            'feedback' => 'required|string',
+            'kp_book' => 'nullable|file|mimes:pdf|max:10240', // Validasi file PDF max 10MB
+            'draft_kp_book' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        // PERBAIKAN: Update applications dengan sintaks yang benar
-        $apps = DB::table('applications')
-            ->where('application_id', $id)
-            ->update(['internship_id' => $internshipId,
-            'updated_at' => now()]); // Perbaikan sintaks di sini
+        DB::beginTransaction();
+        try {
+            $user = Auth::user();
+            $student = Students::where('user_id', $user->user_id)->firstOrFail();
 
-        // Ambil data internship yang baru dibuat
-        $internship = DB::table('internships')
-            ->where('internship_id', $internshipId)
-            ->first();
+            // Proses file PDF terlebih dahulu
+            $fileUrl = null;
+            if ($request->hasFile('kp_book')) {
+                $file = $request->file('kp_book');
+                $fileName = 'kp_' . time() . '_' . Str::random(8) . '.pdf';
+                $filePath = $file->store('public');
+                $absolutePath = Storage::path($filePath);
 
-        DB::commit();
+                // Proses watermark PDF
+                $pdf = new Fpdi();
+                $pageCount = $pdf->setSourceFile($absolutePath);
 
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Feedback dan Buku KP berhasil disimpan.',
-        //     'internship' => $internship,
-        //     'apps_updated' => $apps
-        // ]);
-        return redirect()->back()->with('success', 'Feedback dan Buku KP berhasil disimpan.');
+                for ($i = 1; $i <= $pageCount; $i++) {
+                    $tplId = $pdf->importPage($i);
+                    $size = $pdf->getTemplateSize($tplId);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
+                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                    $pdf->useTemplate($tplId);
 
-        return response()->json([
-            'error' => 'Terjadi kesalahan: ' . $e->getMessage()
-        ], 500);
+                    // Tambahkan watermark
+                    $pdf->SetFont('Helvetica', 'I', 24);
+                    $pdf->SetTextColor(255, 0, 0);
+                    $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
+                    $pdf->Cell($size['width'], 10, '© 2025 - PENS', 0, 0, 'C');
+                }
+
+                // Simpan file dengan watermark
+                $publicPath = 'kp_books/' . $fileName;
+                $finalFullPath = storage_path('app/public/' . $publicPath);
+
+                // Pastikan direktori ada
+                if (!is_dir(dirname($finalFullPath))) {
+                    mkdir(dirname($finalFullPath), 0755, true);
+                }
+
+                $pdf->Output($finalFullPath, 'F');
+
+                // Dapatkan URL publik
+                $fileUrl = Storage::url($publicPath);
+
+                // Hapus file temporary
+                Storage::delete($filePath);
+            };
+
+            // Proses file PDF terlebih dahulu
+            $draftFileUrl = null;
+            if ($request->hasFile('draft_kp_book')) {
+                $file = $request->file('draft_kp_book');
+                $fileName = 'draft_kp_' . time() . '_' . Str::random(8) . '.pdf';
+                $filePath = $file->storeAs('draft_kp_book', 'public');
+                $absolutePath = Storage::path($filePath);
+
+                // Proses watermark PDF
+                $pdf = new \setasign\Fpdi\Fpdi();
+                $pageCount = $pdf->setSourceFile($absolutePath);
+
+                for ($i = 1; $i <= $pageCount; $i++) {
+                    $tplId = $pdf->importPage($i);
+                    $size = $pdf->getTemplateSize($tplId);
+
+                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                    $pdf->useTemplate($tplId);
+
+                    // Tambahkan watermark
+                    $pdf->SetFont('Helvetica', 'I', 24);
+                    $pdf->SetTextColor(255, 0, 0);
+                    $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
+                    $pdf->Cell($size['width'], 10, '© 2025 - PENS', 0, 0, 'C');
+                }
+
+                // Simpan file dengan watermark
+                $publicPath = 'draft_kp_books/' . $fileName;
+                $finalFullPath = storage_path('app/public/' . $publicPath);
+
+                // Pastikan direktori ada
+                if (!is_dir(dirname($finalFullPath))) {
+                    mkdir(dirname($finalFullPath), 0755, true);
+                }
+
+                $pdf->Output($finalFullPath, 'F');
+
+                // Dapatkan URL publik
+                $fileUrl = Storage::url($publicPath);
+
+                // Hapus file temporary
+                Storage::delete($filePath);
+
+                $draftFileUrl = $fileUrl;
+            };
+
+            // Simpan data internship
+            $internshipId = DB::table('internships')->insertGetId([
+                'student_id' => $student->student_id,
+                'company_id' => $request->company_id,
+                'title' => $request->title,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'position' => $request->position,
+                'feedback' => $request->feedback,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'rating' => $request->rating,
+                'application_id' => $id,
+                'vacancy_id' => $request->vacancy_id,
+                'kp_book' => $fileUrl, // Simpan URL file atau null jika tidak ada file
+                'draft_kp_book' => $draftFileUrl
+            ]);
+
+            // PERBAIKAN: Update applications dengan sintaks yang benar
+            $apps = DB::table('applications')
+                ->where('application_id', $id)
+                ->update([
+                    'internship_id' => $internshipId,
+                    'updated_at' => now()
+                ]); // Perbaikan sintaks di sini
+
+            // Ambil data internship yang baru dibuat
+            $internship = DB::table('internships')
+                ->where('internship_id', $internshipId)
+                ->first();
+
+            DB::commit();
+
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => 'Feedback dan Buku KP berhasil disimpan.',
+            //     'internship' => $internship,
+            //     'apps_updated' => $apps
+            // ]);
+            return redirect()->back()->with('success', 'Feedback dan Buku KP berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
 
     public function internexperience()
     {
@@ -514,7 +535,7 @@ class InternshipController
             Log::info('Tidak ada perubahan data pada tabel students.');
         }
 
-        // Upload CV ke Firebase Storage
+        // Upload CV ke Storage
         if ($request->hasFile('cv')) {
             try {
                 // Hapus CV lama jika ada
