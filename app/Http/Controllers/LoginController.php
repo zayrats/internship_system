@@ -43,6 +43,9 @@ class LoginController
                 case 'Dosen Koordinator':
                     return redirect()->route('lecturerdashboard');
                     break;
+                case 'Pustakawan':
+                    return redirect()->route('pustakawan');
+                    break;
 
                 case 'Admin':
                     return redirect()->route('admin.users');
