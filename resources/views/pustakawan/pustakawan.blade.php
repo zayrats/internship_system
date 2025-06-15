@@ -146,10 +146,10 @@
             document.getElementById('editModal').classList.add('hidden');
         }
 
-        function toggleMessageField() {
-            const status = document.getElementById('bookStatus').value;
-            document.getElementById('messageField').classList.toggle('hidden', status !== 'Approved');
-        }
+        // function toggleMessageField() {
+        //     const status = document.getElementById('bookStatus').value;
+        //     document.getElementById('messageField').classList.toggle('hidden', status !== 'Approved');
+        // }
 
         function openKpBookModal() {
             document.getElementById('kpBookModal').classList.remove('hidden');
