@@ -54,7 +54,7 @@ class PustakawanController extends Controller
             )
             ->get();
 
-        return view('pustakawan', compact('data'));
+        return view('pustakawan.pustakawan', compact('data'));
     }
 
     public function before()
@@ -87,7 +87,7 @@ class PustakawanController extends Controller
             )
             ->get();
 
-        return view('before', compact('data'));
+        return view('pustakawan.before', compact('data'));
     }
 
     public function after()
@@ -120,7 +120,7 @@ class PustakawanController extends Controller
             )
             ->get();
 
-        return view('after', compact('data'));
+        return view('pustakawan.after', compact('data'));
     }
 
     public function update(Request $request, $id)
