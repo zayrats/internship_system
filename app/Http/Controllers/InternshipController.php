@@ -385,6 +385,12 @@ class InternshipController
                 'draft_kp_book' => $draftFileUrl
             ]);
 
+            $internship = Internship::findOrFail($internshipId);
+            // Update book_status jadi pending jika sudah mengirim revisi
+            if ($internship->book_status === 'Rejected') {
+                $internship->book_status = 'Pending';
+                $internship->save();
+            }
             // PERBAIKAN: Update applications dengan sintaks yang benar
             $apps = DB::table('applications')
                 ->where('application_id', $id)
