@@ -108,8 +108,7 @@
         </div>
     </div>
     <!-- Modal Draft KP Book -->
-    <div id="draftKpBookModal"
-        class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center ">
+    <div id="draftKpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center ">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
             <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Draft Buku KP</h2>
 
@@ -152,17 +151,17 @@
             document.getElementById('messageField').classList.toggle('hidden', status !== 'Rejected');
         }
 
-        function openKpBookModal() {
-            document.getElementById('kpBookModal').classList.remove('hidden');
-        }
-        function closeKpBookModal() {
-            document.getElementById('kpBookModal').classList.add('hidden');
-        }
-        function openDraftKpBookModal() {
-            document.getElementById('draftKpBookModal').classList.remove('hidden');
-        }
-        function closeDraftKpBookModal() {
-            document.getElementById('draftKpBookModal').classList.add('hidden');
-        }
+        document.getElementById("closeKpBookModal").addEventListener("click", function() {
+            // const kpBookModal = document.getElementById("kpBookModal");
+            // const kpBookFrame = document.getElementById("kpBookFrame");
+            kpBookModal.classList.add("hidden");
+            kpBookFrame.src = ""; // Kosongkan iframe
+        });
+        document.getElementById("closeDraftKpBookModal").addEventListener("click", function() {
+            // const kpBookModal = document.getElementById("kpBookModal");
+            // const kpBookFrame = document.getElementById("kpBookFrame");
+            draftKpBookModal.classList.add("hidden");
+            draftKpBookFrame.src = ""; // Kosongkan iframe
+        });
     </script>
 @endsection
