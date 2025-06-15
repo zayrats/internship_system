@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="p-6">
-        <h2 class="text-2xl font-bold mb-4">Daftar Pengajuan KP</h2>
+        <h2 class="text-2xl font-bold mb-4">Daftar Pengumpulan draft dan Buku KP Terverifikasi</h2>
         <table class="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
             <thead class="bg-gray-100">
                 <tr>

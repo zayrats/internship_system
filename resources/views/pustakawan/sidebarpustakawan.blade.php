@@ -46,13 +46,13 @@
                     <li>
                         <a href="{{ route('pustakawan.before') }}"
                             class="block py-2 px-3 rounded hover:bg-yellow-600 transition-all duration-200">
-                            ⏳ Pending Review
+                            ⏳ Belum Diverifikasi
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('pustakawan.after') }}"
                             class="block py-2 px-3 rounded hover:bg-red-600 transition-all duration-200">
-                            ❌ Ditolak
+                            ✅ Sudah Diverifikasi
                         </a>
                     </li>
                     <li>
