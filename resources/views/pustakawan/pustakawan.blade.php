@@ -151,5 +151,18 @@
             const status = document.getElementById('bookStatus').value;
             document.getElementById('messageField').classList.toggle('hidden', status !== 'Rejected');
         }
+
+        function openKpBookModal() {
+            document.getElementById('kpBookModal').classList.remove('hidden');
+        }
+        function closeKpBookModal() {
+            document.getElementById('kpBookModal').classList.add('hidden');
+        }
+        function openDraftKpBookModal() {
+            document.getElementById('draftKpBookModal').classList.remove('hidden');
+        }
+        function closeDraftKpBookModal() {
+            document.getElementById('draftKpBookModal').classList.add('hidden');
+        }
     </script>
 @endsection
