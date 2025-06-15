@@ -95,7 +95,7 @@ class PustakawanController extends Controller
         $data = DB::table('internships')
             ->leftJoin('students', 'internships.student_id', '=', 'students.student_id')
             ->leftJoin('companies', 'internships.company_id', '=', 'companies.company_id')
-            ->whereIn('internships.book_status', ['Declined', 'Rejected'])
+            ->whereIn('internships.book_status', ['Approved', 'Rejected'])
             ->select(
                 'internships.internship_id as id',
                 'internships.title',

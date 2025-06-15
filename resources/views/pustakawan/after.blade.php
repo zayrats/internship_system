@@ -125,7 +125,7 @@
             document.getElementById('duration').innerText = internship.duration + ' bulan';
             document.getElementById('kpBookFrame').src = internship.kp_book;
             document.getElementById('draftKpBookFrame').src = internship.draft_kp_book;
-            document.getElementById('bookStatus').value = internship.book_status || 'Approved';
+            document.getElementById('bookStatus').value = internship.book_status || '';
             document.getElementById('message').value = internship.message || '';
             document.getElementById('editForm').action = '/pustakawan/update/' + internship.id;
             document.getElementById('editModal').classList.remove('hidden');
