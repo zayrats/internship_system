@@ -421,7 +421,7 @@ class InternshipController
         $data = DB::table('internships')
             ->leftJoin('companies', 'internships.company_id', '=', 'companies.company_id')
             ->leftJoin('students', 'internships.student_id', '=', 'students.student_id')
-            ->where('internships.status', '=', 'Approved')
+            ->where('internships.book_status', '=', 'Approved')
             ->select(
                 'internships.internship_id as internship_id',
                 'internships.title',
