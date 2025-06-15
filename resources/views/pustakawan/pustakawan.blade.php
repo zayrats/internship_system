@@ -151,6 +151,13 @@
             document.getElementById('messageField').classList.toggle('hidden', status !== 'Rejected');
         }
 
+        function openKpBookModal() {
+            document.getElementById('kpBookModal').classList.remove('hidden');
+        }
+
+        function openDraftKpBookModal() {
+            document.getElementById('draftKpBookModal').classList.remove('hidden');
+        }
         document.getElementById("closeKpBookModal").addEventListener("click", function() {
             // const kpBookModal = document.getElementById("kpBookModal");
             // const kpBookFrame = document.getElementById("kpBookFrame");
