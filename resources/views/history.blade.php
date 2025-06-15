@@ -733,14 +733,22 @@
                 console.log("🚀 ~ document.addEventListener ~ kpBook:", internshipId)
                 console.log("🚀 ~ book_status:", bookStatus)
                 if (!internshipId) {
+
                     feedbackForm.method = 'post'
                     feedbackForm.action = `/history/${applicationId}/submit-feedback`
                     document.getElementById("modalVacancyId").value = vacancyId;
-                    console.log(`🚀 ~ document.addEventListener ~  document.getElementById("modalVacancyId"):`,
+                    console.log(
+                        `🚀 ~ document.addEventListener ~  document.getElementById("modalVacancyId"):`,
                         document.getElementById("modalVacancyId"))
 
                 } else {
-                    feedbackForm.method = 'get'
+                    if (bookStatus === 'Rejected') {
+                        feedbackForm.method = 'post'
+                        feedbackForm.action = `/history/${applicationId}/submit-feedback`
+                        document.getElementById("modalVacancyId").value = vacancyId;
+                    } else {
+                        feedbackForm.method = 'get'
+                    }
                 }
                 console.log(feedbackForm) // Set ID aplikasi dan perusahaan
                 document.getElementById("internshipId").value = internshipId;
