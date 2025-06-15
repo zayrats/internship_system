@@ -836,8 +836,8 @@
                     "Revisi" :
                     "Isi Pengalaman";
 
-                document.getElementById("submitFeedbackBtn").classList.toggle("hidden", isReadOnly);
-                document.getElementById("submitFeedbackBtn").classList.remove("hidden", isRevision);
+                document.getElementById("submitFeedbackBtn").classList.toggle("hidden", isReadOnly && !
+                    isRevision);
 
                 feedbackForm.querySelectorAll("input, textarea").forEach(el => {
                     if (el.id !== 'internshipId' && el.id !== 'modalCompanyId') {
