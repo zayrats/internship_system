@@ -1,10 +1,6 @@
 @extends('pustakawan.sidebarpustakawan')
 
 @section('content')
-    <!-- Template untuk semua halaman: pustakawan.blade.php, before.blade.php, after.blade.php -->
-    <!-- Gunakan Tailwind CSS dan pastikan ini berada di dalam layout blade yang sesuai -->
-
-    <!-- Daftar Data -->
     <div class="p-6">
         <h2 class="text-2xl font-bold mb-4">Daftar Pengajuan KP</h2>
         <table class="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -34,7 +30,7 @@
         </table>
     </div>
 
-    <!-- Modal Edit -->
+    <!-- Modal Detail/Edit -->
     <div id="editModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 flex">
         <div class="bg-white rounded-lg p-6 w-full max-w-xl">
             <h3 class="text-xl font-semibold mb-4">Detail Pengajuan KP</h3>
@@ -59,22 +55,17 @@
                     <label class="block font-medium text-sm">Durasi</label>
                     <p id="duration" class="text-gray-700"></p>
                 </div>
-                <div class="flex justify-end gap-2 mb-3">
-                    <button type="button" class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
-                        onclick="openKpBookModal()">
-                        Lihat Buku KP
-                    </button>
-                    <button type="button" class="text-white bg-yellow-500 hover:underline rounded px-3 py-1"
-                        onclick="openDraftKpBookModal()">
-                        Lihat Draft Buku KP
-                    </button>
-                </div>
 
+                <div class="flex justify-end gap-2 mb-3">
+                    <button type="button" class="bg-yellow-500 text-white px-3 py-1 rounded"
+                        onclick="openKpBookModal()">Lihat Buku KP</button>
+                    <button type="button" class="bg-yellow-500 text-white px-3 py-1 rounded"
+                        onclick="openDraftKpBookModal()">Lihat Draft Buku KP</button>
+                </div>
 
                 <div class="mb-3">
                     <label for="book_status" class="block text-sm font-medium">Status Buku KP</label>
-                    <select name="book_status" id="bookStatus" required onchange="toggleMessageField()"
-                        class="w-full border rounded px-3 py-2">
+                    <select name="book_status" id="bookStatus" required class="w-full border rounded px-3 py-2">
                         <option value="Approved">Approved</option>
                         <option value="Rejected">Rejected</option>
                     </select>
@@ -93,40 +84,36 @@
             </form>
         </div>
     </div>
+
     <!-- Modal Lihat Buku KP -->
-    <div id="kpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center ">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
-            <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Buku KP</h2>
-
+    <div id="kpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+            <h2 class="text-lg font-semibold mb-4 text-center">Buku KP</h2>
             <iframe id="kpBookFrame" class="w-full h-[500px]"></iframe>
-
             <div class="flex justify-center mt-6">
-                <button id="closeKpBookModal" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                    Tutup
-                </button>
+                <button id="closeKpBookModal"
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Tutup</button>
             </div>
         </div>
     </div>
-    <!-- Modal Draft KP Book -->
-    <div id="draftKpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center ">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
-            <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">Draft Buku KP</h2>
 
+    <!-- Modal Lihat Draft Buku KP -->
+    <div id="draftKpBookModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+            <h2 class="text-lg font-semibold mb-4 text-center">Draft Buku KP</h2>
             <iframe id="draftKpBookFrame" class="w-full h-[500px]"></iframe>
-
             <div class="flex justify-center mt-6">
-                <button id="closeDraftKpBookModal" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                    Tutup
-                </button>
+                <button id="closeDraftKpBookModal"
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Tutup</button>
             </div>
         </div>
     </div>
+
     <script>
         const data = @json($data);
 
         function openEditModal(id) {
             const internship = data.find(d => d.id == id);
-
             document.getElementById('internshipId').value = internship.id;
             document.getElementById('studentName').innerText = internship.student_name;
             document.getElementById('companyName').innerText = internship.company_name;
@@ -136,8 +123,6 @@
             document.getElementById('draftKpBookFrame').src = internship.draft_kp_book;
             document.getElementById('bookStatus').value = internship.book_status || 'Approved';
             document.getElementById('message').value = internship.message || '';
-            toggleMessageField();
-
             document.getElementById('editForm').action = '/pustakawan/update/' + internship.id;
             document.getElementById('editModal').classList.remove('hidden');
         }
@@ -146,11 +131,6 @@
             document.getElementById('editModal').classList.add('hidden');
         }
 
-        // function toggleMessageField() {
-        //     const status = document.getElementById('bookStatus').value;
-        //     document.getElementById('messageField').classList.toggle('hidden', status !== 'Approved');
-        // }
-
         function openKpBookModal() {
             document.getElementById('kpBookModal').classList.remove('hidden');
         }
@@ -158,17 +138,15 @@
         function openDraftKpBookModal() {
             document.getElementById('draftKpBookModal').classList.remove('hidden');
         }
+
         document.getElementById("closeKpBookModal").addEventListener("click", function() {
-            // const kpBookModal = document.getElementById("kpBookModal");
-            // const kpBookFrame = document.getElementById("kpBookFrame");
-            kpBookModal.classList.add("hidden");
-            kpBookFrame.src = ""; // Kosongkan iframe
+            document.getElementById("kpBookModal").classList.add("hidden");
+            document.getElementById("kpBookFrame").src = "";
         });
+
         document.getElementById("closeDraftKpBookModal").addEventListener("click", function() {
-            // const kpBookModal = document.getElementById("kpBookModal");
-            // const kpBookFrame = document.getElementById("kpBookFrame");
-            draftKpBookModal.classList.add("hidden");
-            draftKpBookFrame.src = ""; // Kosongkan iframe
+            document.getElementById("draftKpBookModal").classList.add("hidden");
+            document.getElementById("draftKpBookFrame").src = "";
         });
     </script>
 @endsection
