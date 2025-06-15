@@ -148,7 +148,7 @@
 
         function toggleMessageField() {
             const status = document.getElementById('bookStatus').value;
-            document.getElementById('messageField').classList.toggle('hidden', status !== 'Rejected');
+            document.getElementById('messageField').classList.toggle('hidden', status !== 'Approved');
         }
 
         function openKpBookModal() {
