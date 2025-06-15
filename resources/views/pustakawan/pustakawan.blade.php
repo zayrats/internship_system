@@ -3,7 +3,7 @@
 @section('content')
     <div class="p-6">
         <h2 class="text-2xl font-bold mb-4">Daftar Pengumpulan draft dan Buku KP</h2>
-        <table class="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table id="kpTable" class="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
             <thead class="bg-gray-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
@@ -29,6 +29,7 @@
             </tbody>
         </table>
     </div>
+
 
     <!-- Modal Detail/Edit -->
     <div id="editModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 flex">
@@ -150,6 +151,24 @@
         document.getElementById("closeDraftKpBookModal").addEventListener("click", function() {
             document.getElementById("draftKpBookModal").classList.add("hidden");
             document.getElementById("draftKpBookFrame").src = "";
+        });
+        $(document).ready(function() {
+            $('#kpTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 20, 50],
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ hingga _END_ dari _TOTAL_ data",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "→",
+                        previous: "←"
+                    },
+                    zeroRecords: "Tidak ada data yang cocok",
+                }
+            });
         });
     </script>
 @endsection
