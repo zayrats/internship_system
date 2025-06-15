@@ -218,7 +218,7 @@
 
             <!-- Modal Feedback -->
             <div id="feedbackModal"
-                class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center mt-24">
+                class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center mt-24 max-h-screen overflow-y-auto">
                 <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 w-96">
                     <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center"
                         id="feedbackModalTitle">
@@ -243,15 +243,15 @@
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Mulai</label>
-                        <input type="date" name="start_date" id="startDate"
+                        <input disabled type="date" name="start_date" id="startDate"
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Selesai</label>
-                        <input type="date" name="end_date" id="endDate"
+                        <input disabled type="date" name="end_date" id="endDate"
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Posisi Magang</label>
-                        <input type="text" name="position" id="position"
+                        <input disabled type="text" name="position" id="position"
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Rating</label>
