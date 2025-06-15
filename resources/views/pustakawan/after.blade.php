@@ -66,7 +66,7 @@
 
                 <div class="mb-3">
                     <label for="book_status" class="block text-sm font-medium">Status Buku KP</label>
-                    <select name="book_status" id="bookStatus" required class="w-full border rounded px-3 py-2">
+                    <select disabled name="book_status" id="bookStatus" required class="w-full border rounded px-3 py-2">
                         <option value="Approved">Terima</option>
                         <option value="Rejected">Tolak</option>
                     </select>
@@ -74,7 +74,7 @@
 
                 <div id="messageField" class="mb-3">
                     <label for="message" class="block text-sm font-medium">Revisi</label>
-                    <textarea name="message" id="message" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+                    <textarea disabled name="message" id="message" rows="3" class="w-full border rounded px-3 py-2"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-2">
