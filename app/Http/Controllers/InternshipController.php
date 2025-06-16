@@ -389,6 +389,8 @@ class InternshipController
             // Update book_status jadi pending jika sudah mengirim revisi
             if ($internship->book_status === 'Rejected') {
                 $internship->book_status = 'Pending';
+                $internship->kp_book = $fileUrl;
+                $internship->draft_kp_book = $draftFileUrl;
                 $internship->save();
             }
             // PERBAIKAN: Update applications dengan sintaks yang benar
