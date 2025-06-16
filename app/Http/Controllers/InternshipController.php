@@ -359,12 +359,10 @@ class InternshipController
                 $pdf->Output($finalFullPath, 'F');
 
                 // Dapatkan URL publik
-                $fileUrl = Storage::url($publicPath);
+                $draftFileUrl = Storage::url($publicPath);
 
                 // Hapus file temporary
                 Storage::delete($filePath);
-
-                $draftFileUrl = $fileUrl;
             };
 
             // Simpan data internship
@@ -391,7 +389,8 @@ class InternshipController
                 $internship->book_status = 'Pending';
                 $internship->kp_book = $fileUrl;
                 $internship->draft_kp_book = $draftFileUrl;
-                $internship->save();
+                $internship->updated_at = now();
+                $internship->update();
             }
             // PERBAIKAN: Update applications dengan sintaks yang benar
             $apps = DB::table('applications')
