@@ -191,7 +191,7 @@
                             </label>
 
                             @if ($student->cv)
-                                <a href="{{ $student->cv }}" target="_blank"
+                                <a href="{{ asset('storage/cv' . $student->cv) }}" download class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
                                     class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
                                     CV</a>
                             @endif
