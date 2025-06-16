@@ -191,7 +191,7 @@
                             </label>
 
                             @if ($student->cv)
-                                <a href="{{ asset($student->cv) }}" download class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
+                                <a href="{{ asset($student->cv) }}" class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
                                     CV</a>
                             @endif
                             <!-- Tempat preview nama file -->
