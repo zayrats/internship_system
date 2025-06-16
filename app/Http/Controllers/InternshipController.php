@@ -259,7 +259,7 @@ class InternshipController
     public function submitHistoryFeedback(Request $request, $id)
     {
         $data = $request->all();
-
+        dd($data);
         $request->validate([
             'company_id' => 'required|exists:companies,company_id',
             'vacancy_id' => 'required',
@@ -268,8 +268,8 @@ class InternshipController
             'end_date' => 'required|date|after_or_equal:start_date',
             'position' => 'required|string|max:255',
             'feedback' => 'required|string',
-            'kp_book' => 'nullable|file|mimes:pdf|max:10240', // Validasi file PDF max 10MB
-            'draft_kp_book' => 'nullable|file|mimes:pdf|max:10240',
+            'kp_book' => 'nullable|file|mimes:pdf', // Validasi file PDF max 10MB
+            'draft_kp_book' => 'nullable|file|mimes:pdf',
         ]);
 
         DB::beginTransaction();
