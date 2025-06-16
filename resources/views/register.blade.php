@@ -1,6 +1,17 @@
 @extends('master')
 
 @section('content')
+    @if (session('success'))
+        <div id="alert-success" class="bg-green-500 text-white p-3 rounded mb-4 text-center">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div id="alert-error" class="bg-red-500 text-white p-3 rounded mb-4 text-center">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
         <div
             class="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
@@ -69,7 +80,7 @@
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             required>
                     </div>
-{{--
+                    {{--
                     <div>
                         <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             <i class="fa fa-briefcase mr-1"></i>Role
