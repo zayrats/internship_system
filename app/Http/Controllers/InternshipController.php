@@ -364,7 +364,7 @@ class InternshipController
                 // Hapus file temporary
                 Storage::delete($filePath);
             };
-            dd($request->all());
+            // dd($request->all());
             // Simpan data internship
             $internshipId = DB::table('internships')->insertGetId([
                 'student_id' => $student->student_id,
