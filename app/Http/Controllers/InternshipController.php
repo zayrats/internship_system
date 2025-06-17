@@ -259,7 +259,7 @@ class InternshipController
     public function submitHistoryFeedback(Request $request, $id)
     {
         $data = $request->all();
-        // dd($data);
+        dd($data);
         $request->validate([
             'company_id' => 'required|exists:companies,company_id',
             'vacancy_id' => 'required',
