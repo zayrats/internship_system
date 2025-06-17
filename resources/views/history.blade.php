@@ -80,7 +80,7 @@
 
                                 @if (strtolower(trim($item->status)) === 'finished')
                                     @if ($item->internship_id)
-                                        @dump($item->book_status)
+                                        {{-- @dump($item->book_status) --}}
                                         {{-- jika status buku Rejected, maka tampil revisi --}}
                                         @if (strtolower(trim($item->book_status)) === 'rejected')
                                             <button class="text-white hover:underline bg-red-500 rounded px-3 py-1 mx-1"
