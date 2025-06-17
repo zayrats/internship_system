@@ -261,7 +261,7 @@ class InternshipController
         $data = $request->all();
         // dd($data);
         $request->validate([
-            'company_id' => 'required|exists:companies,company_id',
+            // 'company_id' => 'required|exists:companies,company_id',
             'vacancy_id' => 'required',
             'title' => 'required|string|max:255',
             // 'start_date' => 'required|date',
