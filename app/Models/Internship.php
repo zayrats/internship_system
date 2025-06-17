@@ -17,12 +17,19 @@ class Internship extends Model
         'student_id',
         'company_id',
         'title',
-        'description',
         'start_date',
         'end_date',
         'position',
         'feedback',
-        'book_kp',
+        'kp_book',
+        'book_status',
+        'created_at',
+        'updated_at',
+        'rating',
+        'application_id',
+        'vacancy_id',
+        'draft_kp_book',
+        'message'
     ];
 
     // Relasi ke student
