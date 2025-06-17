@@ -383,15 +383,27 @@ class InternshipController
                 'draft_kp_book' => $draftFileUrl
             ]);
 
-            $internshipRevision = Internship::findOrFail($request->internship_id);
-            // Update book_status jadi pending jika sudah mengirim revisi
-            if ($internshipRevision->book_status === 'Rejected') {
-                $internshipRevision->book_status = 'Pending';
-                $internshipRevision->kp_book = $fileUrl;
-                $internshipRevision->draft_kp_book = $draftFileUrl;
-                $internshipRevision->updated_at = now();
-                $internshipRevision->update();
+            if(isset($request->internship_id)){
+                DB::table('internships')
+                ->where('internship_id', $request->internship_id)
+                ->update([
+                    'book_status' => 'Pending',
+                    'kp_book' => $fileUrl,
+                    'draft_kp_book' => $draftFileUrl,
+                    'updated_at' => now()
+                ]);
             }
+            // $internshipRevision = DB::table('internships')
+            //     ->where('internship_id', $request->internship_id)
+            //     ->first();
+            // // Update book_status jadi pending jika sudah mengirim revisi
+            // if ($internshipRevision->book_status === 'Rejected') {
+            //     $internshipRevision->book_status = 'Pending';
+            //     $internshipRevision->kp_book = $fileUrl;
+            //     $internshipRevision->draft_kp_book = $draftFileUrl;
+            //     $internshipRevision->updated_at = now();
+            //     $internshipRevision->update();
+            // }
             // PERBAIKAN: Update applications dengan sintaks yang benar
             $apps = DB::table('applications')
                 ->where('application_id', $id)
