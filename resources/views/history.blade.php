@@ -243,15 +243,15 @@
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Mulai</label>
-                        <input disabled type="date" name="start_date" id="startDate"
+                        <input readonly type="date" name="start_date" id="startDate"
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Tanggal Selesai</label>
-                        <input disabled type="date" name="end_date" id="endDate"
+                        <input readonly type="date" name="end_date" id="endDate"
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Posisi Magang</label>
-                        <input disabled type="text" name="position" id="position"
+                        <input readonly type="text" name="position" id="position"
                             class="w-full p-2 border rounded dark:text-black">
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Rating</label>
