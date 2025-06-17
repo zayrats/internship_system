@@ -266,8 +266,8 @@ class InternshipController
             // 'title' => 'required|string|max:255',
             // 'start_date' => 'required|date',
             // 'end_date' => 'required|date|after_or_equal:start_date',
-            'position' => 'required|string|max:255',
-            'feedback' => 'required|string',
+            // 'position' => 'required|string|max:255',
+            // 'feedback' => 'required|string',
             // 'kp_book' => 'nullable|file|mimes:pdf', // Validasi file PDF max 10MB
             // 'draft_kp_book' => 'nullable|file|mimes:pdf',
         ]);
