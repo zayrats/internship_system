@@ -102,7 +102,7 @@
                                                 Revisi
                                             </button>
                                         @else
-                                            <button class="text-green-600 hover:underline bg-green-500 rounded px-3 py-1"
+                                            <button class="text-white hover:underline bg-green-500 rounded px-3 py-1 mx-1"
                                                 onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
                                             '{{ $item->id }}',
                                             '{{ $item->company_id }}',
