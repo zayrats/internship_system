@@ -271,7 +271,7 @@ class InternshipController
             'kp_book' => 'nullable|file|mimes:pdf', // Validasi file PDF max 10MB
             'draft_kp_book' => 'nullable|file|mimes:pdf',
         ]);
-        dd($request->all());
+        // dd($request->all());
         DB::beginTransaction();
         try {
             $user = Auth::user();
