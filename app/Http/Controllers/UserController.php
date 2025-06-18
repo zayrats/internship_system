@@ -9,7 +9,8 @@ class UserController
 {
     public function index()
     {
-        $users = User::orderBy('username', 'asc')->paginate(10); // Ambil semua user dengan pagination
+        //ambil semua user
+        $users = User::all();
         return view('admin.admindashboard', compact('users'));
     }
 
@@ -36,7 +37,7 @@ class UserController
     {
         $user = User::findOrFail($id);
         $request->validate([
-            'role' => 'required|in:Admin,Mahasiswa,Perusahaan',
+            'role' => 'required|in:Admin,Mahasiswa,Pustakawan',
         ]);
         $user->role = $request->role;
         $user->save();

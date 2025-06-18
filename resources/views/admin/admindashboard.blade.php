@@ -48,7 +48,8 @@
                                         <option value="Admin" {{ $user->role == 'Admin' ? 'selected' : '' }}>Admin</option>
                                         <option value="Mahasiswa" {{ $user->role == 'Mahasiswa' ? 'selected' : '' }}>
                                             Mahasiswa</option>
-                                        {{-- <option value="Perusahaan" {{ $user->role == 'Perusahaan' ? 'selected' : '' }}>
+                                        <option value="Pustakawan" {{ $user->role == 'Pustakawan' ? 'selected' : '' }}>
+                                            {{-- <option value="Perusahaan" {{ $user->role == 'Perusahaan' ? 'selected' : '' }}>
                                             Perusahaan</option> --}}
                                     </select>
                             </td>
@@ -80,8 +81,9 @@
                 <input type="password" name="password" placeholder="Password"
                     class="w-full border p-2 mb-3 rounded focus:ring-2 focus:ring-blue-400" required>
                 <select name="role" class="w-full border p-2 mb-4 rounded focus:ring-2 focus:ring-blue-400">
-                    <option value="admin">Admin</option>
-                    <option value="mahasiswa">Mahasiswa</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Mahasiswa">Mahasiswa</option>
+                    <option value="Pustakawan">Pustakawan</option>
                     {{-- <option value="perusahaan">Perusahaan</option> --}}
                 </select>
                 <div class="flex justify-end space-x-2">
