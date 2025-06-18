@@ -249,7 +249,7 @@ class AdminController
             $query->where('division', 'like', "%{$request->search}%");
         }
 
-        $companies = $query;
+        $companies = $query->get();
         $vacancies = Vacancy::all();
         // dd($companies->toArray());
         return view('admin.companies', compact('companies', 'vacancies', 'internships'));
