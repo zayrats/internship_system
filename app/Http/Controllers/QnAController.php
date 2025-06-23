@@ -15,9 +15,10 @@ class QnAController
     public function index()
     {
         // $user = User::find(Auth::id());
-        $questions = Question::with('user:user_id,username')->latest()->take(20)->paginate(10);
+        $questions = Question::with('user:user_id,username')->latest();
+        $replies = AnswerComment::with('user:user_id,username')->latest();
         // dd($questions);
-        return view('qna', compact('questions'));
+        return view('qna', compact('questions', 'replies'));
     }
 
     // Form buat pertanyaan
@@ -76,19 +77,18 @@ class QnAController
     }
 
     // Detail pertanyaan & jawabannya
-    public function show(Question $question)
+    public function show(Question $question, AnswerComment $replies)
     {
         $question->load([
             'user:user_id,username',
             'answers.user',
             'answers.comments.user:id,username',
             'answers.comments.replies.user:id,username',
-            'answercomment.user:id,username',
-            'answercomment.replies.user:id,username',
-            'answers.comments..user:id,username'
         ]);
 
-        return view('qnashow', compact('question'));
+        $replies->load(['user:user_id,username', 'replies.user:user_id,username']);
+
+        return view('qnashow', compact('question', 'replies'));
     }
 
     // Simpan jawaban

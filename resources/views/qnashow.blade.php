@@ -20,7 +20,7 @@
                         class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
                         @dump($answer)
                     {{-- Balasan dari komentar --}}
-                    @forelse ($answer->comments->where('parent_id', $answer->id) as $reply)
+                    @forelse ($reply->replies->where('answer_id', $answer->id) as $reply)
                         <div class="mt-2 ml-4 space-y-2">
                             <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
                                 <p class="text-sm text-gray-700 dark:text-gray-300">{{ $reply->comment }}</p>
@@ -34,15 +34,15 @@
 
                     {{-- Form reply tersembunyi --}}
                     <form action="{{ route('answer.comment', $answer->id) }}" method="POST" class="mt-2 hidden reply-form"
-                        id="reply-form-{{ $comment->id }}">
+                        id="reply-form-{{ $reply->id }}">
                         @csrf
-                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                        <input type="hidden" name="parent_id" value="{{ $reply->id }}">
                         <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
                             placeholder="Tulis balasan..." required></textarea>
                         <div class="flex gap-2 mt-1">
                             <button type="submit"
                                 class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
-                            <button type="button" onclick="hideReplyForm({{ $comment->id }})"
+                            <button type="button" onclick="hideReplyForm({{ $reply->id }})"
                                 class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
                         </div>
                     </form>
