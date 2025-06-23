@@ -16,7 +16,7 @@ class QnAController
     {
         // $user = User::find(Auth::id());
         $questions = Question::with('user:user_id,username')->latest()->take(20)->paginate(10);
-        // dd($questions);
+        dd($questions);
         return view('qna', compact('questions'));
     }
 

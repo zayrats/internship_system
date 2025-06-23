@@ -31,14 +31,16 @@
                                     @foreach ($answer->comments->where('parent_id', $comment->id) as $reply)
                                         <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
                                             <p class="text-sm text-gray-700 dark:text-gray-300">{{ $reply->comment }}</p>
-                                            <div class="text-xs text-gray-500">— {{ $reply->user->username }}</div>
+                                            <div class="text-xs text-gray-500">— {{ $reply->user->username }} {{ $reply->created_at->diffForHumans() }}</div>
+                                            {{-- <button onclick="toggleReplyForm({{ $reply->id }})"
+                                                class="text-blue-500 text-xs hover:underline">Balas</button> --}}
                                         </div>
                                     @endforeach
                                 </div>
 
                                 {{-- Form reply tersembunyi --}}
                                 <form action="{{ route('answer.comment', $answer->id) }}" method="POST"
-                                    class="mt-2 hidden reply-form" id="reply-form-{{ $comment->id }}">
+                                    class="mt-2 hidden reply-form flex" id="reply-form-{{ $comment->id }}">
                                     @csrf
                                     <input type="hidden" name="parent_id" value="{{ $comment->id }}">
                                     <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
