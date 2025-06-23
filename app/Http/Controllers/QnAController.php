@@ -79,18 +79,14 @@ class QnAController
     // Detail pertanyaan & jawabannya
     public function show(Question $question)
     {
-        $replies = AnswerComment::with('user:user_id,username')->latest();
-
         $question->load([
             'user:user_id,username',
-            'answers.user',
+            'answers.user:id,username',
             'answers.comments.user:id,username',
             'answers.comments.replies.user:id,username',
         ]);
 
-        $replies->load(['user:user_id,username', 'replies:user_id,username', 'answer.user']);
-
-        return view('qnashow', compact('question', 'replies'));
+        return view('qnashow', compact('question'));
     }
 
     // Simpan jawaban
