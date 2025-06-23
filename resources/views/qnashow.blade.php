@@ -22,7 +22,7 @@
                     @dump($answer)
                     @foreach ($answer->comments->where('parent_id', null) as $comment)
                         {{-- Balasan dari komentar --}}
-                        @foreach ($comment->replies as $reply)
+                        @forelse ($comment->replies as $reply)
                             <div class="mt-2 ml-4 space-y-2">
                                 <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
                                     <p class="text-sm text-gray-700 dark:text-gray-300">{{ $reply->comment }}</p>
