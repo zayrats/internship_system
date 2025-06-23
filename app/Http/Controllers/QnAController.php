@@ -62,7 +62,7 @@ class QnAController
     public function show(Question $question)
     {
         $question->load(['user:user_id,username', 'answers.user']);
-        dd($question);
+        // dd($question);
         return view('qnashow', compact('question'));
     }
 
