@@ -71,51 +71,51 @@
                                 class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
                         </div>
                     </form>
-            @endforeach
-        </div>
-        @empty
-            <p class="text-gray-500">Belum ada jawaban.</p>
+                @empty
+                    <p class="text-gray-500">Belum ada jawaban.</p>
             @endforelse
         </div>
+    </div>
 
-        {{-- Form Kirim Jawaban --}}
-        <form action="{{ route('qna.answer', $question) }}" method="POST"
-            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            @csrf
-            <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
-                placeholder="Tulis jawabanmu..." required></textarea>
-            <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
-                Jawaban</button>
-        </form>
-        </div>
 
-        <script>
-            function toggleReplyForm(id) {
-                document.querySelectorAll('.reply-form').forEach(form => form.classList.add('hidden'));
-                const form = document.getElementById(`reply-form-${id}`);
-                if (form) {
-                    form.classList.remove('hidden');
-                    form.querySelector('textarea').focus();
-                }
+    {{-- Form Kirim Jawaban --}}
+    <form action="{{ route('qna.answer', $question) }}" method="POST"
+        class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        @csrf
+        <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
+            placeholder="Tulis jawabanmu..." required></textarea>
+        <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
+            Jawaban</button>
+    </form>
+    </div>
+
+    <script>
+        function toggleReplyForm(id) {
+            document.querySelectorAll('.reply-form').forEach(form => form.classList.add('hidden'));
+            const form = document.getElementById(`reply-form-${id}`);
+            if (form) {
+                form.classList.remove('hidden');
+                form.querySelector('textarea').focus();
             }
+        }
 
-            function hideReplyForm(id) {
-                const form = document.getElementById(`reply-form-${id}`);
-                if (form) {
+        function hideReplyForm(id) {
+            const form = document.getElementById(`reply-form-${id}`);
+            if (form) {
+                form.classList.add('hidden');
+                form.reset();
+            }
+        }
+
+        // Event listener untuk menyembunyikan form reply saat klik di luar
+        document.addEventListener('click', function(event) {
+            // Jika yang diklik bukan tombol Balas atau elemen dalam form reply
+            if (!event.target.closest('.reply-form') && !event.target.matches(
+                    'button[onclick*="toggleReplyForm"]')) {
+                document.querySelectorAll('.reply-form').forEach(form => {
                     form.classList.add('hidden');
-                    form.reset();
-                }
+                });
             }
-
-            // Event listener untuk menyembunyikan form reply saat klik di luar
-            document.addEventListener('click', function(event) {
-                // Jika yang diklik bukan tombol Balas atau elemen dalam form reply
-                if (!event.target.closest('.reply-form') && !event.target.matches(
-                        'button[onclick*="toggleReplyForm"]')) {
-                    document.querySelectorAll('.reply-form').forEach(form => {
-                        form.classList.add('hidden');
-                    });
-                }
-            });
-        </script>
-    @endsection
+        });
+    </script>
+@endsection
