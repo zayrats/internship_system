@@ -78,10 +78,15 @@ class QnAController
     // Detail pertanyaan & jawabannya
     public function show(Question $question)
     {
-        $question->load(['user:user_id,username', 'answers.user']);
-        // dd($question);
+        $question->load([
+            'user:user_id,username',
+            'answers.user',
+            'answers.comments.user' // ⬅️ ini penting agar comment dan username-nya ikut dimuat
+        ]);
+
         return view('qnashow', compact('question'));
     }
+
 
     // Simpan jawaban
     public function answer(Request $request, Question $question)
