@@ -19,7 +19,7 @@
                     <div class="mt-4 pl-4 border-l-2 border-blue-400 space-y-4">
                         @dump($answer->comments)
                         @dump($answer)
-                        @foreach ($answer->comments->where('parent_id', null) as $comment)
+                        @foreach ($answer->comments as $comment)
                             {{-- sementara tampilkan ID part2 --}}
                             <p>ID Komentar: {{ $comment->id }}</p>
                             <div class="bg-white dark:bg-gray-800 p-3 rounded shadow-sm">
