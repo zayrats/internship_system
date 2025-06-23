@@ -87,7 +87,6 @@ class QnAController
         return view('qnashow', compact('question'));
     }
 
-
     // Simpan jawaban
     public function answer(Request $request, Question $question)
     {
