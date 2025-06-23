@@ -17,7 +17,11 @@
 
                     {{-- Komentar-komentar --}}
                     <div class="mt-4 pl-4 border-l-2 border-blue-400 space-y-4">
+                        {{-- sementara tampilkan ID --}}
+                        <p>ID Komentar: {{ $comment->id }}</p>
                         @foreach ($answer->comments->where('parent_id', null) as $comment)
+                            {{-- sementara tampilkan ID part2 --}}
+                            <p>ID Komentar: {{ $comment->id }}</p>
                             <div class="bg-white dark:bg-gray-800 p-3 rounded shadow-sm">
                                 <p class="text-sm text-gray-800 dark:text-gray-200">{{ $comment->comment }}</p>
                                 <div class="text-xs text-gray-500 flex justify-between items-center">
