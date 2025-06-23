@@ -16,11 +16,12 @@
                     <p>{{ $answer->content }}</p>
                     <div class="text-sm text-gray-500 mt-2">Dijawab oleh {{ $answer->user->username }}</div>
 
-                    {{-- Tombol untuk beri komentar ke jawaban langsung --}}
-                    <button onclick="toggleReplyForm('answer-{{ $answer->id }}')"
-                        class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
+
                     {{-- @dump($answer) --}}
-                    @foreach ($answer->comments as $comment)
+                    @foreach ($answer->comments->where('parent_id', null) as $comment)
+                        {{-- Tombol untuk beri komentar ke jawaban langsung --}}
+                        <button onclick="toggleReplyForm('{{ $commnet->id }}')"
+                            class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
                         {{-- Balasan dari komentar --}}
                         @forelse ($comment->replies as $reply)
                             <div class="mt-2 ml-4 space-y-2">
