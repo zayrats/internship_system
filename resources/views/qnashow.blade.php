@@ -12,8 +12,12 @@
             <h2 class="text-xl font-semibold mb-2">Jawaban ({{ $question->answers->count() }})</h2>
             @forelse ($question->answers as $answer)
                 <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+
                     <p>{{ $answer->content }}</p>
                     <div class="text-sm text-gray-500 mt-2">Dijawab oleh {{ $answer->user->username }}</div>
+                    {{-- Tombol untuk beri komentar ke jawaban langsung --}}
+                    <button onclick="toggleReplyForm('answer-{{ $answer->id }}')"
+                        class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
 
                     {{-- Komentar-komentar --}}
                     <div class="mt-4 pl-4 border-l-2 border-blue-400 space-y-2">
@@ -80,29 +84,19 @@
     </div>
 
     <script>
-        function toggleReplyForm(commentId) {
-            // Sembunyikan semua form reply yang sedang terbuka
-            document.querySelectorAll('.reply-form').forEach(form => {
-                form.classList.add('hidden');
-            });
-
-            // Tampilkan form reply untuk komentar yang diklik
-            const targetForm = document.getElementById(`reply-form-${commentId}`);
-            if (targetForm) {
-                targetForm.classList.remove('hidden');
-                // Focus pada textarea
-                const textarea = targetForm.querySelector('textarea');
-                if (textarea) {
-                    textarea.focus();
-                }
+        function toggleReplyForm(id) {
+            document.querySelectorAll('.reply-form').forEach(form => form.classList.add('hidden'));
+            const form = document.getElementById(`reply-form-${id}`);
+            if (form) {
+                form.classList.remove('hidden');
+                form.querySelector('textarea').focus();
             }
         }
 
-        function hideReplyForm(commentId) {
-            const form = document.getElementById(`reply-form-${commentId}`);
+        function hideReplyForm(id) {
+            const form = document.getElementById(`reply-form-${id}`);
             if (form) {
                 form.classList.add('hidden');
-                // Reset form
                 form.reset();
             }
         }
@@ -111,7 +105,7 @@
         document.addEventListener('click', function(event) {
             // Jika yang diklik bukan tombol Balas atau elemen dalam form reply
             if (!event.target.closest('.reply-form') && !event.target.matches(
-                'button[onclick*="toggleReplyForm"]')) {
+                    'button[onclick*="toggleReplyForm"]')) {
                 document.querySelectorAll('.reply-form').forEach(form => {
                     form.classList.add('hidden');
                 });
