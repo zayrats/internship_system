@@ -81,9 +81,9 @@ class QnAController
     {
         $question->load([
             'user:user_id,username',
-            'answers.user:id,username',
-            'answers.comments.user:id,username',
-            'answers.comments.replies.user:id,username',
+            'answers.user:user_id,username',
+            'answers.comments.user:user_id,username',
+            'answers.comments.replies.user:user_id,username',
         ]);
 
         return view('qnashow', compact('question'));
