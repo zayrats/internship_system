@@ -58,6 +58,8 @@ class QnAController
 
         return back()->with('success', 'Komentar berhasil ditambahkan');
     }
+
+    // ini buat looping reply, jika diminta
     public function reply(Request $request, $answerId)
     {
         $request->validate([

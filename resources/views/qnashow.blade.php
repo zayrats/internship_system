@@ -16,34 +16,31 @@
                     <p>{{ $answer->content }}</p>
                     <div class="text-sm text-gray-500 mt-2">Dijawab oleh {{ $answer->user->username }}</div>
 
-
-                    {{-- @dump($answer) --}}
-                    {{-- @foreach ($answer->comments->where('parent_id', null) as $comment)
-                        <button onclick="toggleReplyForm('{{ $comment->id }}')"
-                            class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
-                        @forelse ($comment->replies as $reply)
-                            <div class="mt-2 ml-4 space-y-2">
-                                <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ $reply->comment }}</p>
-                                    <div class="text-xs text-gray-500">— {{ $reply->user->username }}</div>
-                                </div>
+                    {{-- @dump($answer)
+                    @forelse ($comment->replies as $reply)
+                        <div class="mt-2 ml-4 space-y-2">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">{{ $reply->comment }}</p>
+                                <div class="text-xs text-gray-500">— {{ $reply->user->username }}</div>
                             </div>
-                        @empty
-                        @endforelse
+                        </div>
+                    @empty
+                    @endforelse
 
-                        <form action="{{ route('comment.reply', $answer->id) }}" method="POST"
-                            class="mt-2 hidden reply-form" id="reply-form-{{ $comment->id }}">
-                            @csrf
-                            <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                            <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
-                                placeholder="Tulis balasan..." required></textarea>
-                            <div class="flex gap-2 mt-1">
-                                <button type="submit"
-                                    class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
-                                <button type="button" onclick="hideReplyForm({{ $comment->id }})"
-                                    class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
-                            </div>
-                        </form> --}}
+
+                    <form action="{{ route('comment.reply', $answer->id) }}" method="POST" class="mt-2 hidden reply-form"
+                        id="reply-form-{{ $reply->id }}">
+                        @csrf
+                        <input type="hidden" name="parent_id" value="{{ $reply->id }}">
+                        <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
+                            placeholder="Tulis balasan..." required></textarea>
+                        <div class="flex gap-2 mt-1">
+                            <button type="submit"
+                                class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
+                            <button type="button" onclick="hideReplyForm({{ $reply->id }})"
+                                class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
+                        </div>
+                    </form> --}}
                     {{-- Tampilkan komentar-komentar --}}
                     <div class="mt-3 space-y-2">
                         @foreach ($answer->comments as $comment)
@@ -71,22 +68,21 @@
                                 class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
                         </div>
                     </form>
-                @empty
-                    <p class="text-gray-500">Belum ada jawaban.</p>
+                </div>
+            @empty
+                <p class="text-gray-500">Belum ada jawaban.</p>
             @endforelse
         </div>
-    </div>
 
-
-    {{-- Form Kirim Jawaban --}}
-    <form action="{{ route('qna.answer', $question) }}" method="POST"
-        class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        @csrf
-        <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
-            placeholder="Tulis jawabanmu..." required></textarea>
-        <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
-            Jawaban</button>
-    </form>
+        {{-- Form Kirim Jawaban --}}
+        <form action="{{ route('qna.answer', $question) }}" method="POST"
+            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+            @csrf
+            <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
+                placeholder="Tulis jawabanmu..." required></textarea>
+            <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
+                Jawaban</button>
+        </form>
     </div>
 
     <script>
