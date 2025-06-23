@@ -57,6 +57,23 @@ class QnAController
 
         return back()->with('success', 'Komentar berhasil ditambahkan');
     }
+    public function reply(Request $request, $commentId)
+    {
+        $request->validate([
+            'comment' => 'required|string',
+        ]);
+
+        $parent = AnswerComment::findOrFail($commentId);
+
+        AnswerComment::create([
+            'answer_id' => $parent->answer_id,
+            'user_id' => Auth::user()->id,
+            'comment' => $request->comment,
+            'parent_id' => $parent->id,
+        ]);
+
+        return back();
+    }
 
     // Detail pertanyaan & jawabannya
     public function show(Question $question)

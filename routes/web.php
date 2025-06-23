@@ -56,6 +56,7 @@ Route::middleware(['web'])->group(function () {
             Route::get('/buat', [QnAController::class, 'create'])->name('qna.create');
             Route::post('/buat', [QnAController::class, 'store'])->name('qna.store');
             Route::post('/jawaban/{answer}/comment', [QnaController::class, 'storeComment'])->name('answer.comment');
+            Route::post('/comment/{comment}/reply', [QnAController::class, 'reply'])->name('comment.reply');
             Route::get('/{question}', [QnAController::class, 'show'])->name('qna.show');
             Route::post('/{question}/jawab', [QnAController::class, 'answer'])->name('qna.answer');
             Route::get('/pertanyaan/search', [QnAController::class, 'search'])->name('questions.search');
