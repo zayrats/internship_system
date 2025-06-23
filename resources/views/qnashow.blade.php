@@ -19,8 +19,8 @@
                     {{-- Tombol untuk beri komentar ke jawaban langsung --}}
                     <button onclick="toggleReplyForm('answer-{{ $answer->id }}')"
                         class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
-                    @dump($answer)
-                    @foreach ($answer->comments->where('parent_id', null) as $comment)
+                    {{-- @dump($answer) --}}
+                    @foreach ($answer->comments as $comment)
                         {{-- Balasan dari komentar --}}
                         @forelse ($comment->replies as $reply)
                             <div class="mt-2 ml-4 space-y-2">
