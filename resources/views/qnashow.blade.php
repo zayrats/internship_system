@@ -12,15 +12,15 @@
             <h2 class="text-xl font-semibold mb-2">Jawaban ({{ $question->answers->count() }})</h2>
             @forelse ($question->answers as $answer)
                 <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
-
+                    <input type="hidden" name="answer_id" value="{{ $answer->id }}">
                     <p>{{ $answer->content }}</p>
                     <div class="text-sm text-gray-500 mt-2">Dijawab oleh {{ $answer->user->username }}</div>
                     {{-- Tombol untuk beri komentar ke jawaban langsung --}}
                     <button onclick="toggleReplyForm('answer-{{ $answer->id }}')"
                         class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
-
+                        @dump($answer)
                     {{-- Balasan dari komentar --}}
-                    @forelse ($answer->comments->where('parent_id', $comment->id) as $reply)
+                    @forelse ($answer->comments->where('parent_id', $answer->id) as $reply)
                         <div class="mt-2 ml-4 space-y-2">
                             <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
                                 <p class="text-sm text-gray-700 dark:text-gray-300">{{ $reply->comment }}</p>
