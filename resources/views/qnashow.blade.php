@@ -77,14 +77,10 @@
 
     <script>
         function toggleReplyForm(commentId) {
-            // Sembunyikan semua reply form dulu
             document.querySelectorAll('.reply-form').forEach(el => el.classList.add('hidden'));
-
-            // Baru tampilkan form yang sesuai dengan tombol yang ditekan
             const form = document.getElementById(`reply-form-${commentId}`);
-            if (form) form.classList.remove('hidden');
+            if (form) form.classList.add('hidden');
         }
     </script>
-
 
 @endsection
