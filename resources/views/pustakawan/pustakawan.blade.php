@@ -1,11 +1,13 @@
 @extends('pustakawan.sidebarpustakawan')
 
 @section('content')
-    <div class="p-6">
-        <h2 class="text-2xl font-bold mb-4">Daftar Pengumpulan draft dan Buku KP</h2>
-        <table id="kpTable" class="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <thead class="bg-gray-100">
-                <tr>
+    <div class="p-6 overflow-x-auto">
+        <h2 class="text-3xl font-semibold mb-6 text-gray-800 dark:text-white border-b pb-3">📘 Daftar Pengumpulan Buku KP
+        </h2>
+        <table id="kpTable"
+            class="min-w-full divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden text-sm">
+            <thead class="bg-blue-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm uppercase tracking-wide">
+                <tr class="hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Perusahaan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Divisi</th>
@@ -22,7 +24,9 @@
                         <td class="px-6 py-4">{{ $item->duration }}</td>
                         <td class="px-6 py-4 text-right">
                             <button onclick="openEditModal({{ $item->id }})"
-                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Detail</button>
+                                class="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md shadow transition">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
                         </td>
                     </tr>
                 @endforeach
@@ -32,9 +36,10 @@
 
 
     <!-- Modal Detail/Edit -->
-    <div id="editModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 flex">
-        <div class="bg-white rounded-lg p-6 w-full max-w-xl">
-            <h3 class="text-xl font-semibold mb-4">Detail Pengajuan KP</h3>
+    <div id="editModal"
+        class="fixed inset-0 hidden z-50 items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm transition-all duration-300 scale-95 opacity-0">
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-2xl">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">📝 Detail Pengajuan KP</h3>
             @if (isset($item))
                 <form method="POST" id="editForm">
                     @csrf
@@ -82,7 +87,9 @@
                     <div class="flex justify-end gap-2">
                         <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-gray-500">Batal</button>
                         <button type="submit"
-                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Simpan</button>
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 shadow">
+                            ✅ Simpan
+                        </button>
                     </div>
                 </form>
             @endif
@@ -170,5 +177,7 @@
                 }
             });
         });
+        modal.classList.remove("hidden");
+        modal.classList.add("scale-100", "opacity-100");
     </script>
 @endsection

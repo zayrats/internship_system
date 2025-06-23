@@ -16,75 +16,80 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class AdminController
+class DosenController
 {
-
-
-    public function admindashboard(Request $request)
+    public function dashboard(Request $request)
     {
         $periodeFilter = $request->input('periode');
         $prodiFilter = $request->input('prodi');
+        $semesterFilter = $request->input('semester'); // untuk future-proof
 
-        // Ambil data unik untuk filter dropdown
+        // Ambil data filter dropdown unik
         $periodes = Internship::select('periode')->distinct()->pluck('periode');
         $prodis = Students::select('prodi')->distinct()->pluck('prodi');
+        $semesters = Internship::select('semester')->distinct()->pluck('semester'); // optional
 
-        // Hitung total status berdasarkan filter
+        // Query dasar internship dengan relasi student
         $internships = Internship::with('student');
 
         if ($periodeFilter) {
             $internships->where('periode', $periodeFilter);
         }
+
         if ($prodiFilter) {
-            $internships->whereHas('student', function ($q) use ($prodiFilter) {
-                $q->where('prodi', $prodiFilter);
+            $internships->whereHas('student', function ($query) use ($prodiFilter) {
+                $query->where('prodi', $prodiFilter);
             });
         }
 
-        $statuses = ['Finished', 'Pending', 'Approved', 'Rejected', 'Terminated'];
+        // Untuk Pie Chart dan Card Stats
+        $sudahKP = (clone $internships)->where('status', 'Finished')->count();
+        $belumKP = (clone $internships)->where('status', '!=', 'Finished')->count();
+        $totalMahasiswa = $sudahKP + $belumKP;
 
-        $statusCounts = [];
-        foreach ($statuses as $status) {
-            $statusCounts[$status] = (clone $internships)->where('status', $status)->count();
-        }
-
-        // Data bar chart: Mahasiswa yang sudah KP per Prodi
-        $prodiStats = Students::select('prodi', DB::raw("COUNT(*) as total"))
-            ->whereIn('student_id', Internship::where('status', 'Finished')->pluck('student_id'))
+        // Untuk Chart Bar per Prodi
+        $perProdi = Students::select('prodi', DB::raw('count(*) as total'))
+            ->whereIn('id', Internship::where('status', 'Finished')->pluck('student_id'))
             ->groupBy('prodi')
             ->get();
 
-        return view('dosen.dashboard', compact('periodes', 'prodis', 'statusCounts', 'prodiStats'));
+        return view('dosen.dashboard', [
+            'periode' => $periodes,
+            'prodi' => $prodis,
+            'semester' => $semesters,
+            'totalMahasiswa' => $totalMahasiswa,
+            'sudahKP' => $sudahKP,
+            'belumKP' => $belumKP,
+            'perProdi' => $perProdi,
+        ]);
     }
-    public function detail(Request $request)
+    public function getMahasiswaByStatus(Request $request)
     {
         $status = $request->input('status');
         $periode = $request->input('periode');
         $prodi = $request->input('prodi');
 
-        $internships = Internship::with('student')
-            ->where('status', $status);
+        $query = Internship::with('student')->where('status', $status);
 
         if ($periode) {
-            $internships->where('periode', $periode);
+            $query->where('periode', $periode);
         }
-
         if ($prodi) {
-            $internships->whereHas('student', function ($q) use ($prodi) {
+            $query->whereHas('student', function ($q) use ($prodi) {
                 $q->where('prodi', $prodi);
             });
         }
 
-        $data = $internships->get()->map(function ($i) {
+        $result = $query->get()->map(function ($item) {
             return [
-                'name' => $i->student->name,
-                'student_number' => $i->student->student_number,
-                'prodi' => $i->student->prodi,
-                'status' => $i->status,
+                'name' => $item->student->name ?? '-',
+                'student_number' => $item->student->student_number ?? '-',
+                'prodi' => $item->student->prodi ?? '-',
+                'status' => $item->status
             ];
         });
 
-        return response()->json($data);
+        return response()->json($result);
     }
 
     public function monitoringMahasiswa(Request $request)
@@ -137,157 +142,7 @@ class AdminController
         $internships = $query->paginate(10);
         $companies = DB::table('companies')->get();
 
-        return view('admin.monitoringmahasiswa', compact('internships', 'companies'));
-    }
-
-    public function manageJobs(Request $request)
-    {
-        $query = Vacancy::with('company');
-
-        // Filter berdasarkan perusahaan
-        if ($request->filled('company_id')) {
-            $query->where('company_id', $request->company_id);
-        }
-
-        // Filter status lowongan
-        if ($request->filled('status')) {
-            $now = now();
-            if ($request->status == 'aktif') {
-                $query->whereDate('end_date', '>=', $now);
-            } elseif ($request->status == 'berakhir') {
-                $query->whereDate('end_date', '<', $now);
-            }
-        }
-
-        // Pencarian berdasarkan posisi
-        if ($request->filled('search')) {
-            $query->where('division', 'like', "%{$request->search}%");
-        }
-
-        $jobs = $query->paginate(10);
-        $companies = Company::all();
-        // dd($jobs->toArray());
-        return view('admin.jobs', compact('jobs', 'companies'));
-    }
-    public function updateJob(Request $request, $id)
-    {
-        $request->validate([
-            'approval' => 'required|in:Approved,Rejected',
-        ]);
-        // dd($request->all());
-        DB::table('vacancy')
-            ->where('vacancy_id', $id)
-            ->update(['approval' => $request->approval]);
-
-
-        return redirect()->route('admin.jobs')->with('success', 'Status lowongan berhasil diperbarui');
-    }
-
-    public function deleteJob($id)
-    {
-        DB::table('vacancy')->where('id', $id)->delete();
-        return redirect()->route('admin.jobs')->with('success', 'Lowongan berhasil dihapus');
-    }
-
-    public function rekapInternships(Request $request)
-    {
-        $query = DB::table('internships')
-            ->join('students', 'internships.student_id', '=', 'students.id')
-            ->join('companies', 'internships.company_id', '=', 'companies.id')
-            ->select('internships.*', 'students.name as student', 'students.nrp', 'companies.name as company');
-
-        // Filter berdasarkan perusahaan
-        if (request()->has('company_id') && $request->company_id != '') {
-            $query->where('companies.id', $request->company_id);
-        }
-
-        // Filter status magang
-        if (request()->has('status') && $request->status != '') {
-            $query->where('internships.status', $request->status);
-        }
-
-        // Pencarian berdasarkan nama mahasiswa
-        if (request()->has('search') && $request->search != '') {
-            $query->where('students.name', 'like', "%{$request->search}%");
-        }
-
-        $internships = $query->paginate(10);
-        $companies = DB::table('companies')->get();
-
-        return view('admin.internships', compact('internships', 'companies'));
-    }
-
-    public function exportInternships()
-    {
-        $internships = DB::table('internships')
-            ->join('students', 'internships.student_id', '=', 'students.id')
-            ->join('companies', 'internships.company_id', '=', 'companies.id')
-            ->select('students.name as Nama', 'students.nrp as NRP', 'companies.name as Perusahaan', 'internships.start_date as Mulai', 'internships.end_date as Selesai', 'internships.status as Status')
-            ->get();
-
-        return Excel::download(new InternshipsExport($internships), 'rekap_magang.xlsx');
-    }
-
-    public function statistics()
-    {
-        // Statistik jumlah mahasiswa magang per perusahaan
-        $companyStats = DB::table('internships')
-            ->join('companies', 'internships.company_id', '=', 'companies.company_id')
-            ->select('companies.name as company_name', DB::raw('COUNT(internships.internship_id) as total'))
-            ->groupBy('companies.name')
-            ->get();
-
-        // Statistik jumlah status magang (Aktif vs Selesai)
-        $statusStats = DB::table('internships')
-            ->join('applications', 'internships.application_id', '=', 'applications.application_id')
-            ->select(
-                'applications.status',
-                DB::raw('COUNT(internships.internship_id) as total')
-            )
-            ->whereIn('applications.status', ['on_going', 'finished']) // Hanya hitung yang magang atau selesai
-            ->groupBy('applications.status')
-            ->get();
-
-        // Statistik jumlah mahasiswa magang per bulan
-        $monthlyStats = DB::table('internships')
-            ->select(
-                DB::raw("DATE_FORMAT(start_date, '%Y-%m') as month"),
-                DB::raw('COUNT(internships.internship_id) as total')
-            )
-            ->groupBy('month')
-            ->orderBy('month', 'ASC')
-            ->get();
-
-        return view('admin.statistics', compact('companyStats', 'statusStats', 'monthlyStats'));
-    }
-
-
-
-    public function detailuser(Request $request)
-    {
-        $id = $request->id;
-        $user = User::find($id);
-        return view('detailuser', compact('user'));
-    }
-
-    public function updateuser(Request $request)
-    {
-        $id = $request->id;
-        $user = User::find($id);
-        $user->email = $request->email;
-        $user->username = $request->username;
-        $user->password = Hash::make($request->password);
-        $user->role = $request->role;
-        $user->save();
-        return redirect()->route('admindashboard');
-    }
-
-    public function deleteuser(Request $request)
-    {
-        $id = $request->id;
-        $user = User::find($id);
-        $user->delete();
-        return redirect()->route('admindashboard');
+        return view('dosen.monitoringmahasiswa', compact('internships', 'companies'));
     }
 
     public function manageCompanies(Request $request)
@@ -318,7 +173,55 @@ class AdminController
         $companies = $query->get();
         $vacancies = Vacancy::all();
         // dd($companies->toArray());
-        return view('admin.companies', compact('companies', 'vacancies', 'internships'));
+        return view('dosen.companies', compact('companies', 'vacancies', 'internships'));
+    }
+    public function manageJobs(Request $request)
+    {
+        $query = Vacancy::with('company');
+
+        // Filter berdasarkan perusahaan
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        // Filter status lowongan
+        if ($request->filled('status')) {
+            $now = now();
+            if ($request->status == 'aktif') {
+                $query->whereDate('end_date', '>=', $now);
+            } elseif ($request->status == 'berakhir') {
+                $query->whereDate('end_date', '<', $now);
+            }
+        }
+
+        // Pencarian berdasarkan posisi
+        if ($request->filled('search')) {
+            $query->where('division', 'like', "%{$request->search}%");
+        }
+
+        $jobs = $query->paginate(10);
+        $companies = Company::all();
+        // dd($jobs->toArray());
+        return view('dosen.jobs', compact('jobs', 'companies'));
+    }
+    public function updateJob(Request $request, $id)
+    {
+        $request->validate([
+            'approval' => 'required|in:Approved,Rejected',
+        ]);
+        // dd($request->all());
+        DB::table('vacancy')
+            ->where('vacancy_id', $id)
+            ->update(['approval' => $request->approval]);
+
+
+        return redirect()->route('dosen.jobs')->with('success', 'Status lowongan berhasil diperbarui');
+    }
+
+    public function deleteJob($id)
+    {
+        DB::table('vacancy')->where('id', $id)->delete();
+        return redirect()->route('dosen.jobs')->with('success', 'Lowongan berhasil dihapus');
     }
 
     public function updateCompany(Request $request, $id)
@@ -364,14 +267,14 @@ class AdminController
         // Simpan semua perubahan
         $company->save();
 
-        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
+        return redirect()->route('dosen.companies')->with('success', 'Perusahaan berhasil diperbarui');
     }
 
 
     public function deleteCompany($id)
     {
         DB::table('companies')->where('company_id', $id)->delete();
-        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil dihapus');
+        return redirect()->route('dosen.companies')->with('success', 'Perusahaan berhasil dihapus');
     }
     public function addCompany(Request $request)
     {
@@ -417,7 +320,7 @@ class AdminController
         // return redirect()->back()->with('success', 'Logo perusahaan berhasil diperbarui');
         // };
 
-        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil ditambahkan');
+        return redirect()->route('dosen.companies')->with('success', 'Perusahaan berhasil ditambahkan');
     }
 
     public function addVacancy(Request $request)
@@ -443,7 +346,7 @@ class AdminController
         $vacancy->save();
 
 
-        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil ditambahkan');
+        return redirect()->route('dosen.companies')->with('success', 'Perusahaan berhasil ditambahkan');
     }
 
     public function updateVacancy(Request $request, $id)
@@ -472,12 +375,12 @@ class AdminController
         ]);
 
 
-        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil diperbarui');
+        return redirect()->route('dosen.companies')->with('success', 'Perusahaan berhasil diperbarui');
     }
 
     public function deleteVacancy(Request $request, $id)
     {
         DB::table('vacancy')->where('vacancy_id', $id)->delete();
-        return redirect()->route('admin.companies')->with('success', 'Perusahaan berhasil dihapus');
+        return redirect()->route('dosen.companies')->with('success', 'Perusahaan berhasil dihapus');
     }
 }

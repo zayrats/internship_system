@@ -137,10 +137,34 @@
                             <label class="text-gray-700 dark:text-gray-300">Program Studi</label>
                             <select name="prodi"
                                 class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-800 dark:text-white">
-                                <option value="D3" {{ old('prodi', $student->prodi) == 'D3' ? 'selected' : '' }}>D3
-                                </option>
-                                <option value="D4" {{ old('prodi', $student->prodi) == 'D4' ? 'selected' : '' }}>D4
-                                </option>
+                                @php
+                                    $prodiOptions = [
+                                        'D3 Teknik Elektronika',
+                                        'D4  Teknik Elektronika',
+                                        'D3 Teknik Informatika',
+                                        'D4 Teknik Informatika',
+                                        'D3 Teknik Telekomunikasi',
+                                        'D4 Teknik Telekomunikasi',
+                                        'D3 Teknik Elektro Industri',
+                                        'D4 Teknik Elektro Industri',
+                                        'D4 Teknik Komputer',
+                                        'D4 Teknik Rekayasa Perangkat Lunak',
+                                        'D4 Teknik Multimedia Digital',
+                                        'D4 Teknik Mekatronika',
+                                        'D4 Sistem Pembangkitan Energi',
+                                        'D4 Teknologi Rekayasa Otomotif',
+                                        'D4 Teknologi Rekayasa Multimedia',
+                                        'D4 Teknologi Game',
+                                        'D4 Desain Grafis',
+                                    ];
+                                @endphp
+
+                                @foreach ($prodiOptions as $option)
+                                    <option value="{{ $option }}"
+                                        {{ old('prodi', $student->prodi) == $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('prodi')
                                 <p class="text-red-500 text-sm">{{ $message }}</p>
@@ -150,8 +174,24 @@
                         <!-- Departemen -->
                         <div>
                             <label class="text-gray-700 dark:text-gray-300">Departemen</label>
-                            <input type="text" name="department" value="{{ old('department', $student->department) }}"
+                            <select name="department"
                                 class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-800 dark:text-white">
+                                @php
+                                    $deptOptions = [
+                                        'Departemen Teknik Elektro',
+                                        'Departemen Teknik Informatika dan Komputer',
+                                        'Departemen Teknik Mekanika Energi',
+                                        'Departemen Teknologi Multimedia Kreatif',
+                                    ];
+                                @endphp
+
+                                @foreach ($deptOptions as $option)
+                                    <option value="{{ $option }}"
+                                        {{ old('department', $student->department) == $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('department')
                                 <p class="text-red-500 text-sm">{{ $message }}</p>
                             @enderror
@@ -190,7 +230,8 @@
                                 {{ $student->cv ? 'Update CV' : 'Upload CV' }}
                             </label>
                             @if ($student->cv)
-                                <a href="{{ asset($student->cv) }}" target="_blank" class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
+                                <a href="{{ asset($student->cv) }}" target="_blank"
+                                    class="text-blue-500  bg-slate-500 text-white px-4 py-2 rounded cursor-pointer">Lihat
                                     CV</a>
                             @endif
                             <!-- Tempat preview nama file -->

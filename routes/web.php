@@ -10,9 +10,11 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DosenController;
 use App\Http\Controllers\PustakawanController;
 use App\Http\Controllers\VacancyController;
 use App\Http\Controllers\QnAController;
+use App\Http\Controllers\SidangController;
 
 Route::middleware(['web'])->group(function () {
 
@@ -31,6 +33,8 @@ Route::middleware(['web'])->group(function () {
         Route::post('/internship/{id}', [InternshipController::class, 'internshipapply'])->name('internshipapply');
         Route::put('/applications/{id}', [InternshipController::class, 'update'])->name('applications.update');
         Route::post('/applications/add', [InternshipController::class, 'store'])->name('applications.store');
+        Route::put('/applications/{id}/terminate', [InternshipController::class, 'terminate'])
+            ->name('applications.terminate');
         Route::get('/internship/{id}/document', [Controller::class, 'internshipdocument'])->name('internshipdocument');
         Route::get('/history', [InternshipController::class, 'history'])->name('history');
         Route::post('/history/{id}/delete', [InternshipController::class, 'deleteHistory'])->name('deleteHistory');
@@ -51,6 +55,7 @@ Route::middleware(['web'])->group(function () {
             Route::get('/', [QnAController::class, 'index'])->name('qna.index');
             Route::get('/buat', [QnAController::class, 'create'])->name('qna.create');
             Route::post('/buat', [QnAController::class, 'store'])->name('qna.store');
+            Route::post('/jawaban/{answer}/comment', [QnaController::class, 'storeComment'])->name('answer.comment');
             Route::get('/{question}', [QnAController::class, 'show'])->name('qna.show');
             Route::post('/{question}/jawab', [QnAController::class, 'answer'])->name('qna.answer');
             Route::get('/pertanyaan/search', [QnAController::class, 'search'])->name('questions.search');
@@ -77,7 +82,6 @@ Route::middleware(['web'])->group(function () {
 
         //monitor
         Route::get('/company/monitor', [VacancyController::class, 'monitor'])->name('vacancymonitor');
-
     });
 
 
@@ -101,27 +105,21 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
 
-        Route::get('/admin/monitoring', [AdminController::class, 'monitoringMahasiswa'])->name('admin.monitoring');
+
         Route::get('/admin/internships', [AdminController::class, 'rekapInternships'])->name('admin.internships');
         Route::get('/admin/internships/export', [AdminController::class, 'exportInternships'])->name('admin.internships.export');
-        Route::get('/admin/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
+        // Route::get('/admin/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
 
 
-        Route::get('/admin/internship/{id}', [Controller::class, 'lecturerinternshipdetail'])->name('lecturerinternshipdetail');
-        Route::get('admin/internship/{id}/document', [Controller::class, 'lecturerinternshipdocument'])->name('lecturerinternshipdocument');
+        // Route::get('/admin/internship/{id}', [Controller::class, 'lecturerinternshipdetail'])->name('lecturerinternshipdetail');
+        // Route::get('admin/internship/{id}/document', [Controller::class, 'lecturerinternshipdocument'])->name('lecturerinternshipdocument');
 
 
-        Route::get('/admin/jobs', [AdminController::class, 'manageJobs'])->name('admin.jobs');
-        Route::put('/admin/jobs/{id}', [AdminController::class, 'updateJob'])->name('admin.jobs.update');
-        Route::delete('/admin/jobs/{id}', [AdminController::class, 'deleteJob'])->name('admin.jobs.delete');
+        // Route::get('/admin/jobs', [AdminController::class, 'manageJobs'])->name('admin.jobs');
+        // Route::put('/admin/jobs/{id}', [AdminController::class, 'updateJob'])->name('admin.jobs.update');
+        // Route::delete('/admin/jobs/{id}', [AdminController::class, 'deleteJob'])->name('admin.jobs.delete');
 
-        Route::get('/admin/perusahaan', [AdminController::class, 'manageCompanies'])->name('admin.companies');
-        Route::put('/admin/perusahaan/{id}', [AdminController::class, 'updateCompany'])->name('admin.companies.update');
-        Route::delete('/admin/perusahaan/{id}', [AdminController::class, 'deleteCompany'])->name('admin.companies.destroy');
-        Route::post('/admin/perusahaan/tambah', [AdminController::class, 'addCompany'])->name('admin.companies.store');
-        Route::post('/admin/perusahaan/tambah-lowongan', [AdminController::class, 'addVacancy'])->name('admin.companies.store-vacancy');
-        Route::put('/admin/perusahaan/update-lowongan/{id}', [AdminController::class, 'updateVacancy'])->name('admin.vacancies.update');
-        Route::delete('/admin/perusahaan/hapus-lowongan/{id}', [AdminController::class, 'deleteVacancy'])->name('admin.vacancies.destroy');
+
     });
 
     Route::group(['middleware' => ['auth', 'role:Pustakawan']], function () {
@@ -129,5 +127,21 @@ Route::middleware(['web'])->group(function () {
         Route::get('/pustakawan/before', [PustakawanController::class, 'before'])->name('pustakawan.before');
         Route::get('/pustakawan/after', [PustakawanController::class, 'after'])->name('pustakawan.after');
         Route::put('/pustakawan/update/{id}', [PustakawanController::class, 'update'])->name('pustakawan.update');
+    });
+
+    Route::group(['middleware' => ['auth', 'role:Dosen']], function () {
+        Route::get('/dosen', [DosenController::class, 'dashboard'])->name('dosen.dashboard');
+        Route::get('/dashboard/detail', [DosenController::class, 'getMahasiswaByStatus']);
+        Route::get('/dosen/monitoring', [DosenController::class, 'monitoringMahasiswa'])->name('dosen.monitoring');
+        Route::get('/dosen/perusahaan', [DosenController::class, 'manageCompanies'])->name('dosen.companies');
+        Route::put('/dosen/perusahaan/{id}', [DosenController::class, 'updateCompany'])->name('dosen.companies.update');
+        Route::delete('/dosen/perusahaan/{id}', [DosenController::class, 'deleteCompany'])->name('dosen.companies.destroy');
+        Route::post('/dosen/perusahaan/tambah', [DosenController::class, 'addCompany'])->name('dosen.companies.store');
+        Route::post('/dosen/perusahaan/tambah-lowongan', [DosenController::class, 'addVacancy'])->name('dosen.companies.store-vacancy');
+        Route::put('/dosen/perusahaan/update-lowongan/{id}', [DosenController::class, 'updateVacancy'])->name('dosen.vacancies.update');
+        Route::delete('/dosen/perusahaan/hapus-lowongan/{id}', [DosenController::class, 'deleteVacancy'])->name('dosen.vacancies.destroy');
+
+        Route::put('/dosen/sidang/{id}', [SidangController::class, 'update'])->name('sidang.update');
+        Route::get('/dosen/sidang', [SidangController::class, 'index'])->name('sidang.index');
     });
 });

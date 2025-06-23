@@ -108,7 +108,7 @@ class LoginController
             DB::commit(); // 🔹 Simpan perubahan jika semua berhasil
 
             Session::flash('message', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');
-            return redirect('login') ->with('message', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');
+            return redirect('login') ->with('success', 'Register Berhasil. Akun Anda sudah Aktif silahkan Login menggunakan username dan password.');
         } catch (\Exception $e) {
             DB::rollback(); // ❌ Batalkan semua perubahan jika terjadi error
 

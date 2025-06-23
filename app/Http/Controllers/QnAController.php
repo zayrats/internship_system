@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Question;
 use App\Models\Answer;
+use App\Models\AnswerComment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,21 @@ class QnAController
         ]);
 
         return redirect()->route('qna.index')->with('success', 'Pertanyaan berhasil ditambahkan!');
+    }
+
+    public function storeComment(Request $request, $answerId)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        AnswerComment::create([
+            'user_id' => Auth::id(),
+            'answer_id' => $answerId,
+            'comment' => $request->comment,
+        ]);
+
+        return back()->with('success', 'Komentar berhasil ditambahkan');
     }
 
     // Detail pertanyaan & jawabannya

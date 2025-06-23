@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Admin - Ayo Magang</title>
+    <title>Dosen - Ayo Magang</title>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css" />
@@ -25,35 +25,64 @@
 <body class="bg-gray-100">
     <div class="flex h-full min-h-screen">
         <!-- Sidebar -->
-        <!-- Sidebar -->
-        <aside
-            class="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-md min-h-screen">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <span class="text-lg font-semibold text-gray-800 dark:text-white">🛠️ Admin Panel</span>
-                <button id="toggleSidebar" class="md:hidden text-gray-600 dark:text-gray-300">
-                    ☰
-                </button>
+        <aside id="sidebar"
+            class="w-64 bg-white dark:bg-gray-800 shadow-md fixed inset-y-0 left-0 transform md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+            <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
+                <img src="https://kompaspedia.kompas.id/wp-content/uploads/2020/07/logo_Politeknik-Elektronika-Negeri-Surabaya-thumb.png"
+                    alt="Logo" class="h-10 mr-2">
+                <span class="text-xl font-bold">Dosen Koordinator KP</span>
             </div>
-
             <nav class="p-4 space-y-2">
-                <a href="{{ route('admin.users') }}"
-                    class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-blue-100 dark:text-gray-200 dark:hover:bg-blue-600 transition-all duration-200">
-                    👥 <span class="ml-3">Manajemen User</span>
+                <a href="{{ route('dosen.dashboard') }}"
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    <svg class="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6"></path>
+                    </svg>
+                    Dashboard
                 </a>
-
-                {{-- <a href="{{ route('admin.companies') }}"
-                    class="flex items-center px-4 py-2 text-sm font-medium text-purple-800 bg-purple-50 hover:bg-purple-100 rounded-lg dark:text-purple-300 dark:bg-purple-900 dark:hover:bg-purple-800 transition-all duration-200">
-                    🏢 <span class="ml-3">Manajemen Perusahaan</span>
-                </a> --}}
-
-                <hr class="my-3 border-t dark:border-gray-600">
-
-                <a href="{{ route('logout') }}"
-                    class="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200">
-                    🚪 <span class="ml-3">Logout</span>
+                <a href="{{ route('dosen.monitoring') }}"
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    <svg class="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M3 10h18M9 21V3m6 18V3"></path>
+                    </svg>
+                    Monitoring
                 </a>
+                <a href="{{ route('dosen.companies') }}"
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    <svg class="w-5 h-5 mr-3 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    Manajemen Perusahaan
+                </a>
+                <a href="{{ route('sidang.index') }}"
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    <svg class="w-5 h-5 mr-3 text-purple-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M8 7V3M16 7V3M4 11h16M5 20h14a2 2 0 002-2V7H3v11a2 2 0 002 2z"></path>
+                    </svg>
+                    Jadwal Sidang
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                        class="w-full flex items-center p-2 rounded bg-red-500 text-white hover:bg-red-600 transition">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"></path>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
             </nav>
         </aside>
+
+        <main class="ml-64 min-h-screen bg-gray-100 p-6 flex-1 overflow-y-auto">
+            @yield('content')
+        </main>
+
 
         <!-- Main Content -->
         <main class="flex-1 p-6">

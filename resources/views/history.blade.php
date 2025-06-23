@@ -44,7 +44,9 @@
                                     class="mx-auto font-medium text-sm
                         {{ strtolower($item->status) === 'pending' ? 'text-yellow-500 dark:text-yellow-600' : '' }}
                         {{ strtolower($item->status) === 'approved' ? 'text-green-500 dark:text-green-600' : '' }}
-                        {{ strtolower($item->status) === 'rejected' ? 'text-red-500 dark:text-red-600' : '' }}">
+                        {{ strtolower($item->status) === 'rejected' ? 'text-red-500 dark:text-red-600' : '' }}
+                         {{ strtolower($item->status) === 'terminated' ? 'text-red-800 dark:text-red-900' : '' }}
+                          {{ strtolower($item->status) === 'finished' ? 'text-blue-800 dark:text-blue-900' : '' }}">
                                     {{ ucfirst($item->status) }}
                                 </div>
                             </td>
@@ -59,31 +61,56 @@
                                     data-requirements="{{ $item->requirements }}" data-division="{{ $item->division }}"
                                     data-duration="{{ $item->duration }}" data-type="{{ $item->type }}"
                                     data-status="{{ $item->status }}"
-                                    data-application_date="{{ $item->application_date }}">
-                                    Lihat
+                                    data-application_date="{{ $item->application_date }}"
+                                    data-start_date="{{ $item->start_date }}" data-end_date="{{ $item->end_date }}" <i
+                                    class="fa-solid fa-eye"></i>
                                 </a>
 
-                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                                    onclick="openEditApplicationModal('{{ $item->id }}',
+                                {{-- edit pengajuan --}}
+                                @if (strtolower(trim($item->status)) === 'Finished' || strtolower(trim($item->status)) === 'Rejected')
+                                @else
+                                    <button
+                                        class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                        onclick="openEditApplicationModal('{{ $item->id }}',
                             '{{ $item->vacancy_id }}',
                             '{{ $item->status }}',
                             '{{ $item->application_date }}',
                             '{{ basename($item->document) }}')">
-                                    Edit Pengajuan
-                                </button>
+                                        <i class="fa-solid fa-file-pen"></i>
+                                    </button>
+                                @endif
 
+                                {{-- hapus pengajuan --}}
                                 <a href="{{ route('deleteHistory', $item->id) }}"
-                                    class="text-white hover:underline rounded bg-red-500 px-3 py-1"
+                                    class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline"
                                     onclick="return confirm('Yakin ingin menghapus pengajuan ini?')">
-                                    Hapus
+                                    <i class="fa-solid fa-trash"></i>
                                 </a>
+                                @if ($application->status === 'Approved')
+                                    <button onclick="document.getElementById('terminationForm').classList.remove('hidden')"
+                                        class="mt-4 bg-red-600 text-white px-4 py-2 rounded">
+                                        Laporkan Pemecatan KP
+                                    </button>
+
+                                    <form action="{{ route('applications.terminate', $application->id) }}" method="POST"
+                                        id="terminationForm" class="hidden mt-4 bg-red-100 p-4 rounded">
+                                        @csrf
+                                        @method('PUT')
+                                        <label class="block mb-2 font-medium">Alasan Pemecatan:</label>
+                                        <textarea name="terminated_reason" class="w-full border p-2 rounded" required></textarea>
+                                        <button type="submit" class="mt-2 bg-red-700 text-white px-4 py-1 rounded">
+                                            Konfirmasi Pemecatan
+                                        </button>
+                                    </form>
+                                @endif
 
                                 @if (strtolower(trim($item->status)) === 'finished')
                                     @if ($item->internship_id)
                                         {{-- @dump($item->book_status) --}}
                                         {{-- jika status buku Rejected, maka tampil revisi --}}
                                         @if (strtolower(trim($item->book_status)) === 'rejected')
-                                            <button class="text-white hover:underline bg-red-500 rounded px-3 py-1 mx-1"
+                                            <button
+                                                class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline"
                                                 onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
                                             '{{ $item->id }}',
                                             '{{ $item->company_id }}',
@@ -99,10 +126,11 @@
                                             '{{ $item->draft_kp_book }}',
                                             '{{ $item->book_status }}',
                                             '{{ $item->message }}')">
-                                                Revisi
+                                                Revisi Buku KP
                                             </button>
                                         @else
-                                            <button class="text-white hover:underline bg-green-500 rounded px-3 py-1 mx-1"
+                                            <button
+                                                class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline "
                                                 onclick="openFeedbackModal('{{ $item->internship_id_useless }}',
                                             '{{ $item->id }}',
                                             '{{ $item->company_id }}',
@@ -118,7 +146,7 @@
                                             '{{ $item->draft_kp_book }}',
                                             '{{ $item->book_status }}',
                                             '{{ $item->message }}')">
-                                                Lihat Rating
+                                                Cek Feedback
                                             </button>
                                             <input type="hidden" id="currentKpBookUrl"
                                                 value="{{ asset($item->kp_book) }}">
@@ -126,7 +154,8 @@
                                                 value="{{ asset($item->draft_kp_book) }}">
                                         @endif
                                     @else
-                                        <button class="text-white hover:underline bg-green-500 rounded px-3 py-1 mx-1"
+                                        <button
+                                            class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline "
                                             onclick="openFeedbackModal('{{ $item->internship_id_useless ?? '' }}',
                                     '{{ $item->id }}',
                                     '{{ $item->company_id }}',
@@ -139,7 +168,7 @@
                                     '{{ $item->rating ?? '' }}',
                                     '{{ $item->kp_book ?? '' }}',
                                     '{{ $item->vacancy_id ?? '' }}')">
-                                            Unggah Pengalaman
+                                            Feedback Perusahaan
                                         </button>
                                     @endif
 
@@ -161,9 +190,25 @@
                     @endforelse
                 </tbody>
             </table>
+            @if ($internship->status === 'Finished')
+                <div class="mt-6 bg-white dark:bg-gray-800 p-4 rounded shadow">
+                    <h3 class="text-lg font-semibold mb-2 text-blue-600">Jadwal Sidang KP</h3>
+
+                    @if ($internship->tanggal_sidang)
+                        <p class="text-gray-800 dark:text-gray-200">
+                            Tanggal Sidang:
+                            <strong>{{ \Carbon\Carbon::parse($internship->tanggal_sidang)->translatedFormat('l, d F Y') }}</strong>
+                        </p>
+                    @else
+                        <p class="text-red-600 dark:text-red-400">Jadwal sidang belum ditentukan.</p>
+                    @endif
+                </div>
+            @endif
+
 
             <!-- Modal Detail -->
-            <div id="detailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+            <div id="detailModal"
+                class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center mt-24">
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
                     <h2 class="text-lg text-center font-bold text-center mb-4 text-gray-900 dark:text-white ">Detail
                         Perusahaan</h2>
@@ -205,6 +250,18 @@
 
                         <p class="font-semibold text-gray-900 dark:text-white">Tanggal Pengajuan:</p>
                         <p id="modalApplicationDate" class="text-gray-900 dark:text-white"></p>
+
+                        <p class="font-semibold text-gray-900 dark:text-white">Tanggal Mulai:</p>
+                        <p id="modalStartDate" class="text-gray-900 dark:text-white"></p>
+
+                        <p class="font-semibold text-gray-900 dark:text-white">Tanggal Selesai:</p>
+                        <p id="modalEndDate" class="text-gray-900 dark:text-white"></p>
+
+                        @if ($application->status === 'Terminated')
+                            <p class="text-red-600 font-bold">Status: Diberhentikan</p>
+                            <p><strong>Alasan:</strong> {{ $application->terminated_reason }}</p>
+                        @endif
+
                     </div>
 
                     <!-- Tombol Tutup -->
@@ -419,6 +476,12 @@
                             <input type="file" name="document" accept="application/pdf" required
                                 class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
                         </div>
+                        <label for="partner_nrp" class="block text-sm font-medium text-gray-700">NRP Teman
+                            (opsional)</label>
+                        <input type="text" name="partner_nrp" id="partner_nrp"
+                            class="mt-1 p-2 block w-full border border-gray-300 rounded-md"
+                            placeholder="Kosongkan jika sendiri">
+
 
                         <!-- Tombol -->
                         <div class="space-y-2">
@@ -435,7 +498,7 @@
 
             <!-- Modal Edit Pengajuan -->
             <div id="editApplicationModal"
-                class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50 mt-24">
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
                     <h2 class="text-lg font-bold text-center mb-4 text-gray-900 dark:text-white">Edit Pengajuan</h2>
                     @if (isset($item))
@@ -480,20 +543,24 @@
                                     class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
                             </div>
 
-                            <!-- Unggah Surat Lamaran -->
-                            <div class="mb-4">
-                                <label class="block font-semibold text-gray-900 dark:text-white mb-1">
-                                    Unggah Surat Lamaran Baru
-                                </label>
+                            @foreach ($data as $item)
+                                @if (strtolower(trim($item->status)) === 'Pending')
+                                    <!-- Unggah Surat Lamaran -->
+                                    <div class="mb-4">
+                                        <label class="block font-semibold text-gray-900 dark:text-white mb-1">
+                                            Unggah Surat Lamaran Baru
+                                        </label>
 
-                                <!-- Tampilkan file lama -->
-                                <p id="existingDocumentName" class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
+                                        <!-- Tampilkan file lama -->
+                                        <p id="existingDocumentName"
+                                            class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
 
-                                <!-- Input file baru -->
-                                <input type="file" name="document" accept="application/pdf"
-                                    class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                            </div>
-
+                                        <!-- Input file baru -->
+                                        <input type="file" name="document" accept="application/pdf"
+                                            class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                @endif
+                            @endforeach
 
                             <!-- Tombol -->
                             <div class="flex justify-end mt-6 gap-2">
@@ -617,6 +684,8 @@
             const modalType = document.getElementById('modalType');
             const modalStatus = document.getElementById('modalStatus');
             const modalApplicationDate = document.getElementById('modalApplicationDate');
+            const modalStartDate = document.getElementById('modalStartDate');
+            const modalEndDate = document.getElementById('modalEndDate');
 
             detailButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -629,6 +698,8 @@
                     modalType.textContent = this.dataset.type;
                     modalStatus.textContent = this.dataset.status;
                     modalApplicationDate.textContent = this.dataset.application_date;
+                    modalStartDate.textContent = this.dataset.start_date;
+                    modalEndDate.textContent = this.dataset.end_date;
 
                     modal.classList.remove('hidden');
                 });
@@ -841,7 +912,7 @@
                 document.getElementById("feedbackModalTitle").textContent = isReadOnly ?
                     "Lihat Rating" :
                     isRevision ?
-                    "Revisi" :
+                    "Revisi Buku KP" :
                     "Isi Pengalaman";
 
                 document.getElementById("submitFeedbackBtn").classList.toggle("hidden", isReadOnly && !

@@ -20,4 +20,9 @@ class Answer extends Model
     {
         return $this->belongsTo(Question::class);
     }
+
+    public function comments()
+    {
+        return $this->hasMany(AnswerComment::class, 'answer_id');
+    }
 }

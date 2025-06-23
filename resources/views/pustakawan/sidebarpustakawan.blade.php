@@ -26,45 +26,40 @@
     <div class="flex h-full min-h-screen">
         <!-- Sidebar -->
         <!-- Sidebar -->
+        <!-- Sidebar -->
         <aside
-            class="w-64 bg-gray-800 text-white shadow-lg transition-transform duration-300 ease-in-out transform md:translate-x-0"
-            id="sidebar">
-            <div class="p-4 flex items-center justify-between">
-                <span class="text-xl font-bold">Pustakawan Panel</span>
-                <button id="toggleSidebar" class="md:hidden text-white focus:outline-none">
+            class="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-md min-h-screen">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <span class="text-lg font-semibold text-gray-800 dark:text-white">📘 Pustakawan</span>
+                <button id="toggleSidebar" class="md:hidden text-gray-600 dark:text-gray-300">
                     ☰
                 </button>
             </div>
-            <nav class="p-4">
-                <ul>
-                    <li>
-                        <a href="{{ route('pustakawan') }}"
-                            class="block py-2 px-3 rounded hover:bg-blue-600 transition-all duration-200">
-                            📚 Semua Buku KP
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('pustakawan.before') }}"
-                            class="block py-2 px-3 rounded hover:bg-yellow-600 transition-all duration-200">
-                            ⏳ Belum Diverifikasi
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('pustakawan.after') }}"
-                            class="block py-2 px-3 rounded hover:bg-red-600 transition-all duration-200">
-                            ✅ Sudah Diverifikasi
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('logout') }}"
-                            class="block py-2 px-3 rounded bg-red-500 text-white hover:bg-red-600 transition-all duration-200">
-                            🚪 Logout
-                        </a>
-                    </li>
-                </ul>
+
+            <nav class="p-4 space-y-2">
+                <a href="{{ route('pustakawan') }}"
+                    class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-blue-100 dark:text-gray-200 dark:hover:bg-blue-600 transition-all duration-200">
+                    📚 <span class="ml-3">Semua Buku KP</span>
+                </a>
+
+                <a href="{{ route('pustakawan.before') }}"
+                    class="flex items-center px-4 py-2 text-sm font-medium text-yellow-800 bg-yellow-50 hover:bg-yellow-100 rounded-lg dark:text-yellow-300 dark:bg-yellow-900 dark:hover:bg-yellow-800 transition-all duration-200">
+                    ⏳ <span class="ml-3">Belum Diverifikasi</span>
+                </a>
+
+                <a href="{{ route('pustakawan.after') }}"
+                    class="flex items-center px-4 py-2 text-sm font-medium text-green-800 bg-green-50 hover:bg-green-100 rounded-lg dark:text-green-300 dark:bg-green-900 dark:hover:bg-green-800 transition-all duration-200">
+                    ✅ <span class="ml-3">Sudah Diverifikasi</span>
+                </a>
+
+                <hr class="my-3 border-t dark:border-gray-600">
+
+                <a href="{{ route('logout') }}"
+                    class="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200">
+                    🚪 <span class="ml-3">Logout</span>
+                </a>
             </nav>
         </aside>
-
 
         <!-- Main Content -->
         <main class="flex-1 p-6">

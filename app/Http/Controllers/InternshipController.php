@@ -8,6 +8,7 @@ use App\Models\Internship;
 use App\Models\Students;
 use App\Models\User;
 use App\Services\FirebaseService;
+use Carbon\Carbon;
 use Illuminate\Console\View\Components\Success;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Request;
@@ -104,6 +105,32 @@ class InternshipController
         }
     }
 
+    private function generatePeriode(Carbon $startDate)
+    {
+        $tahun = $startDate->year;
+        // Jika bulan < Juli, berarti masih tahun ajaran sebelumnya
+        if ($startDate->month < 7) {
+            return ($tahun - 1) . '/' . $tahun;
+        } else {
+            return $tahun . '/' . ($tahun + 1);
+        }
+    }
+
+    private function generateSemester(Carbon $startDate)
+    {
+        $tahun = $startDate->year;
+
+        // Tentukan minggu ke-3 bulan Februari dan Agustus
+        $mingguKetigaFeb = Carbon::createFromDate($tahun, 2, 15)->startOfWeek();
+        $mingguKetigaAgu = Carbon::createFromDate($tahun, 8, 15)->startOfWeek();
+
+        if ($startDate->between($mingguKetigaFeb, $mingguKetigaAgu->copy()->subDay())) {
+            return 'genap';
+        } else {
+            return 'ganjil';
+        }
+    }
+
     public function store(Request $request)
     {
         // dd($request->all());
@@ -121,41 +148,160 @@ class InternshipController
             return redirect()->back()->with('error', "Mohon lengkapi data diri terlebih dahulu: Email belum diisi.");
         }
 
-        // Cek apakah sudah pernah apply ke lowongan ini
-        $existing = DB::table('applications')
-            ->where('student_id', $student->student_id)
-            ->where('vacancy_id', $request->vacancy_id)
-            ->first();
 
-        if ($existing) {
-            return redirect()->back()->with('error', 'Anda sudah pernah mengajukan lamaran untuk lowongan ini.');
-        }
+
+
+
+        // $application = Applications::where('student_id', $student->student_id)
+        // ->where('vacancy_id', $request->vacancy_id)
+        // ->first();
+        // if ($internship) {
+        //     if ($internship->status == 'Pending' || $internship->status == 'Approved') {
+        //         return redirect()->back()->with('error', 'Lowongan ini sudah ditolak.');
+        //     }
+        // }
         $request->validate([
             // 'user_id' => 'required|exists:users,id',
             'vacancy_id' => 'required|exists:vacancy,vacancy_id',
             // 'status' => 'required',
             // 'application_date' => 'required',
-            'document' => 'nullable|file|mimes:pdf|max:2048'
+            'document' => 'nullable|file|mimes:pdf|max:2048',
+            'partner_nrp' => 'nullable|string|exists:students,student_number',
+        ]);
+        // Hitung semester & periode dari start_date
+        $startDate = Carbon::parse($request->start_date);
+        $periode = $this->generatePeriode($startDate);
+        $semester = $this->generateSemester($startDate);
+
+        $partner = null;
+
+        // 1. Cek apakah sudah pernah apply ke lowongan yang sama
+        $existingSameVacancy = DB::table('applications')
+            ->where('student_id', $student->student_id)
+            ->where('vacancy_id', $request->vacancy_id)
+            ->first();
+
+        if ($existingSameVacancy) {
+            return redirect()->back()->with('error', 'Anda sudah pernah mengajukan lamaran untuk lowongan ini.');
+        }
+
+        // 2. Cek apakah sudah punya pengajuan aktif (Pending/Approved)
+        $activeApplication = DB::table('applications')
+            ->where('student_id', $student->student_id)
+            ->whereIn('status', ['Pending', 'Approved'])
+            ->first();
+
+        if ($activeApplication) {
+            return redirect()->back()->with('error', 'Anda hanya dapat memiliki satu pengajuan aktif. Silakan tunggu sampai pengajuan Anda ditolak.');
+        }
+
+        // Cek apakah sudah pernah apply
+        $alreadyApplied = Applications::where('student_id', $student->id)
+            ->whereIn('status', ['Pending', 'Approved'])
+            ->exists();
+
+        if ($alreadyApplied) {
+            return back()->with('error', 'Anda sudah memiliki pengajuan aktif.');
+        }
+
+        // Cek jika ada partner
+        if ($request->partner_nrp) {
+            $partner = Students::where('student_number', $request->partner_nrp)->first();
+
+            if (!$partner) {
+                return back()->with('error', 'NRP teman tidak ditemukan.');
+            }
+
+            // Cek partner juga belum apply
+            $partnerApplied = Applications::where('student_id', $partner->student_id)
+                ->whereIn('status', ['Pending', 'Approved'])
+                ->exists();
+
+            if ($partnerApplied) {
+                return back()->with('error', 'Teman Anda sudah memiliki pengajuan aktif.');
+            }
+        }
+
+        // Buat group ID
+        $groupId = Str::uuid();
+
+        // Simpan pengajuan utama
+        Applications::create([
+            'student_id' => $student->id,
+            'vacancy_id' => $request->vacancy_id,
+            'status' => 'Pending',
+            'group_id' => $groupId,
+            'application_date' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+            'periode' => $periode,
+            'semester' => $semester,
         ]);
 
-        $application = new Applications();
-        $application->user_id = $user->user_id;
-        $application->student_id = $student->student_id;
-        $application->vacancy_id = $request->vacancy_id;
-        // $application->status = $request->status;
-        $application->application_date = now();
-        // dd($request->all());
-        $application->created_at = now();
-        $application->updated_at = now();
+
+        // Jika ada partner, simpan juga
+        if ($partner) {
+            Applications::create([
+                'student_id' => $partner->student_id,
+                'vacancy_id' => $request->vacancy_id,
+                'status' => 'Pending',
+                'group_id' => $groupId,
+                'application_date' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+                'periode' => $periode,
+                'semester' => $semester,
+            ]);
+        }
+
         if ($request->hasFile('document')) {
             $file = $request->file('document');
             $path = $file->store('cover_letter', 'public');
-            $application->document = Storage::url($path);
+            $fileUrl = Storage::url($path);
+
+            DB::table('applications')->where('group_id', $groupId)->update([
+                'document' => Storage::url($path),
+                'updated_at' => now()
+            ]);
         }
-        // dd($request->all());
-        $application->save();
+        // $application = new Applications();
+        // $application->user_id = $user->user_id;
+        // $application->student_id = $student->student_id;
+        // $application->vacancy_id = $request->vacancy_id;
+        // // $application->status = $request->status;
+        // $application->application_date = now();
+        // // dd($request->all());
+        // $application->created_at = now();
+        // $application->updated_at = now();
+        // if ($request->hasFile('document')) {
+        //     $file = $request->file('document');
+        //     $path = $file->store('cover_letter', 'public');
+        //     $application->document = Storage::url($path);
+        // }
+        // // dd($request->all());
+        // $application->save();
 
         return redirect()->back()->with('success', 'Pengajuan berhasil dikirim!');
+    }
+    public function terminate(Request $request, $id)
+    {
+        $request->validate([
+            'terminated_reason' => 'required|string|max:1000',
+        ]);
+
+        $application = Applications::where('student_id', Auth::user()->id)
+            ->findorFail($id);
+
+        // Hanya bisa terminate jika status saat ini 'Approved'
+        if ($application->status !== 'Approved') {
+            return back()->with('error', 'Hanya bisa melaporkan pemecatan dari status Approved.');
+        }
+
+        $application->status = 'Terminated';
+        $application->terminated_reason = $request->terminated_reason;
+        $application->save();
+
+        return back()->with('success', 'Status pengajuan diubah menjadi Diberhentikan.');
     }
     public function update(Request $request, $id)
     {
@@ -222,7 +368,10 @@ class InternshipController
                 'internships.end_date',
                 'internships.position',
                 'internships.title',
-                'internships.rating'
+                'internships.rating',
+                'internships.semester',
+                'internships.periode',
+                'internships.tanggal_sidang'
             )
             ->get();
         // dd($data);
@@ -288,7 +437,8 @@ class InternshipController
                 // Proses watermark PDF
                 $pdf = new Fpdi();
                 $pageCount = $pdf->setSourceFile($absolutePath);
-
+                $logoPath = storage_path('app/public/Logo_PENS.png'); // Pastikan file PNG ada di sini
+                $logoWidth = 50; // Sesuaikan lebar logo (dalam mm)
                 for ($i = 1; $i <= $pageCount; $i++) {
                     $tplId = $pdf->importPage($i);
                     $size = $pdf->getTemplateSize($tplId);
@@ -296,11 +446,12 @@ class InternshipController
                     $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
                     $pdf->useTemplate($tplId);
 
-                    // Tambahkan watermark
-                    $pdf->SetFont('Helvetica', 'I', 24);
-                    $pdf->SetTextColor(255, 0, 0);
-                    $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
-                    $pdf->Cell($size['width'], 10, '© 2025 - PENS', 0, 0, 'C');
+                    // Hitung posisi agar logo di tengah halaman
+                    $x = ($size['width'] - $logoWidth) / 2;
+                    $y = $size['height'] / 2 - 10; // Bisa diatur agar tidak terlalu ke atas/bawah
+
+                    // Tambahkan logo sebagai watermark
+                    $pdf->Image($logoPath, $x, $y, $logoWidth);
                 }
 
                 // Simpan file dengan watermark
@@ -383,15 +534,15 @@ class InternshipController
                 'draft_kp_book' => $draftFileUrl
             ]);
 
-            if(isset($request->internship_id)){
+            if (isset($request->internship_id)) {
                 DB::table('internships')
-                ->where('internship_id', $request->internship_id)
-                ->update([
-                    'book_status' => 'Pending',
-                    'kp_book' => $fileUrl,
-                    'draft_kp_book' => $draftFileUrl,
-                    'updated_at' => now()
-                ]);
+                    ->where('internship_id', $request->internship_id)
+                    ->update([
+                        'book_status' => 'Pending',
+                        'kp_book' => $fileUrl,
+                        'draft_kp_book' => $draftFileUrl,
+                        'updated_at' => now()
+                    ]);
             }
             // $internshipRevision = DB::table('internships')
             //     ->where('internship_id', $request->internship_id)

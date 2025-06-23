@@ -41,7 +41,7 @@
                                     data-start_date="{{ $item->start_date }}" data-end_date="{{ $item->end_date }}"
                                     data-duration="{{ \Carbon\Carbon::parse($item->start_date)->diffInMonths(\Carbon\Carbon::parse($item->end_date)) }} bulan"
                                     data-company_address="{{ $item->company_address }}"
-                                    data-kp_book="{{ $item->kp_book }}">
+                                    data-draft_kp_book="{{ $item->draft_kp_book }}">
                                     Selengkapnya
                                 </button>
                             </td>
@@ -99,7 +99,7 @@
                     <p class="text-gray-900 dark:text-white font-medium">Buku KP:</p>
                     <button id="modalKpBook"
                         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:underline"
-                        onclick="openKpBookModal('{{ $item->kp_book }}')">
+                        onclick="openKpBookModal('{{ $item->draft_kp_book }}')">
                         Lihat Buku KP
                     </button>
                 </div>
@@ -156,7 +156,7 @@
                     let companyLogo = button.getAttribute("data-company_logo");
                     document.getElementById("modalCompanyLogo").setAttribute("src", companyLogo);
 
-                    let kpBookLink = button.getAttribute("data-kp_book");
+                    let kpBookLink = button.getAttribute("data-draft_kp_book");
                     document.getElementById("modalKpBook").setAttribute("href", kpBookLink);
 
                     modal.classList.remove("hidden");
