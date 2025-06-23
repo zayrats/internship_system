@@ -42,9 +42,13 @@
                                     @csrf
                                     <input type="hidden" name="parent_id" value="{{ $comment->id }}">
                                     <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
-                                        placeholder="Tulis balasan..."></textarea>
-                                    <button
-                                        class="mt-1 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
+                                        placeholder="Tulis balasan..." required></textarea>
+                                    <div class="flex gap-2 mt-1">
+                                        <button type="submit"
+                                            class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
+                                        <button type="button" onclick="hideReplyForm({{ $comment->id }})"
+                                            class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
+                                    </div>
                                 </form>
                             </div>
                         @endforeach
@@ -53,8 +57,8 @@
                         <form action="{{ route('answer.comment', $answer->id) }}" method="POST" class="mt-4">
                             @csrf
                             <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
-                                placeholder="Tulis komentar..."></textarea>
-                            <button
+                                placeholder="Tulis komentar..." required></textarea>
+                            <button type="submit"
                                 class="mt-1 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
                         </form>
                     </div>
@@ -69,18 +73,50 @@
             class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
             @csrf
             <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
-                placeholder="Tulis jawabanmu..."></textarea>
-            <button class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim Jawaban</button>
+                placeholder="Tulis jawabanmu..." required></textarea>
+            <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
+                Jawaban</button>
         </form>
     </div>
 
-
     <script>
         function toggleReplyForm(commentId) {
-            document.querySelectorAll('.reply-form').forEach(el => el.classList.add('hidden'));
-            const form = document.getElementById(`reply-form-${commentId}`);
-            if (form) form.classList.add('hidden');
+            // Sembunyikan semua form reply yang sedang terbuka
+            document.querySelectorAll('.reply-form').forEach(form => {
+                form.classList.add('hidden');
+            });
+
+            // Tampilkan form reply untuk komentar yang diklik
+            const targetForm = document.getElementById(`reply-form-${commentId}`);
+            if (targetForm) {
+                targetForm.classList.remove('hidden');
+                // Focus pada textarea
+                const textarea = targetForm.querySelector('textarea');
+                if (textarea) {
+                    textarea.focus();
+                }
+            }
         }
+
+        function hideReplyForm(commentId) {
+            const form = document.getElementById(`reply-form-${commentId}`);
+            if (form) {
+                form.classList.add('hidden');
+                // Reset form
+                form.reset();
+            }
+        }
+
+        // Event listener untuk menyembunyikan form reply saat klik di luar
+        document.addEventListener('click', function(event) {
+            // Jika yang diklik bukan tombol Balas atau elemen dalam form reply
+            if (!event.target.closest('.reply-form') && !event.target.matches(
+                'button[onclick*="toggleReplyForm"]')) {
+                document.querySelectorAll('.reply-form').forEach(form => {
+                    form.classList.add('hidden');
+                });
+            }
+        });
     </script>
 
 @endsection
