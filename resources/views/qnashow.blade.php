@@ -74,15 +74,10 @@
         </form>
     </div>
 
+
     <script>
         function toggleReplyForm(commentId) {
-            document.querySelectorAll('.reply-form').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`reply-form-${commentId}`).classList.toggle('hidden');
-        }
-    </script>
-    <script>
-        function toggleReplyForm(commentId) {
-            document.querySelectorAll('.reply-form').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.reply-form').forEach(el => el.classList.toggle('hidden'));
             const form = document.getElementById(`reply-form-${commentId}`);
             if (form) form.classList.toggle('hidden');
         }
