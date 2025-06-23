@@ -49,6 +49,7 @@
                                         <option value="Mahasiswa" {{ $user->role == 'Mahasiswa' ? 'selected' : '' }}>
                                             Mahasiswa</option>
                                         <option value="Pustakawan" {{ $user->role == 'Pustakawan' ? 'selected' : '' }}> Pustakawan</option>
+                                        <option value="Dosen" {{ $user->role == 'Dosen' ? 'selected' : '' }}> Dosen</option>
                                             {{-- <option value="Perusahaan" {{ $user->role == 'Perusahaan' ? 'selected' : '' }}>
                                             Perusahaan</option> --}}
                                     </select>
