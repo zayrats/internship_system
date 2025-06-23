@@ -23,7 +23,7 @@ class Answer extends Model
 
     public function comments()
     {
-        return $this->hasMany(AnswerComment::class)->whereNull('parent_id');
+        return $this->hasMany(AnswerComment::class);
     }
     public function allComments()
     {

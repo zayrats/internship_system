@@ -18,11 +18,9 @@
 
 
                     {{-- @dump($answer) --}}
-                    @foreach ($answer->comments->where('parent_id', null) as $comment)
-                        {{-- Tombol untuk beri komentar ke jawaban langsung --}}
-                        <button onclick="toggleReplyForm('{{ $commnet->id }}')"
+                    {{-- @foreach ($answer->comments->where('parent_id', null) as $comment)
+                        <button onclick="toggleReplyForm('{{ $comment->id }}')"
                             class="text-blue-500 text-xs hover:underline mt-2">Komentari jawaban ini</button>
-                        {{-- Balasan dari komentar --}}
                         @forelse ($comment->replies as $reply)
                             <div class="mt-2 ml-4 space-y-2">
                                 <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
@@ -33,7 +31,6 @@
                         @empty
                         @endforelse
 
-                        {{-- Form reply tersembunyi --}}
                         <form action="{{ route('comment.reply', $answer->id) }}" method="POST"
                             class="mt-2 hidden reply-form" id="reply-form-{{ $comment->id }}">
                             @csrf
@@ -46,28 +43,55 @@
                                 <button type="button" onclick="hideReplyForm({{ $comment->id }})"
                                     class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
                             </div>
-                        </form>
-                    @endforeach
-                </div>
-                @empty
-                    <p class="text-gray-500">Belum ada jawaban.</p>
-                @endforelse
-            </div>
+                        </form> --}}
+                    {{-- Tampilkan komentar-komentar --}}
+                    <div class="mt-3 space-y-2">
+                        @foreach ($answer->comments as $comment)
+                            <div class="bg-white dark:bg-gray-800 p-2 rounded shadow-sm">
+                                <p class="text-sm text-gray-800 dark:text-gray-200">{{ $comment->comment }}</p>
+                                <div class="text-xs text-gray-500">— {{ $comment->user->username }}</div>
+                            </div>
+                        @endforeach
+                    </div>
 
-            {{-- Form Kirim Jawaban --}}
-            <form action="{{ route('qna.answer', $question) }}" method="POST"
-                class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                @csrf
-                <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
-                    placeholder="Tulis jawabanmu..." required></textarea>
-                <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
-                    Jawaban</button>
-            </form>
+                    {{-- Tombol untuk tampilkan form komentar --}}
+                    <button onclick="toggleReplyForm({{ $answer->id }})"
+                        class="mt-2 text-xs text-blue-500 hover:underline">Komentari jawaban ini</button>
+
+                    {{-- Form komentar tersembunyi --}}
+                    <form action="{{ route('answer.comment', $answer->id) }}" method="POST" class="mt-2 hidden reply-form"
+                        id="reply-form-{{ $answer->id }}">
+                        @csrf
+                        <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
+                            placeholder="Tulis komentar terhadap jawaban ini..." required></textarea>
+                        <div class="flex gap-2 mt-1">
+                            <button type="submit"
+                                class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">Kirim</button>
+                            <button type="button" onclick="hideReplyForm({{ $answer->id }})"
+                                class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600">Batal</button>
+                        </div>
+                    </form>
+            @endforeach
+        </div>
+        @empty
+            <p class="text-gray-500">Belum ada jawaban.</p>
+            @endforelse
+        </div>
+
+        {{-- Form Kirim Jawaban --}}
+        <form action="{{ route('qna.answer', $question) }}" method="POST"
+            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+            @csrf
+            <textarea name="content" rows="4" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white"
+                placeholder="Tulis jawabanmu..." required></textarea>
+            <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Kirim
+                Jawaban</button>
+        </form>
         </div>
 
         <script>
             function toggleReplyForm(id) {
-                document.querySelectorAll('.reply-form').forEach(form => form.classList.remove('hidden'));
+                document.querySelectorAll('.reply-form').forEach(form => form.classList.add('hidden'));
                 const form = document.getElementById(`reply-form-${id}`);
                 if (form) {
                     form.classList.remove('hidden');
@@ -94,5 +118,4 @@
                 }
             });
         </script>
-
     @endsection
