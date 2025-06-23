@@ -15,7 +15,7 @@ class QnAController
     public function index()
     {
         // $user = User::find(Auth::id());
-        $questions = Question::with('user:user_id,username')->latest();
+        $questions = Question::with('user:user_id,username')->latest()->paginate(10);
         $replies = AnswerComment::with('user:user_id,username')->latest();
         // dd($questions);
         return view('qna', compact('questions', 'replies'));
@@ -58,13 +58,13 @@ class QnAController
 
         return back()->with('success', 'Komentar berhasil ditambahkan');
     }
-    public function reply(Request $request, $commentId)
+    public function reply(Request $request, $answerId)
     {
         $request->validate([
             'comment' => 'required|string',
         ]);
 
-        $parent = AnswerComment::findOrFail($commentId);
+        $parent = AnswerComment::findOrFail($answerId);
 
         AnswerComment::create([
             'answer_id' => $parent->answer_id,
@@ -73,12 +73,14 @@ class QnAController
             'parent_id' => $parent->id,
         ]);
 
-        return back();
+        return back()->with('success', 'Balasan berhasil dikirim!');
     }
 
     // Detail pertanyaan & jawabannya
-    public function show(Question $question, AnswerComment $replies)
+    public function show(Question $question)
     {
+        $replies = AnswerComment::with('user:user_id,username')->latest();
+
         $question->load([
             'user:user_id,username',
             'answers.user',

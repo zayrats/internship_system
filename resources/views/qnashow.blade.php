@@ -30,10 +30,8 @@
                     @empty
                     @endforelse
 
-
-
                     {{-- Form reply tersembunyi --}}
-                    <form action="{{ route('answer.comment', $answer->id) }}" method="POST" class="mt-2 hidden reply-form"
+                    <form action="{{ route('comment.reply', $answer->id) }}" method="POST" class="mt-2 hidden reply-form"
                         id="reply-form-{{ $reply->id }}">
                         @csrf
                         <input type="hidden" name="parent_id" value="{{ $reply->id }}">
