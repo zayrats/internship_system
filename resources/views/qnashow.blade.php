@@ -38,7 +38,7 @@
 
                                 {{-- Form reply tersembunyi --}}
                                 <form action="{{ route('answer.comment', $answer->id) }}" method="POST"
-                                    class="mt-2 reply-form" id="reply-form-{{ $comment->id }}" style="display: none;">
+                                    class="mt-2 hidden reply-form" id="reply-form-{{ $comment->id }}">
                                     @csrf
                                     <input type="hidden" name="parent_id" value="{{ $comment->id }}">
                                     <textarea name="comment" rows="2" class="w-full p-2 border rounded dark:bg-gray-600 dark:text-white text-sm"
@@ -83,13 +83,13 @@
         function toggleReplyForm(commentId) {
             // Sembunyikan semua form reply yang sedang terbuka
             document.querySelectorAll('.reply-form').forEach(form => {
-                form.style.display = 'none';
+                form.classList.add('hidden');
             });
 
             // Tampilkan form reply untuk komentar yang diklik
             const targetForm = document.getElementById(`reply-form-${commentId}`);
             if (targetForm) {
-                targetForm.style.display = 'block';
+                targetForm.classList.remove('hidden');
                 // Focus pada textarea
                 const textarea = targetForm.querySelector('textarea');
                 if (textarea) {
@@ -101,7 +101,7 @@
         function hideReplyForm(commentId) {
             const form = document.getElementById(`reply-form-${commentId}`);
             if (form) {
-                form.style.display = 'none';
+                form.classList.add('hidden');
                 // Reset form
                 form.reset();
             }
@@ -113,16 +113,9 @@
             if (!event.target.closest('.reply-form') && !event.target.matches(
                 'button[onclick*="toggleReplyForm"]')) {
                 document.querySelectorAll('.reply-form').forEach(form => {
-                    form.style.display = 'none';
+                    form.classList.add('hidden');
                 });
             }
-        });
-
-        // Pastikan semua form reply tersembunyi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.reply-form').forEach(form => {
-                form.style.display = 'none';
-            });
         });
     </script>
 

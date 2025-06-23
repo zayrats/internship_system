@@ -9,8 +9,12 @@ class AnswerComment extends Model
 {
     //
     use HasFactory;
-    protected $fillable = ['answer_id', 'user_id', 'comment'];
-
+    protected $fillable = [
+        'answer_id',
+        'user_id',
+        'comment',
+        'parent_id',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
