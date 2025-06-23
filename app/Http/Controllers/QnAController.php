@@ -81,7 +81,7 @@ class QnAController
         $question->load([
             'user:user_id,username',
             'answers.user',
-            'answers.comment.user' // ⬅️ ini penting agar comment dan username-nya ikut dimuat
+            'answers.comments.user' // ⬅️ ini penting agar comment dan username-nya ikut dimuat
         ]);
 
         return view('qnashow', compact('question'));
