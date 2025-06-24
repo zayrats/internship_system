@@ -52,9 +52,10 @@
                             </td>
                             <td class="px-6 py-4">{{ $item->application_date }}</td>
                             <td class="px-6 py-4">{{ $item->division }}</td>
-                            <td class="px-6 py-4 text-center">
-                                <a href="#"
-                                    class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline detail-btn"
+                            <td class="px-6 py-4 text-center flex justify-evenly">
+                                {{-- lihat detail --}}
+                                <button href="#"
+                                    class="flex items-center space-x-1 rounded-md border border-blue-500 text-blue-500 px-2 py-1 text-xs hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 detail-btn"
                                     data-id="{{ $item->company_id }}" data-name="{{ $item->company_name }}"
                                     data-address="{{ $item->company_address }}"
                                     data-logo="{{ asset($item->company_logo) }}"
@@ -62,37 +63,56 @@
                                     data-duration="{{ $item->duration }}" data-type="{{ $item->type }}"
                                     data-status="{{ $item->status }}"
                                     data-application_date="{{ $item->application_date }}"
-                                    data-start_date="{{ $item->start_date }}" data-end_date="{{ $item->end_date }}" <i
-                                    class="fa-solid fa-eye"></i>
-                                </a>
+                                    data-start_date="{{ $item->start_date }}" data-end_date="{{ $item->end_date }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline-block" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
 
                                 {{-- edit pengajuan --}}
-                                @if (strtolower(trim($item->status)) === 'Finished' || strtolower(trim($item->status)) === 'Rejected')
-                                @else
+                                @if (strtolower(trim($item->status)) !== 'finished' && strtolower(trim($item->status)) !== 'rejected')
                                     <button
-                                        class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                        class="flex items-center space-x-1 rounded-md border border-green-500 text-green-500 px-2 py-1 text-xs hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300"
                                         onclick="openEditApplicationModal('{{ $item->id }}',
                             '{{ $item->vacancy_id }}',
                             '{{ $item->status }}',
                             '{{ $item->application_date }}',
                             '{{ basename($item->document) }}')">
-                                        <i class="fa-solid fa-file-pen"></i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline-block" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536M4 20h4l10-10-4-4L4 16v4z" />
+                                        </svg>
                                     </button>
                                 @endif
 
                                 {{-- hapus pengajuan --}}
-                                <a href="{{ route('deleteHistory', $item->id) }}"
-                                    class="rounded bg-white px-3 py-1 mx-1 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                    onclick="return confirm('Yakin ingin menghapus pengajuan ini?')">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                                @if ($application->status === 'Approved')
+                                <form action="{{ route('deleteHistory', $item->id) }}" method="POST" class="inline"
+                                    onsubmit="return confirm('Yakin ingin menghapus pengajuan ini?')">
+                                    @csrf
+                                    @method('POST')
+                                    <button type="submit"
+                                        class="flex items-center space-x-1 rounded-md border border-red-500 text-red-500 px-2 py-1 text-xs hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                        title="Hapus Pengajuan">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline-block" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                @if ($item->status === 'Approved')
                                     <button onclick="document.getElementById('terminationForm').classList.remove('hidden')"
-                                        class="mt-4 bg-red-600 text-white px-4 py-2 rounded">
+                                        class="rounded-md bg-red-500 text-white px-2 py-1 text-xs hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
                                         Laporkan Pemecatan KP
                                     </button>
 
-                                    <form action="{{ route('applications.terminate', $application->id) }}" method="POST"
+                                    <form action="{{ route('applications.terminate', $item->id) }}" method="POST"
                                         id="terminationForm" class="hidden mt-4 bg-red-100 p-4 rounded">
                                         @csrf
                                         @method('PUT')
@@ -167,6 +187,7 @@
                                     '{{ $item->feedback ?? '' }}',
                                     '{{ $item->rating ?? '' }}',
                                     '{{ $item->kp_book ?? '' }}',
+                                    '{{ $item->draft_kp_book ?? '' }}',
                                     '{{ $item->vacancy_id ?? '' }}')">
                                             Feedback Perusahaan
                                         </button>
@@ -190,14 +211,14 @@
                     @endforelse
                 </tbody>
             </table>
-            @if ($internship->status === 'Finished')
+            @if ($item->status === 'Finished')
                 <div class="mt-6 bg-white dark:bg-gray-800 p-4 rounded shadow">
                     <h3 class="text-lg font-semibold mb-2 text-blue-600">Jadwal Sidang KP</h3>
 
-                    @if ($internship->tanggal_sidang)
+                    @if ($item->tanggal_sidang)
                         <p class="text-gray-800 dark:text-gray-200">
                             Tanggal Sidang:
-                            <strong>{{ \Carbon\Carbon::parse($internship->tanggal_sidang)->translatedFormat('l, d F Y') }}</strong>
+                            <strong>{{ \Carbon\Carbon::parse($item->tanggal_sidang)->translatedFormat('l, d F Y') }}</strong>
                         </p>
                     @else
                         <p class="text-red-600 dark:text-red-400">Jadwal sidang belum ditentukan.</p>
@@ -257,9 +278,9 @@
                         <p class="font-semibold text-gray-900 dark:text-white">Tanggal Selesai:</p>
                         <p id="modalEndDate" class="text-gray-900 dark:text-white"></p>
 
-                        @if ($application->status === 'Terminated')
+                        @if ($item->status === 'Terminated')
                             <p class="text-red-600 font-bold">Status: Diberhentikan</p>
-                            <p><strong>Alasan:</strong> {{ $application->terminated_reason }}</p>
+                            <p><strong>Alasan:</strong> {{ $item->terminated_reason }}</p>
                         @endif
 
                     </div>
@@ -476,11 +497,14 @@
                             <input type="file" name="document" accept="application/pdf" required
                                 class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
                         </div>
-                        <label for="partner_nrp" class="block text-sm font-medium text-gray-700">NRP Teman
-                            (opsional)</label>
-                        <input type="text" name="partner_nrp" id="partner_nrp"
-                            class="mt-1 p-2 block w-full border border-gray-300 rounded-md"
-                            placeholder="Kosongkan jika sendiri">
+                        <div>
+                            <label for="partner_nrp"
+                                class="block text-sm font-medium text-gray-600 dark:text-gray-300">NRP Teman
+                                (opsional)</label>
+                            <input type="text" name="partner_nrp" id="partner_nrp"
+                                class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white"
+                                placeholder="Kosongkan jika sendiri">
+                        </div>
 
 
                         <!-- Tombol -->

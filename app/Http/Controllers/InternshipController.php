@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Internship;
 use App\Models\Students;
 use App\Models\User;
+use App\Models\Vacancy;
 use App\Services\FirebaseService;
 use Carbon\Carbon;
 use Illuminate\Console\View\Components\Success;
@@ -168,8 +169,10 @@ class InternshipController
             'document' => 'nullable|file|mimes:pdf|max:2048',
             'partner_nrp' => 'nullable|string|exists:students,student_number',
         ]);
+
+        $vacancy = Vacancy::findOrFail($request->vacancy_id);
         // Hitung semester & periode dari start_date
-        $startDate = Carbon::parse($request->start_date);
+        $startDate = Carbon::parse($vacancy->start_date);
         $periode = $this->generatePeriode($startDate);
         $semester = $this->generateSemester($startDate);
 
@@ -227,8 +230,9 @@ class InternshipController
 
         // Simpan pengajuan utama
         Applications::create([
-            'student_id' => $student->id,
+            'student_id' => $student->student_id,
             'vacancy_id' => $request->vacancy_id,
+            'user_id' => $user->user_id,
             'status' => 'Pending',
             'group_id' => $groupId,
             'application_date' => now(),
@@ -241,9 +245,11 @@ class InternshipController
 
         // Jika ada partner, simpan juga
         if ($partner) {
+            $partnerId = User::where('student_id', $partner->student_id)->firstOrFail()->user_id;
             Applications::create([
                 'student_id' => $partner->student_id,
                 'vacancy_id' => $request->vacancy_id,
+                'user_id' => $partnerId,
                 'status' => 'Pending',
                 'group_id' => $groupId,
                 'application_date' => now(),
@@ -260,7 +266,7 @@ class InternshipController
             $fileUrl = Storage::url($path);
 
             DB::table('applications')->where('group_id', $groupId)->update([
-                'document' => Storage::url($path),
+                'document' => $fileUrl,
                 'updated_at' => now()
             ]);
         }
@@ -278,7 +284,7 @@ class InternshipController
         //     $path = $file->store('cover_letter', 'public');
         //     $application->document = Storage::url($path);
         // }
-        // // dd($request->all());
+        // dd($request->all());
         // $application->save();
 
         return redirect()->back()->with('success', 'Pengajuan berhasil dikirim!');
@@ -601,6 +607,7 @@ class InternshipController
                 'internships.company_id',
                 'internships.rating',
                 'internships.kp_book',
+                'internships.draft_kp_book',
                 'companies.name as company_name',
                 'companies.address as company_address',
                 'companies.logo as company_logo',

@@ -40,8 +40,8 @@ class LoginController
                 case 'Perusahaan':
                     return redirect()->route('companydashboard');
                     break;
-                case 'Dosen Koordinator':
-                    return redirect()->route('lecturerdashboard');
+                case 'Dosen':
+                    return redirect()->route('dosen.dashboard');
                     break;
                 case 'Pustakawan':
                     return redirect()->route('pustakawan');

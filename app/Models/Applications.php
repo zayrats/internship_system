@@ -20,7 +20,11 @@ class Applications extends Model
         'status',
         'document',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'internship_id',
+        'group_id',
+        'partner_nrp',
+        'terminated_reason'
     ];
 
     // Relasi ke internship
