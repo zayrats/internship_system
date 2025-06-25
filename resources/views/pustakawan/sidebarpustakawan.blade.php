@@ -62,7 +62,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-6  bg-gray-500">
             @yield('content')
         </main>
     </div>
