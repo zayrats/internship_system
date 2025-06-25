@@ -79,7 +79,7 @@
             </nav>
         </aside>
 
-        <main class="ml-64 min-h-screen bg-gray-500 p-6 flex-1 overflow-y-auto">
+        <main class="flex-1 p-6">
             @yield('content')
         </main>
 
