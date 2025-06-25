@@ -72,7 +72,7 @@ class Controller
             ];
         }
 
-        return view('homepage', compact('initialMarkers'));
+        return view('homepage', compact('initialMarkers','user'));
     }
 
 

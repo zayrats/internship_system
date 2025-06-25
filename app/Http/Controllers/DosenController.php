@@ -23,63 +23,48 @@ class DosenController
     {
         $periodeFilter = $request->input('periode');
         $prodiFilter = $request->input('prodi');
-        $semesterFilter = $request->input('semester'); // untuk future-proof
+        $semesterFilter = $request->input('semester'); // untuk keperluan mendatang
 
-        // Ambil data filter dropdown unik
-        $periodes = Internship::select('periode')->distinct()->pluck('periode');
-        $prodis = Students::select('prodi')->distinct()->pluck('prodi');
-        $semesters = Internship::select('semester')->distinct()->pluck('semester'); // optional
+        // Ambil data dropdown unik
+        $periodes = Applications::select('periode')->whereNotNull('periode')->distinct()->pluck('periode');
+        $prodis = Students::select('prodi')->whereNotNull('prodi')->distinct()->pluck('prodi');
+        $semesters = Applications::select('semester')->whereNotNull('semester')->distinct()->pluck('semester');
 
-        // Query dasar internship dengan relasi student
-        $internships = Internship::with('student');
-        $applications   = Applications::with('student');
-
-        if ($periodeFilter) {
-            $internships->where('periode', $periodeFilter);
-        }
-
-        if ($prodiFilter) {
-            $internships->whereHas('student', function ($query) use ($prodiFilter) {
-                $query->where('prodi', $prodiFilter);
-            });
-        }
-
-        // Untuk Pie Chart dan Card Stats
-        $sudahKP = (clone $applications)->where('status', 'Finished')->count();
-        $belumKP = (clone $applications)
-            ->whereNotIn('status', ['Finished', 'Approved'])
-            ->count();
-
-        $sedangKP = (clone $applications)->where('status', 'Approved')->count();
-        $totalMahasiswa = $sudahKP + $belumKP + $sedangKP;
-
-        // Untuk Chart Bar per Prodi
-        $perProdi = Students::select('prodi', DB::raw('count(*) as total'))
-            ->whereIn('student_id', Applications::where('status', 'Finished')->pluck('student_id'))
-            ->groupBy('prodi')
+        // Ambil data aplikasi yang sudah difilter
+        $filteredApplications = Applications::with('student')
+            ->when($periodeFilter, fn($q) => $q->where('periode', $periodeFilter))
+            ->when($prodiFilter, fn($q) => $q->whereHas('student', fn($q2) => $q2->where('prodi', $prodiFilter)))
+            ->when($semesterFilter, fn($q) => $q->where('semester', $semesterFilter))
             ->get();
 
-        // Sudah isi feedback: aplikasi status 'Finished' yang ADA relasi ke internship
-        $sudahIsiFeedback = Applications::where('status', 'Finished')
+        // Hitung statistik KP
+        $sudahKP = $filteredApplications->where('status', 'Finished')->count();
+        $belumKP = $filteredApplications->whereNotIn('status', ['Finished', 'Approved'])->count();
+        $sedangKP = $filteredApplications->where('status', 'Approved')->count();
+        $totalMahasiswa = $filteredApplications->count();
+
+        // Sudah isi feedback: Finished dan punya relasi ke internship
+        $sudahIsiFeedback = $filteredApplications
+            ->where('status', 'Finished')
             ->whereIn('application_id', Internship::pluck('application_id'))
             ->count();
 
-        // Belum isi feedback: aplikasi status 'Finished' yang TIDAK ADA relasi ke internship
-        $belumIsiFeedback = Applications::where('status', 'Finished')
+        // Belum isi feedback: Finished tapi belum punya internship
+        $belumIsiFeedback = $filteredApplications
+            ->where('status', 'Finished')
             ->whereNotIn('application_id', Internship::pluck('application_id'))
             ->count();
 
-        // Total
         $totalIsiFeedback = $sudahIsiFeedback + $belumIsiFeedback;
 
-        $studentsByProdi = Applications::where('status', 'Finished')
-            ->with('student') // pastikan relasi student() ada di model Applications
-            ->get()
+        // Chart per prodi
+        $studentsByProdi = $filteredApplications
+            ->where('status', 'Finished')
             ->groupBy(fn($app) => $app->student->prodi ?? 'Tidak Diketahui');
 
         $prodiLabels = $studentsByProdi->keys()->toArray();
         $prodiCounts = $studentsByProdi->map->count()->values()->toArray();
-        // dd($periodes);
+
         return view('dosen.dashboard', [
             'periode' => $periodes,
             'prodi' => $prodis,
@@ -88,14 +73,15 @@ class DosenController
             'sudahKP' => $sudahKP,
             'belumKP' => $belumKP,
             'sedangKP' => $sedangKP,
-            'perProdi' => $perProdi,
             'totalIsiFeedback' => $totalIsiFeedback,
             'sudahIsiFeedback' => $sudahIsiFeedback,
             'belumIsiFeedback' => $belumIsiFeedback,
             'prodiLabels' => $prodiLabels,
             'prodiCounts' => $prodiCounts,
+            'perProdi' => $studentsByProdi,
         ]);
     }
+
     public function getMahasiswaByStatus(Request $request)
     {
         $status = $request->input('status');

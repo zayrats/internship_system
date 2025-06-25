@@ -29,6 +29,133 @@
                     src="https://www.pens.ac.id/wp-content/uploads/2023/12/cover-web-ionic-1080x675.jpg" alt="internship" />
             </div>
 
+            {{-- timeline KP --}}
+            @if (isset($user))
+                <ol class="items-center sm:flex">
+                    <li class="relative mb-6 sm:mb-0">
+                        <div class="flex items-center">
+                            <div
+                                class="z-10 flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full ring-0 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                                <svg class="w-2.5 h-2.5 text-blue-800 dark:text-blue-300" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <div class="hidden sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-700"></div>
+                        </div>
+                        <div class="mt-3 sm:pe-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Pra-Kerja Praktek </h3>
+                            <ol class="list-disc ml-6 text-base font-normal text-gray-500 dark:text-gray-400">
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Sosialisasi KP</li>
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Pendaftaran dan
+                                    Pengusulan
+                                    Tempat KP</li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li class="relative mb-6 sm:mb-0">
+                        <div class="flex items-center">
+                            <div
+                                class="z-10 flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full ring-0 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                                <svg class="w-2.5 h-2.5 text-blue-800 dark:text-blue-300" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <div class="hidden sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-700"></div>
+                        </div>
+                        <div class="mt-3 sm:pe-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Pembekalan Kerja Praktek</h3>
+                            <ol class="list-disc ml-6 text-base font-normal text-gray-500 dark:text-gray-400">
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Dibimbing oleh:
+                                    Koordinator
+                                    KP,Kaprodi,Dosen Pembimbing.</li>
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Mahasiswa menyerahkan
+                                    surat
+                                    pengantar ke pembimbing perusahaan.</li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li class="relative mb-6 sm:mb-0">
+                        <div class="flex items-center">
+                            <div
+                                class="z-10 flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full ring-0 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                                <svg class="w-2.5 h-2.5 text-blue-800 dark:text-blue-300" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <div class="hidden sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-700"></div>
+                        </div>
+                        <div class="mt-3 sm:pe-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Pelaksanaan Kerja Praktek</h3>
+                            <ol class="list-disc ml-6 text-base font-normal text-gray-500 dark:text-gray-400">
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Mahasiswa: Mengunggah
+                                    progres
+                                    laporan KP minimal 1 kali/minggu.
+                                </li>
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Pembimbing Perusahaan dan
+                                    Dosen PENS: Memverifikasi dan memberikan feedback mingguan.</li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li class="relative mb-6 sm:mb-0">
+                        <div class="flex items-center">
+                            <div
+                                class="z-10 flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full ring-0 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                                <svg class="w-2.5 h-2.5 text-blue-800 dark:text-blue-300" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <div class="hidden sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-700"></div>
+                        </div>
+                        <div class="mt-3 sm:pe-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Penilaian dan Seminar KP
+                            </h3>
+                            <ol class="list-disc ml-6 text-base font-normal text-gray-500 dark:text-gray-400">
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Penilaian KP
+
+                                    Oleh:
+                                    Pembimbing Perusahaan (50%)
+                                    Dosen Pembimbing (35%)
+                                    Dosen Penguji (15%)
+                                </li>
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">
+                                    Melaksanakan seminar (sidang) KP sesuai jadwal.</li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li class="relative mb-6 sm:mb-0">
+                        <div class="flex items-center">
+                            <div
+                                class="z-10 flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full ring-0 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                                <svg class="w-2.5 h-2.5 text-blue-800 dark:text-blue-300" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <div class="hidden sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-700"></div>
+                        </div>
+                        <div class="mt-3 sm:pe-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Pengumpulan Buku KP
+                            </h3>
+                            <ol class="list-disc ml-6 text-base font-normal text-gray-500 dark:text-gray-400">
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Revisi berdasarkan
+                                    masukan saat seminar.</li>
+                                <li class="text-base font-normal text-gray-500 dark:text-gray-400">Pengumpulan Laporan</li>
+                            </ol>
+                        </div>
+                    </li>
+
+                </ol>
+            @endif
+
             <!-- Map Full Width -->
             <div class="mt-16">
                 <h2 class="text-4xl font-bold text-center text-gray-800 dark:text-white mb-6 animate-fade-in-up">🗺️ Peta

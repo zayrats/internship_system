@@ -9,24 +9,35 @@
         <div class="flex items-center justify-between mb-6 border-b pb-4">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📊 Dashboard KP Dosen</h1>
             <div class="flex space-x-3">
-                <select id="periodeFilter" class="p-2 rounded-lg border bg-white dark:bg-gray-800 dark:text-white shadow">
-                    <option value="">Pilih Periode</option>
-                    @foreach ($periode as $p)
-                        <option value="{{ $p }}">{{ $p }}</option>
-                    @endforeach
-                </select>
-                <select id="prodiFilter" class="p-2 rounded-lg border bg-white dark:bg-gray-800 dark:text-white shadow">
-                    <option value="">Pilih Prodi</option>
-                    @foreach ($prodi as $p)
-                        <option value="{{ $p }}">{{ $p }}</option>
-                    @endforeach
-                </select>
-                <select id="semesterFilter" class="p-2 rounded-lg border bg-white dark:bg-gray-800 dark:text-white shadow">
-                    <option value="">Semester</option>
-                    @foreach ($semester as $s)
-                        <option value="{{ $s }}">{{ $s }}</option>
-                    @endforeach
-                </select>
+                <form method="GET" id="filterForm" class="flex space-x-3">
+                    <select name="periode" onchange="document.getElementById('filterForm').submit()"
+                        class="p-2 rounded-lg border bg-white dark:bg-gray-800 dark:text-white shadow">
+                        <option value="">Pilih Periode</option>
+                        @foreach ($periode as $p)
+                            <option value="{{ $p }}" {{ request('periode') == $p ? 'selected' : '' }}>
+                                {{ $p }}</option>
+                        @endforeach
+                    </select>
+
+                    <select name="prodi" onchange="document.getElementById('filterForm').submit()"
+                        class="p-2 rounded-lg border bg-white dark:bg-gray-800 dark:text-white shadow">
+                        <option value="">Pilih Prodi</option>
+                        @foreach ($prodi as $p)
+                            <option value="{{ $p }}" {{ request('prodi') == $p ? 'selected' : '' }}>
+                                {{ $p }}</option>
+                        @endforeach
+                    </select>
+
+                    <select name="semester" onchange="document.getElementById('filterForm').submit()"
+                        class="p-2 rounded-lg border bg-white dark:bg-gray-800 dark:text-white shadow">
+                        <option value="">Semester</option>
+                        @foreach ($semester as $s)
+                            <option value="{{ $s }}" {{ request('semester') == $s ? 'selected' : '' }}>
+                                {{ $s }}</option>
+                        @endforeach
+                    </select>
+                </form>
+
             </div>
         </div>
 
