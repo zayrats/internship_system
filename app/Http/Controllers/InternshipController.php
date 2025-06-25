@@ -239,7 +239,7 @@ class InternshipController
 
             // Jika ada partner, simpan juga
             if ($partner) {
-                $partnerId = User::where('student_id', $partner->student_id)->firstOrFail()->user_id;
+                $partnerId = Students::where('student_id', $partner->student_id)->firstOrFail()->user_id;
                 Applications::create([
                     'student_id' => $partner->student_id,
                     'vacancy_id' => $request->vacancy_id,
