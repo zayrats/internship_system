@@ -27,6 +27,9 @@ class Applications extends Model
         'partner_nrp',
         'terminated_reason',
         'rejected_reason',
+        'periode',
+        'semester',
+        'tanggal_sidang',
     ];
 
     // Relasi ke internship

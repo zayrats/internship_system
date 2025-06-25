@@ -45,21 +45,25 @@ class SidangController
 
         $internships = $query->get();
         // dd($internships);
-        $periodes = Internship::distinct()->pluck('periode');
-        $semesters = Internship::distinct()->pluck('semester');
+        $periodes = Applications::distinct()->pluck('periode');
+        $semesters = Applications::distinct()->pluck('semester');
         $prodis = Students::distinct()->pluck('prodi');
         return view('dosen.sidang', compact('internships', 'periodes', 'semesters', 'prodis'));
     }
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'tanggal_sidang' => 'required|date',
-        ]);
+        try {
+            $request->validate([
+                'tanggal_sidang' => 'required|date',
+            ]);
+            // dd($request->all());
+            Applications::where('application_id', $id)->update([
+                'tanggal_sidang' => $request->tanggal_sidang,
+            ]);
 
-        Internship::where('application_id', $id)->update([
-            'tanggal_sidang' => $request->tanggal_sidang,
-        ]);
-
-        return back()->with('success', 'Tanggal sidang berhasil diperbarui.');
+            return back()->with('success', 'Tanggal sidang berhasil diperbarui.');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
     }
 }

@@ -35,14 +35,14 @@
         <div class="overflow-x-auto bg-white dark:bg-gray-800 p-4 rounded shadow oferflow-y-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200">
+                    <tr class="bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 text-center">
                         <th class="p-2">Nama Mahasiswa</th>
                         <th class="p-2">Perusahaan</th>
                         <th class="p-2">Prodi</th>
                         <th class="p-2">Periode</th>
                         <th class="p-2">Semester</th>
                         <th class="p-2">Tanggal Sidang</th>
-                        <th class="p-2">Aksi</th>
+                        <th class="p-2">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,8 +59,8 @@
                                     @csrf
                                     @method('PUT')
                                     <input type="date" name="tanggal_sidang" value="{{ $data->tanggal_sidang }}"
-                                        class="border rounded p-1 text-sm">
-                                    <button class="bg-green-600 text-white text-sm px-2 py-1 rounded hover:bg-green-700">Simpan</button>
+                                        class="border rounded p-1 text-sm text-green-600 dark:text-green-400">
+                                    <button type="submit" class="bg-green-600 text-white text-sm px-2 py-1 rounded hover:bg-green-700 submit-btn">Simpan</button>
                                 </form>
                             </td>
                             <td class="p-2">

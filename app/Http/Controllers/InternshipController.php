@@ -190,7 +190,6 @@ class InternshipController
         $periode = $this->generatePeriode($startDate);
 
         $semester = $this->generateSemester($startDate);
-
         // 1. Cek apakah sudah pernah apply ke lowongan yang sama
         $existingSameVacancy = DB::table('applications')
             ->where('student_id', $student->student_id)
@@ -256,6 +255,7 @@ class InternshipController
             }
         }
 
+        // dd($periode, $semester);
 
         // dd($student->student_id);
         // Simpan pengajuan utama
@@ -272,6 +272,7 @@ class InternshipController
             'semester' => $semester,
         ]);
 
+                // dd($periode, $semester);
 
 
 
