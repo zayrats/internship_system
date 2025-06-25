@@ -369,6 +369,10 @@ class InternshipController
                 'applications.status as status',
                 'applications.internship_id',
                 'applications.document as document',
+                'applications.periode',
+                'applications.semester',
+                'applications.group_id',
+                'applications.tanggal_sidang',
                 'vacancy.division',
                 'vacancy.duration',
                 'vacancy.type',
@@ -391,9 +395,6 @@ class InternshipController
                 'internships.position',
                 'internships.title',
                 'internships.rating',
-                'internships.semester',
-                'internships.periode',
-                'internships.tanggal_sidang'
             )
             ->get();
         // dd($data);

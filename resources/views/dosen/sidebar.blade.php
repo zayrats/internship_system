@@ -27,14 +27,14 @@
         <!-- Sidebar -->
         <aside id="sidebar"
             class="w-64 bg-white dark:bg-gray-800 shadow-md fixed inset-y-0 left-0 transform md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
-            <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700 text-white">
                 <img src="https://kompaspedia.kompas.id/wp-content/uploads/2020/07/logo_Politeknik-Elektronika-Negeri-Surabaya-thumb.png"
                     alt="Logo" class="h-10 mr-2">
-                <span class="text-xl font-bold">Dosen Koordinator KP</span>
+                <span class=" text-lg font-bold">Dosen Koordinator KP</span>
             </div>
             <nav class="p-4 space-y-2">
                 <a href="{{ route('dosen.dashboard') }}"
-                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition text-white">
                     <svg class="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6"></path>
@@ -42,7 +42,7 @@
                     Dashboard
                 </a>
                 <a href="{{ route('dosen.monitoring') }}"
-                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition text-white">
                     <svg class="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path d="M3 10h18M9 21V3m6 18V3"></path>
@@ -50,7 +50,7 @@
                     Monitoring
                 </a>
                 <a href="{{ route('dosen.companies') }}"
-                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition text-white">
                     <svg class="w-5 h-5 mr-3 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path d="M4 6h16M4 12h16M4 18h16"></path>
@@ -58,7 +58,7 @@
                     Manajemen Perusahaan
                 </a>
                 <a href="{{ route('sidang.index') }}"
-                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                    class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition text-white">
                     <svg class="w-5 h-5 mr-3 text-purple-600" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path d="M8 7V3M16 7V3M4 11h16M5 20h14a2 2 0 002-2V7H3v11a2 2 0 002 2z"></path>
