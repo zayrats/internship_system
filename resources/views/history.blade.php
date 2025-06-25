@@ -77,11 +77,7 @@
                                 @if (strtolower(trim($item->status)) !== 'finished' && strtolower(trim($item->status)) !== 'rejected')
                                     <button
                                         class="flex items-center space-x-1 rounded-md border border-green-500 text-green-500 px-2 py-1 text-xs hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300"
-                                        onclick="openEditApplicationModal('{{ $item->id }}',
-                            '{{ $item->vacancy_id }}',
-                            '{{ $item->status }}',
-                            '{{ $item->application_date }}',
-                            '{{ basename($item->document) }}')">
+                                        onclick="openEditApplicationModal('{{ $item->id }}','{{ $item->vacancy_id }}','{{ $item->status }}','{{ $item->application_date }}','{{ basename($item->document) }}')">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline-block" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -187,8 +183,10 @@
                                     '{{ $item->feedback ?? '' }}',
                                     '{{ $item->rating ?? '' }}',
                                     '{{ $item->kp_book ?? '' }}',
+                                    '{{ $item->vacancy_id ?? '' }}',
                                     '{{ $item->draft_kp_book ?? '' }}',
-                                    '{{ $item->vacancy_id ?? '' }}')">
+                                    )">
+                                    {{-- @dump($item->vacancy_id) --}}
                                             Feedback Perusahaan
                                         </button>
                                     @endif
@@ -225,7 +223,6 @@
                     @endif
                 </div>
             @endif
-
 
             <!-- Modal Detail -->
             <div id="detailModal"
@@ -308,9 +305,10 @@
                         <input type="hidden" name="internship_id" id="internshipId">
                         <input type="hidden" name="application_id" id="applicationId">
                         <input type="hidden" name="company_id" id="modalCompanyId">
-                        <input type="hidden" name="vacancy_id" class="hidden" id="modalVacancyId">
+                        <input type="hidden" name="vacancy_id" id="modalVacancyId">
                         <input type="hidden" id="currentKpBookUrl">
                         <input type="hidden" id="currentdraftKpBookUrl">
+                        {{-- @dump($vacancies->vacancy_id) --}}
 
                         <label class="block text-sm font-medium text-gray-900 dark:text-white">Perusahaan</label>
                         <input type="text" disabled id="companyName"
@@ -499,7 +497,8 @@
                         </div>
                         <div>
                             <label for="partner_nrp"
-                                class="block text-sm font-medium text-gray-600 dark:text-gray-300">NRP Teman
+                                class="block text-sm font-medium text-gray-600 dark:text-gray-300">NRP
+                                Teman
                                 (opsional)</label>
                             <input type="text" name="partner_nrp" id="partner_nrp"
                                 class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:text-white"
@@ -530,7 +529,6 @@
                             action="{{ route('applications.update', ['id' => $item->id]) }}">
                             @csrf
                             @method('PUT')
-
                             <input type="hidden" id="editApplicationId" name="application_id">
 
                             <!-- Lowongan (disabled) -->
@@ -558,31 +556,44 @@
                                     <option value="Finished">Finished</option>
                                 </select>
                             </div>
+                            @foreach ($data as $applicationItem)
+                                <!-- Tanggal Pengajuan -->
+                                @if ($item->id === $applicationItem->id)
+                                    @if (trim($item->status) === 'Approved')
+                                        <div class="mb-4">
+                                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal
+                                                Pengajuan</label>
+                                            <input readonly type="date" name="application_date" id="editApplicationDate"
+                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                        </div>
+                                    @else
+                                        <div class="mb-4">
+                                            <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal
+                                                Pengajuan</label>
+                                            <input type="date" name="application_date" id="editApplicationDate"
+                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
+                                        </div>
+                                    @endif
+                                @endif
 
-                            <!-- Tanggal Pengajuan -->
-                            <div class="mb-4">
-                                <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal
-                                    Pengajuan</label>
-                                <input type="date" name="application_date" id="editApplicationDate"
-                                    class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                            </div>
+                                @if ($item->id === $applicationItem->id)
+                                    @if (trim($item->status) === 'Pending')
+                                        <!-- Unggah Surat Lamaran -->
+                                        <div class="mb-4">
+                                            <label id="labelExist"
+                                                class="block font-semibold text-gray-900 dark:text-white mb-1">
+                                                Unggah Surat Lamaran Baru
+                                            </label>
 
-                            @foreach ($data as $item)
-                                @if (strtolower(trim($item->status)) === 'Pending')
-                                    <!-- Unggah Surat Lamaran -->
-                                    <div class="mb-4">
-                                        <label class="block font-semibold text-gray-900 dark:text-white mb-1">
-                                            Unggah Surat Lamaran Baru
-                                        </label>
+                                            <!-- Tampilkan file lama -->
+                                            <p id="existingDocumentName"
+                                                class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
 
-                                        <!-- Tampilkan file lama -->
-                                        <p id="existingDocumentName"
-                                            class="text-sm text-gray-600 dark:text-gray-300 mb-2"></p>
-
-                                        <!-- Input file baru -->
-                                        <input type="file" name="document" accept="application/pdf"
-                                            class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
-                                    </div>
+                                            <!-- Input file baru -->
+                                            <input type="file" name="document" accept="application/pdf"
+                                                class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white" />
+                                        </div>
+                                    @endif
                                 @endif
                             @endforeach
 
@@ -618,12 +629,15 @@
             document.getElementById('editStatusSelect').value = status;
             document.getElementById('editApplicationDate').value = applicationDate;
 
-            // Tampilkan nama file dokumen lama
+            {{-- Tampilkan nama file dokumen lama --}}
             const docNameElement = document.getElementById('existingDocumentName');
-            if (documentName && documentName !== 'null') {
-                docNameElement.textContent = "File sebelumnya: " + documentName;
-            } else {
-                docNameElement.textContent = "Belum ada file surat lamaran.";
+            if (status !== 'Approved') {
+                if (documentName) {
+                    console.log("🚀 ~ openEditApplicationModal ~ documentName:", documentName)
+                    docNameElement.textContent = "File sebelumnya: " + documentName;
+                } else {
+                    docNameElement.textContent = "Belum ada file surat lamaran.";
+                }
             }
 
             modal.classList.remove('hidden');
@@ -822,7 +836,7 @@
             // Fungsi membuka modal (Mode Isi Pengalaman atau Lihat Rating)
             window.openFeedbackModal = function(internshipId, applicationId, companyId, companyName = '', title =
                 '', startDate =
-                '', endDate = '', position = '', feedback = '', rating = 0, kpBookUrl = '', vacancyId = null,
+                '', endDate = '', position = '', feedback = '', rating = 0, kpBookUrl = '', vacancyId,
                 draftKpBookUrl = '', bookStatus = '', message = ''
             ) {
                 console.log("🚀 ~ document.addEventListener ~ kpBook:", internshipId)
@@ -849,6 +863,7 @@
                 document.getElementById("internshipId").value = internshipId;
                 document.getElementById("applicationId").value = applicationId;
                 document.getElementById("modalCompanyId").value = companyId;
+                document.getElementById("modalVacancyId").value = vacancyId;
 
                 // Isi data ke dalam form
                 document.getElementById("companyName").value = companyName;

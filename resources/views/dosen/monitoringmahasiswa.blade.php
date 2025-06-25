@@ -1,4 +1,4 @@
-@extends('admin.sidebaradmin')
+@extends('dosen.sidebar')
 
 @section('content')
     <div class="bg-white shadow-md rounded p-6">
@@ -12,7 +12,7 @@
         </h1>
 
         <!-- Filter dan Pencarian -->
-        <form method="GET" action="{{ route('admin.monitoring') }}" class="flex flex-wrap gap-4 mb-4">
+        <form method="GET" action="{{ route('dosen.monitoring') }}" class="flex flex-wrap gap-4 mb-4">
             <input type="text" name="search" placeholder="Cari Nama / NRP" class="border p-2 rounded w-full md:w-1/4"
                 value="{{ request('search') }}">
 

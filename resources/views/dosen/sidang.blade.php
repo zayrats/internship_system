@@ -1,4 +1,4 @@
-@extends('master')
+@extends('dosen.sidebar')
 
 @section('content')
 <div class="max-w-6xl mx-auto mt-10 px-4">
@@ -37,6 +37,7 @@
                 <thead>
                     <tr class="bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200">
                         <th class="p-2">Nama Mahasiswa</th>
+                        <th class="p-2">Perusahaan</th>
                         <th class="p-2">Prodi</th>
                         <th class="p-2">Periode</th>
                         <th class="p-2">Semester</th>
@@ -45,24 +46,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($internships as $internship)
-                        <tr class="border-b dark:border-gray-700 text-sm">
-                            <td class="p-2">{{ $internship->student->name }}</td>
-                            <td class="p-2">{{ $internship->student->prodi }}</td>
-                            <td class="p-2">{{ $internship->periode }}</td>
-                            <td class="p-2 capitalize">{{ $internship->semester }}</td>
+                    @foreach ($internships as $data)
+                    {{-- @dd($data->internship->periode) --}}
+                        <tr class="border-b dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200">
+                            <td class="p-2">{{ $data->student->name }}</td>
+                            <td class="p-2">{{$data->vacancy->company->name}}</td>
+                            <td class="p-2">{{ $data->student->prodi }}</td>
+                            <td class="p-2">{{ $data->periode }}</td>
+                            <td class="p-2 capitalize">{{ $data->semester }}</td>
                             <td class="p-2">
-                                <form action="{{ route('sidang.update', $internship->id) }}" method="POST" class="flex items-center gap-2">
+                                <form action="{{ route('sidang.update', $data->application_id) }}" method="POST" class="flex items-center gap-2">
                                     @csrf
                                     @method('PUT')
-                                    <input type="date" name="tanggal_sidang" value="{{ $internship->tanggal_sidang }}"
+                                    <input type="date" name="tanggal_sidang" value="{{ $data->tanggal_sidang }}"
                                         class="border rounded p-1 text-sm">
                                     <button class="bg-green-600 text-white text-sm px-2 py-1 rounded hover:bg-green-700">Simpan</button>
                                 </form>
                             </td>
                             <td class="p-2">
                                 <span class="text-gray-600 dark:text-gray-400">
-                                    {{ $internship->tanggal_sidang ? 'Sudah Dijadwalkan' : 'Belum Dijadwalkan' }}
+                                    {{ $data->tanggal_sidang ? 'Sudah Dijadwalkan' : 'Belum Dijadwalkan' }}
                                 </span>
                             </td>
                         </tr>

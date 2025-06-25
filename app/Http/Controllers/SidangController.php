@@ -26,7 +26,7 @@ class SidangController
 {
     public function index(Request $request)
     {
-        $query = Internship::with('student')
+        $query = Applications::with(['student', 'vacancy.company'])
             ->where('status', 'Finished');
 
         if ($request->filled('semester')) {
@@ -44,12 +44,11 @@ class SidangController
         }
 
         $internships = $query->get();
-
+        // dd($internships);
         $periodes = Internship::distinct()->pluck('periode');
-        $semesters = ['ganjil', 'genap'];
+        $semesters = Internship::distinct()->pluck('semester');
         $prodis = Students::distinct()->pluck('prodi');
-
-        return view('admin.sidang', compact('internships', 'periodes', 'semesters', 'prodis'));
+        return view('dosen.sidang', compact('internships', 'periodes', 'semesters', 'prodis'));
     }
     public function update(Request $request, $id)
     {
@@ -57,7 +56,7 @@ class SidangController
             'tanggal_sidang' => 'required|date',
         ]);
 
-        Internship::where('id', $id)->update([
+        Internship::where('application_id', $id)->update([
             'tanggal_sidang' => $request->tanggal_sidang,
         ]);
 

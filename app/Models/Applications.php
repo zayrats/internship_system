@@ -16,6 +16,7 @@ class Applications extends Model
     protected $fillable = [
         'user_id',
         'vacancy_id',
+        'student_id',
         'application_date',
         'status',
         'document',
@@ -24,7 +25,8 @@ class Applications extends Model
         'internship_id',
         'group_id',
         'partner_nrp',
-        'terminated_reason'
+        'terminated_reason',
+        'rejected_reason',
     ];
 
     // Relasi ke internship

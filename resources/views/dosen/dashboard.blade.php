@@ -1,4 +1,4 @@
-@extends('master')
+@extends('dosen.sidebar')
 
 @section('content')
     <div class="max-w-7xl mx-auto py-10 px-4">
@@ -31,7 +31,8 @@
         </div>
 
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {{-- Total Mahasiswa --}}
             <div class="bg-blue-50 dark:bg-blue-900 p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-blue-500 text-3xl">👨‍🎓</div>
                 <div>
@@ -39,13 +40,26 @@
                     <p class="text-2xl font-bold text-blue-700 dark:text-white">{{ $totalMahasiswa }}</p>
                 </div>
             </div>
+
+            {{-- Sudah KP --}}
             <div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-green-500 text-3xl">✅</div>
                 <div>
-                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Sudah KP</h2>
+                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Selesai KP</h2>
                     <p class="text-2xl font-bold text-green-700 dark:text-white">{{ $sudahKP }}</p>
                 </div>
             </div>
+
+            {{-- Sedang KP --}}
+            <div class="bg-yellow-50 dark:bg-yellow-900 p-5 rounded-xl shadow flex items-center space-x-4">
+                <div class="text-yellow-500 text-3xl">⏳</div>
+                <div>
+                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Sedang KP</h2>
+                    <p class="text-2xl font-bold text-yellow-700 dark:text-white">{{ $sedangKP }}</p>
+                </div>
+            </div>
+
+            {{-- Belum KP --}}
             <div class="bg-red-50 dark:bg-red-900 p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-red-500 text-3xl">❌</div>
                 <div>
@@ -55,10 +69,24 @@
             </div>
         </div>
 
+        <div class="mt-6 p-2 bg-gray-100 dark:bg-gray-900 rounded-xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                {{-- Chart 1: Feedback Mahasiswa --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                    <h2 class="text-lg font-semibold mb-4 text-center text-gray-800 dark:text-white">
+                        Feedback Mahasiswa Setelah KP
+                    </h2>
+                    <canvas id="feedbackPieChart" class="w-full h-64"></canvas>
+                </div>
 
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-white">Distribusi KP Mahasiswa</h2>
-            <canvas id="pieChart"></canvas>
+                {{-- Chart 2: Distribusi KP --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                    <h2 class="text-lg font-semibold mb-4 text-center text-gray-800 dark:text-white">
+                        Distribusi KP Mahasiswa
+                    </h2>
+                    <canvas id="pieChart" class="w-full h-64"></canvas>
+                </div>
+            </div>
         </div>
         <div class="mt-10">
             <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Rekap Mahasiswa KP per Prodi</h3>
@@ -100,6 +128,33 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('feedbackPieChart').getContext('2d');
+        const feedbackPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Sudah Isi Feedback', 'Belum Isi Feedback'],
+                datasets: [{
+                    label: 'Jumlah Mahasiswa',
+                    data: [{{ $sudahIsiFeedback }}, {{ $belumIsiFeedback }}],
+                    backgroundColor: ['#10B981', '#EF4444'], // hijau & merah
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '{{ auth()->user()->theme == 'dark' ? 'white' : 'black' }}'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
     <script>
         async function fetchDetailMahasiswa(status) {
                 document.getElementById('loadingIndicator').classList.remove('hidden');
@@ -142,13 +197,18 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        const prodiLabels = @json($prodiLabels);
+        const prodiCounts = @json($prodiCounts);
+    </script>
+
+    <script>
         const pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
-                labels: ['Sudah KP', 'Belum KP'],
+                labels: ['Selesai KP', 'Belum KP', 'Sedang KP'],
                 datasets: [{
-                    data: [{{ $sudahKP }}, {{ $belumKP }}],
-                    backgroundColor: ['#34D399', '#F87171'],
+                    data: [{{ $sudahKP }}, {{ $belumKP }}, {{ $sedangKP }}],
+                    backgroundColor: ['#34D399', '#F87171', '#FFD700'],
                 }]
             },
             options: {

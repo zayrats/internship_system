@@ -111,9 +111,14 @@ class InternshipController
         $tahun = $startDate->year;
         // Jika bulan < Juli, berarti masih tahun ajaran sebelumnya
         if ($startDate->month < 7) {
-            return ($tahun - 1) . '/' . $tahun;
+            $tahun = ($tahun - 1) . '/' . $tahun;
+
+            // dd($tahun);
+            return  $tahun;
         } else {
-            return $tahun . '/' . ($tahun + 1);
+            $tahun = $tahun . '/' . ($tahun + 1);
+            // dd($tahun);
+            return $tahun;
         }
     }
 
@@ -125,10 +130,14 @@ class InternshipController
         $mingguKetigaFeb = Carbon::createFromDate($tahun, 2, 15)->startOfWeek();
         $mingguKetigaAgu = Carbon::createFromDate($tahun, 8, 15)->startOfWeek();
 
+        //
+
         if ($startDate->between($mingguKetigaFeb, $mingguKetigaAgu->copy()->subDay())) {
-            return 'genap';
+            $semester = 'genap';
+            return $semester;
         } else {
-            return 'ganjil';
+            $semester = 'ganjil';
+            return $semester;
         }
     }
 
@@ -176,7 +185,6 @@ class InternshipController
         $periode = $this->generatePeriode($startDate);
         $semester = $this->generateSemester($startDate);
 
-        $partner = null;
 
         // 1. Cek apakah sudah pernah apply ke lowongan yang sama
         $existingSameVacancy = DB::table('applications')
@@ -206,7 +214,8 @@ class InternshipController
         if ($alreadyApplied) {
             return back()->with('error', 'Anda sudah memiliki pengajuan aktif.');
         }
-
+        // Buat group ID
+        $groupId = Str::uuid();
         // Cek jika ada partner
         if ($request->partner_nrp) {
             $partner = Students::where('student_number', $request->partner_nrp)->first();
@@ -223,11 +232,27 @@ class InternshipController
             if ($partnerApplied) {
                 return back()->with('error', 'Teman Anda sudah memiliki pengajuan aktif.');
             }
+
+            // Jika ada partner, simpan juga
+            if ($partner) {
+                $partnerId = User::where('student_id', $partner->student_id)->firstOrFail()->user_id;
+                Applications::create([
+                    'student_id' => $partner->student_id,
+                    'vacancy_id' => $request->vacancy_id,
+                    'user_id' => $partnerId,
+                    'status' => 'Pending',
+                    'group_id' => $groupId,
+                    'application_date' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'periode' => $periode,
+                    'semester' => $semester,
+                ]);
+            }
         }
 
-        // Buat group ID
-        $groupId = Str::uuid();
 
+        // dd($student->student_id);
         // Simpan pengajuan utama
         Applications::create([
             'student_id' => $student->student_id,
@@ -243,22 +268,7 @@ class InternshipController
         ]);
 
 
-        // Jika ada partner, simpan juga
-        if ($partner) {
-            $partnerId = User::where('student_id', $partner->student_id)->firstOrFail()->user_id;
-            Applications::create([
-                'student_id' => $partner->student_id,
-                'vacancy_id' => $request->vacancy_id,
-                'user_id' => $partnerId,
-                'status' => 'Pending',
-                'group_id' => $groupId,
-                'application_date' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-                'periode' => $periode,
-                'semester' => $semester,
-            ]);
-        }
+
 
         if ($request->hasFile('document')) {
             $file = $request->file('document');
@@ -408,6 +418,10 @@ class InternshipController
         $applications = Applications::findOrFail($id);
         $applications->delete();
 
+        if (isset($applications->internship_id)) {
+            $internships = Internship::findOrFail($applications->internship_id);
+            $internships->delete();
+        }
         return redirect()->back()->with('success', 'Berhasil Hapus Pengajuan!');
     }
 
@@ -417,7 +431,7 @@ class InternshipController
         // dd($data);
         $request->validate([
             'company_id' => 'required|exists:companies,company_id',
-            'vacancy_id' => 'required',
+            'vacancy_id' => 'nullable|exists:vacancy,vacancy_id',
             'title' => 'required|string|max:255',
             // 'start_date' => 'required|date',
             // 'end_date' => 'required|date|after_or_equal:start_date',
@@ -443,7 +457,7 @@ class InternshipController
                 // Proses watermark PDF
                 $pdf = new Fpdi();
                 $pageCount = $pdf->setSourceFile($absolutePath);
-                $logoPath = storage_path('app/public/Logo_PENS.png'); // Pastikan file PNG ada di sini
+                $logoPath = storage_path('app\public\watermark_PENS.png'); // Pastikan file PNG ada di sini
                 $logoWidth = 50; // Sesuaikan lebar logo (dalam mm)
                 for ($i = 1; $i <= $pageCount; $i++) {
                     $tplId = $pdf->importPage($i);
@@ -521,6 +535,15 @@ class InternshipController
                 // Hapus file temporary
                 Storage::delete($filePath);
             };
+            $vacancy = Vacancy::findOrFail($request->vacancy_id);
+            $startDate = Carbon::parse($vacancy->start_date);
+            // dd($startDate);
+            // $periode = $this->generatePeriode($startDate);
+
+            // $cok = getType($periode);
+
+
+            // $semester = $this->generateSemester($startDate);
             // dd($request->all());
             // Simpan data internship
             $internshipId = DB::table('internships')->insertGetId([
@@ -537,18 +560,31 @@ class InternshipController
                 'application_id' => $id,
                 'vacancy_id' => $request->vacancy_id,
                 'kp_book' => $fileUrl, // Simpan URL file atau null jika tidak ada file
-                'draft_kp_book' => $draftFileUrl
+                'draft_kp_book' => $draftFileUrl,
+                // 'periode' => $periode,
+                // 'semester' => $semester
             ]);
 
+
+            // PERBAIKAN: Update internships dengan sintaks yang benar
+
+
             if (isset($request->internship_id)) {
+                dd($request->internship_id);
                 DB::table('internships')
                     ->where('internship_id', $request->internship_id)
                     ->update([
                         'book_status' => 'Pending',
                         'kp_book' => $fileUrl,
                         'draft_kp_book' => $draftFileUrl,
-                        'updated_at' => now()
+
+                        // 'periode' => 'bismillah',
+                        // 'semester' => $semester
                     ]);
+
+                // $internship = Internship::where('internship_id', $request->internship_id)->first();
+                //     dd($startDate, $periode, $internship);
+
             }
             // $internshipRevision = DB::table('internships')
             //     ->where('internship_id', $request->internship_id)
@@ -561,12 +597,13 @@ class InternshipController
             //     $internshipRevision->updated_at = now();
             //     $internshipRevision->update();
             // }
+
             // PERBAIKAN: Update applications dengan sintaks yang benar
             $apps = DB::table('applications')
                 ->where('application_id', $id)
                 ->update([
                     'internship_id' => $internshipId,
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]); // Perbaikan sintaks di sini
 
             // Ambil data internship yang baru dibuat
@@ -642,8 +679,8 @@ class InternshipController
             'student_number' => 'required|string|max:50',
             'email' => 'required|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
             'password' => 'nullable|min:8',
-            'prodi' => 'required|in:D3,D4',
-            'department' => 'required|string|max:255',
+            // 'prodi' => 'required|in:D3,D4',
+            // 'department' => 'required|string|max:255',
             'year' => 'required|integer|min:1900|max:' . date('Y'),
             'phone' => 'required|string|max:15',
             'address' => 'required|string|max:255',

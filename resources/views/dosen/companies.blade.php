@@ -1,4 +1,4 @@
-@extends('admin.sidebaradmin')
+@extends('dosen.sidebar')
 
 @section('content')
     <div class="container mx-auto px-6 py-8">
@@ -49,7 +49,7 @@
                                     </button>
 
                                     <!-- Tombol Hapus -->
-                                    <form action="{{ route('admin.companies.destroy', $company->company_id) }}"
+                                    <form action="{{ route('dosen.companies.destroy', $company->company_id) }}"
                                         method="POST" onsubmit="return confirm('Yakin ingin menghapus perusahaan ini?')">
                                         @csrf
                                         @method('DELETE')
@@ -112,7 +112,7 @@
                                     </button>
 
                                     <!-- Tombol Hapus -->
-                                    <form action="{{ route('admin.vacancies.destroy', ['id' => $vacancy->vacancy_id]) }}"
+                                    <form action="{{ route('dosen.vacancies.destroy', ['id' => $vacancy->vacancy_id]) }}"
                                         method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
                                         @method('DELETE')
                                         @csrf
@@ -247,7 +247,7 @@
                     </div>
 
                     <!-- Form -->
-                    <form action="{{ route('admin.companies.update', $company->company_id) }}" method="POST"
+                    <form action="{{ route('dosen.companies.update', $company->company_id) }}" method="POST"
                         enctype="multipart/form-data" class="px-6 py-6 space-y-4">
                         @csrf
                         @method('PUT')
@@ -328,7 +328,7 @@
                     </div>
 
                     <!-- Form -->
-                    <form action="{{ route('admin.vacancies.update', ['id' => $vacancy->vacancy_id]) }}" method="POST"
+                    <form action="{{ route('dosen.vacancies.update', ['id' => $vacancy->vacancy_id]) }}" method="POST"
                         class="px-6 py-6 space-y-4">
                         @csrf
                         @method('PUT')
@@ -422,7 +422,7 @@
                 </div>
 
                 <!-- Form -->
-                <form action="{{ route('admin.companies.store') }}" method="POST" enctype="multipart/form-data"
+                <form action="{{ route('dosen.companies.store') }}" method="POST" enctype="multipart/form-data"
                     class="px-6 py-6 space-y-4">
                     @csrf
 
@@ -501,7 +501,7 @@
                 </div>
 
                 <!-- Form -->
-                <form action="{{ route('admin.companies.store-vacancy') }}" method="POST" class="px-6 py-6 space-y-4">
+                <form action="{{ route('dosen.companies.store-vacancy') }}" method="POST" class="px-6 py-6 space-y-4">
                     @csrf
 
                     <div>

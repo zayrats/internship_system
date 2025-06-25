@@ -19,8 +19,15 @@ class Controller
     {
         $user = Auth::user();
 
-        if ($user && in_array($user->role, ['Perusahaan', 'Admin'])) {
-            return redirect()->back();
+        if ($user && in_array($user->role, ['Dosen'])) {
+            return view('dosen.dashboard');
+        }
+
+        if ($user && in_array($user->role, ['Pustakawan'])) {
+            return view('pustakawan');
+        }
+        if ($user && in_array($user->role, ['Admin'])) {
+            return view('admin.admindashboard');
         }
 
         // Ambil semua perusahaan yang punya koordinat
