@@ -277,9 +277,11 @@
                         <p class="font-semibold text-gray-900 dark:text-white">Tanggal Selesai:</p>
                         <p id="modalEndDate" class="text-gray-900 dark:text-white"></p>
 
-                        @if ($item->status === 'Terminated')
-                            <p class="text-red-600 font-bold">Status: Diberhentikan</p>
-                            <p><strong>Alasan:</strong> {{ $item->terminated_reason }}</p>
+                        @if (isset($item->status))
+                            @if ($item->status === 'Terminated')
+                                <p class="text-red-600 font-bold">Status: Diberhentikan</p>
+                                <p><strong>Alasan:</strong> {{ $item->terminated_reason }}</p>
+                            @endif
                         @endif
 
                     </div>
