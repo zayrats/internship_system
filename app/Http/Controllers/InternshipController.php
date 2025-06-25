@@ -577,7 +577,7 @@ class InternshipController
 
 
             if (isset($request->internship_id)) {
-                dd($request->internship_id);
+                // dd($request->internship_id);
                 DB::table('internships')
                     ->where('internship_id', $request->internship_id)
                     ->update([
