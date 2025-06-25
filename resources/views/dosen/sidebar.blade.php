@@ -79,22 +79,11 @@
             </nav>
         </aside>
 
-        <main class="flex-1 p-6">
+        <main class=" bg-gray-500 p-6 flex-1 overflow-y-auto">
             @yield('content')
         </main>
 
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const toggleButton = document.getElementById("toggleSidebar");
-            const sidebar = document.getElementById("sidebar");
-
-            toggleButton.addEventListener("click", function() {
-                sidebar.classList.toggle("-translate-x-full");
-            });
-        });
-    </script>
     <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 ml-64">
         <div class="max-w-screen-xl mx-auto p-4 md:py-8">
             <div class="sm:flex sm:items-center sm:justify-between">
@@ -126,6 +115,17 @@
             </span>
         </div>
     </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleButton = document.getElementById("toggleSidebar");
+            const sidebar = document.getElementById("sidebar");
+
+            toggleButton.addEventListener("click", function() {
+                sidebar.classList.toggle("-translate-x-full");
+            });
+        });
+    </script>
+
 </body>
 
 </html>
