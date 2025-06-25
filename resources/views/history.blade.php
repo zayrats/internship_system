@@ -186,7 +186,7 @@
                                     '{{ $item->vacancy_id ?? '' }}',
                                     '{{ $item->draft_kp_book ?? '' }}',
                                     )">
-                                    {{-- @dump($item->vacancy_id) --}}
+                                            {{-- @dump($item->vacancy_id) --}}
                                             Feedback Perusahaan
                                         </button>
                                     @endif
@@ -209,19 +209,21 @@
                     @endforelse
                 </tbody>
             </table>
-            @if ($item->status === 'Finished')
-                <div class="mt-6 bg-white dark:bg-gray-800 p-4 rounded shadow">
-                    <h3 class="text-lg font-semibold mb-2 text-blue-600">Jadwal Sidang KP</h3>
+            @if (isset($item))
+                @if ($item->status === 'Finished')
+                    <div class="mt-6 bg-white dark:bg-gray-800 p-4 rounded shadow">
+                        <h3 class="text-lg font-semibold mb-2 text-blue-600">Jadwal Sidang KP</h3>
 
-                    @if ($item->tanggal_sidang)
-                        <p class="text-gray-800 dark:text-gray-200">
-                            Tanggal Sidang:
-                            <strong>{{ \Carbon\Carbon::parse($item->tanggal_sidang)->translatedFormat('l, d F Y') }}</strong>
-                        </p>
-                    @else
-                        <p class="text-red-600 dark:text-red-400">Jadwal sidang belum ditentukan.</p>
-                    @endif
-                </div>
+                        @if ($item->tanggal_sidang)
+                            <p class="text-gray-800 dark:text-gray-200">
+                                Tanggal Sidang:
+                                <strong>{{ \Carbon\Carbon::parse($item->tanggal_sidang)->translatedFormat('l, d F Y') }}</strong>
+                            </p>
+                        @else
+                            <p class="text-red-600 dark:text-red-400">Jadwal sidang belum ditentukan.</p>
+                        @endif
+                    </div>
+                @endif
             @endif
 
             <!-- Modal Detail -->
@@ -563,7 +565,8 @@
                                         <div class="mb-4">
                                             <label class="block font-semibold text-gray-900 dark:text-white mb-1">Tanggal
                                                 Pengajuan</label>
-                                            <input readonly type="date" name="application_date" id="editApplicationDate"
+                                            <input readonly type="date" name="application_date"
+                                                id="editApplicationDate"
                                                 class="w-full border border-gray-300 rounded-lg p-2 dark:bg-gray-700 dark:text-white">
                                         </div>
                                     @else
