@@ -464,7 +464,7 @@ class InternshipController
                 // Proses watermark PDF
                 $pdf = new Fpdi();
                 $pageCount = $pdf->setSourceFile($absolutePath);
-                $logoPath = storage_path('app\public\watermark_PENS.png'); // Pastikan file PNG ada di sini
+                $logoPath = storage_path('app/public/watermark_PENS.png'); // Pastikan file PNG ada di sini
                 $logoWidth = 50; // Sesuaikan lebar logo (dalam mm)
                 for ($i = 1; $i <= $pageCount; $i++) {
                     $tplId = $pdf->importPage($i);
@@ -508,8 +508,10 @@ class InternshipController
                 $absolutePath = Storage::path($filePath);
 
                 // Proses watermark PDF
-                $pdf = new \setasign\Fpdi\Fpdi();
+                $pdf = new Fpdi();
                 $pageCount = $pdf->setSourceFile($absolutePath);
+                $logoPath = storage_path('app/public/watermark_PENS.png'); // Pastikan file PNG ada di sini
+                $logoWidth = 50; // Sesuaikan lebar logo (dalam mm)
 
                 for ($i = 1; $i <= $pageCount; $i++) {
                     $tplId = $pdf->importPage($i);
@@ -518,11 +520,12 @@ class InternshipController
                     $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
                     $pdf->useTemplate($tplId);
 
-                    // Tambahkan watermark
-                    $pdf->SetFont('Helvetica', 'I', 24);
-                    $pdf->SetTextColor(255, 0, 0);
-                    $pdf->SetXY($size['width'] / 2 - 50, $size['height'] / 2);
-                    $pdf->Cell($size['width'], 10, '© 2025 - PENS', 0, 0, 'C');
+                    // Hitung posisi agar logo di tengah halaman
+                    $x = ($size['width'] - $logoWidth) / 2;
+                    $y = $size['height'] / 2 - 10; // Bisa diatur agar tidak terlalu ke atas/bawah
+
+                    // Tambahkan logo sebagai watermark
+                    $pdf->Image($logoPath, $x, $y, $logoWidth);
                 }
 
                 // Simpan file dengan watermark
@@ -627,9 +630,7 @@ class InternshipController
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan feedback dan buku KP: ' . $e->getMessage());
         }
     }
 
