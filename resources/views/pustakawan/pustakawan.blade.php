@@ -17,7 +17,7 @@
             </thead>
             <tbody>
                 @foreach ($data as $item)
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b hover:bg-gray-50 text-blue-500">
                         <td class="px-6 py-4">{{ $item->student_name }}</td>
                         <td class="px-6 py-4">{{ $item->company_name }}</td>
                         <td class="px-6 py-4">{{ $item->position }}</td>
