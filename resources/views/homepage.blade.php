@@ -30,7 +30,7 @@
             </div>
 
             {{-- timeline KP --}}
-            @if (isset($user))
+            @if (isset($user->role), 'Mahasiswa')
                 <ol class="items-center sm:flex">
                     <li class="relative mb-6 sm:mb-0">
                         <div class="flex items-center">
