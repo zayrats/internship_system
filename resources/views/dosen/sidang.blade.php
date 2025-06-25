@@ -32,7 +32,7 @@
     @if($internships->count() === 0)
         <p class="text-red-600">Tidak ada mahasiswa yang ditemukan.</p>
     @else
-        <div class="overflow-x-auto bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <div class="overflow-x-auto bg-white dark:bg-gray-800 p-4 rounded shadow oferflow-y-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200">

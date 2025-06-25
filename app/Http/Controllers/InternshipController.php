@@ -179,12 +179,17 @@ class InternshipController
             'partner_nrp' => 'nullable|string|exists:students,student_number',
         ]);
 
+        // $vacancy = Vacancy::findOrFail($request->vacancy_id);
+        // // Hitung semester & periode dari start_date
+        // $startDate = Carbon::parse($vacancy->start_date);
+        // $periode = $this->generatePeriode($startDate);
+        // $semester = $this->generateSemester($startDate);
         $vacancy = Vacancy::findOrFail($request->vacancy_id);
-        // Hitung semester & periode dari start_date
         $startDate = Carbon::parse($vacancy->start_date);
+        // dd($startDate);
         $periode = $this->generatePeriode($startDate);
-        $semester = $this->generateSemester($startDate);
 
+        $semester = $this->generateSemester($startDate);
 
         // 1. Cek apakah sudah pernah apply ke lowongan yang sama
         $existingSameVacancy = DB::table('applications')
@@ -539,9 +544,6 @@ class InternshipController
             $startDate = Carbon::parse($vacancy->start_date);
             // dd($startDate);
             // $periode = $this->generatePeriode($startDate);
-
-            // $cok = getType($periode);
-
 
             // $semester = $this->generateSemester($startDate);
             // dd($request->all());
