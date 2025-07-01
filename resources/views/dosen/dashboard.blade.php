@@ -47,7 +47,7 @@
             <div style="background-color: #1447e6" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-blue-500 text-3xl">👨‍🎓</div>
                 <div>
-                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Total Mahasiswa</h2>
+                    <h2 class="text-sm font-medium text-gray-600 dark:text-white">Total Mahasiswa</h2>
                     <p class="text-2xl font-bold text-blue-700 dark:text-white">{{ $totalMahasiswa }}</p>
                 </div>
             </div>
@@ -56,16 +56,16 @@
             <div style="background-color: #00a63e" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-green-500 text-3xl">✅</div>
                 <div>
-                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Selesai KP</h2>
+                    <h2 class="text-sm font-medium text-gray-600 dark:text-white">Selesai KP</h2>
                     <p class="text-2xl font-bold text-green-700 dark:text-white">{{ $sudahKP }}</p>
                 </div>
             </div>
 
             {{-- Sedang KP --}}
-            <div style="background-color: #d08700" class=" p-5 rounded-xl shadow flex items-center space-x-4">
+            <div style="background-color: #efb100" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-yellow-500 text-3xl">⏳</div>
                 <div>
-                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Sedang KP</h2>
+                    <h2 class="text-sm font-medium text-gray-600 dark:text-white">Sedang KP</h2>
                     <p class="text-2xl font-bold text-yellow-700 dark:text-white">{{ $sedangKP }}</p>
                 </div>
             </div>
@@ -74,7 +74,7 @@
             <div style="background-color: #e7000b" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-red-500 text-3xl">❌</div>
                 <div>
-                    <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Belum KP</h2>
+                    <h2 class="text-sm font-medium text-gray-600 dark:text-white">Belum KP</h2>
                     <p class="text-2xl font-bold text-red-700 dark:text-white">{{ $belumKP }}</p>
                 </div>
             </div>
