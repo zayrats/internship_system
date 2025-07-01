@@ -26,7 +26,7 @@
     <div class="flex h-full min-h-screen">
         <!-- Sidebar -->
         <aside id="sidebar"
-            class="w-64 bg-white dark:bg-gray-800 shadow-md fixed inset-y-0 left-0 transform md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+            class="w-80 bg-white dark:bg-gray-800 shadow-md inset-y-0 left-0 transform md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
             <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700 text-white">
                 <img src="https://kompaspedia.kompas.id/wp-content/uploads/2020/07/logo_Politeknik-Elektronika-Negeri-Surabaya-thumb.png"
                     alt="Logo" class="h-10 mr-2">
