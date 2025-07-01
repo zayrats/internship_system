@@ -44,7 +44,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {{-- Total Mahasiswa --}}
-            <div class="bg-blue-50 dark:bg-blue-900 p-5 rounded-xl shadow flex items-center space-x-4">
+            <div class="bg-blue-400 dark:bg-blue-900 p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-blue-500 text-3xl">👨‍🎓</div>
                 <div>
                     <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Total Mahasiswa</h2>
