@@ -51,7 +51,7 @@
                 </a>
                 <a href="{{ route('dosen.companies') }}"
                     class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition text-white">
-                    <svg  style="background-color: #efb100" class="w-5 h-5 mr-3 " fill="none" stroke="currentColor" stroke-width="2"
+                    <svg  style="color: #efb100" class="w-5 h-5 mr-3 " fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -59,7 +59,7 @@
                 </a>
                 <a href="{{ route('sidang.index') }}"
                     class="flex items-center p-2 rounded hover:bg-blue-100 dark:hover:bg-gray-700 transition text-white">
-                    <svg class="w-5 h-5 mr-3 text-purple-600" fill="none" stroke="currentColor" stroke-width="2"
+                    <svg style="color: #ad46ff" class="w-5 h-5 mr-3 " fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path d="M8 7V3M16 7V3M4 11h16M5 20h14a2 2 0 002-2V7H3v11a2 2 0 002 2z"></path>
                     </svg>
