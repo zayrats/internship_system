@@ -118,9 +118,3 @@ class Controller
         return view('studentdashboard');
     }
 }
-
-//login
-
-
-
-//Student section

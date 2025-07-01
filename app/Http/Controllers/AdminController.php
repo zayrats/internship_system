@@ -130,7 +130,7 @@ class AdminController
             $searchTerm = "%{$request->search}%";
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('students.name', 'like', $searchTerm)
-                    ->orWhere('students.nrp', 'like', $searchTerm);
+                    ->orWhere('students.student_number', 'like', $searchTerm);
             });
         }
 
@@ -194,7 +194,7 @@ class AdminController
         $query = DB::table('internships')
             ->join('students', 'internships.student_id', '=', 'students.id')
             ->join('companies', 'internships.company_id', '=', 'companies.id')
-            ->select('internships.*', 'students.name as student', 'students.nrp', 'companies.name as company');
+            ->select('internships.*', 'students.name as student', 'students.student_number', 'companies.name as company');
 
         // Filter berdasarkan perusahaan
         if (request()->has('company_id') && $request->company_id != '') {
@@ -222,7 +222,7 @@ class AdminController
         $internships = DB::table('internships')
             ->join('students', 'internships.student_id', '=', 'students.id')
             ->join('companies', 'internships.company_id', '=', 'companies.id')
-            ->select('students.name as Nama', 'students.nrp as NRP', 'companies.name as Perusahaan', 'internships.start_date as Mulai', 'internships.end_date as Selesai', 'internships.status as Status')
+            ->select('students.name as Nama', 'students.student_number as NRP', 'companies.name as Perusahaan', 'internships.start_date as Mulai', 'internships.end_date as Selesai', 'internships.status as Status')
             ->get();
 
         return Excel::download(new InternshipsExport($internships), 'rekap_magang.xlsx');

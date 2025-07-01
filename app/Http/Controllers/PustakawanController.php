@@ -81,6 +81,8 @@ class PustakawanController extends Controller
                 'internships.student_id',
                 'students.name as student_name',
                 'students.department as student_department',
+                'students.student_number as student_number',
+                'students.prodi as prodi',
                 'students.year as student_year',
                 'internships.position',
                 DB::raw('TIMESTAMPDIFF(MONTH, internships.start_date, internships.end_date) as duration')
@@ -113,6 +115,8 @@ class PustakawanController extends Controller
                 'companies.logo as company_logo',
                 'internships.student_id',
                 'students.name as student_name',
+                'students.student_number as student_number',
+                'students.prodi as prodi',
                 'students.department as student_department',
                 'students.year as student_year',
                 'internships.position',

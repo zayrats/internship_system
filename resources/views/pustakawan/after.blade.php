@@ -7,6 +7,9 @@
             <thead class="bg-gray-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">NRP</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prodi</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departemen</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Perusahaan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Divisi</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durasi (bulan)</th>
@@ -17,6 +20,9 @@
                 @foreach ($data as $item)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="px-6 py-4">{{ $item->student_name }}</td>
+                        <td class="px-6 py-4">{{ $item->student_number }}</td>
+                        <td class="px-6 py-4">{{ $item->prodi }}</td>
+                        <td class="px-6 py-4">{{ $item->department }}</td>
                         <td class="px-6 py-4">{{ $item->company_name }}</td>
                         <td class="px-6 py-4">{{ $item->position }}</td>
                         <td class="px-6 py-4">{{ $item->duration }}</td>
@@ -44,6 +50,18 @@
                     <div class="mb-3">
                         <label class="block font-medium text-sm">Nama Mahasiswa</label>
                         <p id="studentName" class="text-gray-700"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="studentNumber" class="block text-sm font-medium">NRP</label>
+                        <p id="studentNumber" class="text-gray-700"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prodi" class="block text-sm font-medium">Prodi</label>
+                        <p id="prodi" class="text-gray-700"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="block text-sm font-medium">Departemen</label>
+                        <p id="department" class="text-gray-700"></p>
                     </div>
                     <div class="mb-3">
                         <label class="block font-medium text-sm">Perusahaan</label>
@@ -120,6 +138,9 @@
             const internship = data.find(d => d.id == id);
             document.getElementById('internshipId').value = internship.id;
             document.getElementById('studentName').innerText = internship.student_name;
+            document.getElementById('studentNumber').innerText = internship.student_number;
+            document.getElementById('prodi').innerText = internship.prodi;
+            document.getElementById('department').innerText = internship.department;
             document.getElementById('companyName').innerText = internship.company_name;
             document.getElementById('position').innerText = internship.position;
             document.getElementById('duration').innerText = internship.duration + ' bulan';

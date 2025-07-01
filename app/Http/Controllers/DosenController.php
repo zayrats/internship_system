@@ -154,7 +154,7 @@ class DosenController
             $searchTerm = "%{$request->search}%";
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('students.name', 'like', $searchTerm)
-                    ->orWhere('students.nrp', 'like', $searchTerm);
+                    ->orWhere('students.student_number', 'like', $searchTerm);
             });
         }
 

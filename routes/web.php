@@ -45,8 +45,7 @@ Route::middleware(['web'])->group(function () {
         Route::post('/profile/update', [InternshipController::class, 'updateProfile'])->name('profile.update');
         // Route::post('/profile/submit-feedback', [InternshipController::class, 'submitInternshipFeedback'])->name('profile.submitInternshipFeedback');
         Route::get('/our-story', [InternshipController::class, 'internexperience'])->name('internexperience');
-
-
+        
         //chat
 
         // Route::post('/chat/send', [ChatController::class, 'store']); // Kirim chat baru
@@ -104,18 +103,11 @@ Route::middleware(['web'])->group(function () {
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
         Route::put('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
-
-
-
         Route::get('/admin/internships', [AdminController::class, 'rekapInternships'])->name('admin.internships');
         Route::get('/admin/internships/export', [AdminController::class, 'exportInternships'])->name('admin.internships.export');
         // Route::get('/admin/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
-
-
         // Route::get('/admin/internship/{id}', [Controller::class, 'lecturerinternshipdetail'])->name('lecturerinternshipdetail');
         // Route::get('admin/internship/{id}/document', [Controller::class, 'lecturerinternshipdocument'])->name('lecturerinternshipdocument');
-
-
         // Route::get('/admin/jobs', [AdminController::class, 'manageJobs'])->name('admin.jobs');
         // Route::put('/admin/jobs/{id}', [AdminController::class, 'updateJob'])->name('admin.jobs.update');
         // Route::delete('/admin/jobs/{id}', [AdminController::class, 'deleteJob'])->name('admin.jobs.delete');
