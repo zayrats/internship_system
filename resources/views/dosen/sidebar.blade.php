@@ -30,7 +30,7 @@
             <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700 text-white">
                 <img src="https://kompaspedia.kompas.id/wp-content/uploads/2020/07/logo_Politeknik-Elektronika-Negeri-Surabaya-thumb.png"
                     alt="Logo" class="h-10 mr-2">
-                <span class="p-2 text-lg font-bold">Dosen Koordinator KP</span>
+                <span class="p-2 text-md font-bold">Dosen Koordinator KP</span>
             </div>
             <nav class="p-4 space-y-2">
                 <a href="{{ route('dosen.dashboard') }}"
