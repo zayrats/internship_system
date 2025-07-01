@@ -44,7 +44,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {{-- Total Mahasiswa --}}
-            <div style="background-color: #51a2ff" class=" p-5 rounded-xl shadow flex items-center space-x-4">
+            <div style="background-color: #8ec5ff" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-blue-500 text-3xl">👨‍🎓</div>
                 <div>
                     <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Total Mahasiswa</h2>
@@ -53,7 +53,7 @@
             </div>
 
             {{-- Sudah KP --}}
-            <div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl shadow flex items-center space-x-4">
+            <div style="background-color: #7bf1a8" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-green-500 text-3xl">✅</div>
                 <div>
                     <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Selesai KP</h2>
@@ -62,7 +62,7 @@
             </div>
 
             {{-- Sedang KP --}}
-            <div class="bg-yellow-50 dark:bg-yellow-900 p-5 rounded-xl shadow flex items-center space-x-4">
+            <div style="background-color: #ffdf20" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-yellow-500 text-3xl">⏳</div>
                 <div>
                     <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Sedang KP</h2>
@@ -71,7 +71,7 @@
             </div>
 
             {{-- Belum KP --}}
-            <div class="bg-red-50 dark:bg-red-900 p-5 rounded-xl shadow flex items-center space-x-4">
+            <div style="background-color: #ff6467" class=" p-5 rounded-xl shadow flex items-center space-x-4">
                 <div class="text-red-500 text-3xl">❌</div>
                 <div>
                     <h2 class="text-sm font-medium text-gray-600 dark:text-gray-300">Belum KP</h2>
